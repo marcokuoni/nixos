@@ -18,7 +18,10 @@
       fsType = "ext4";
     };
 
-  boot.initrd.luks.devices."cryptoroot".device = "/dev/disk/by-uuid/5355695b-736e-4862-9137-61b423f6ab1d";
+  boot.initrd.luks.devices."cryptoroot" = {
+    device = "/dev/disk/by-uuid/5355695b-736e-4862-9137-61b423f6ab1d";
+    fido2.passwordLess = true;
+  };
 
   fileSystems."/boot" =
     { device = "/dev/disk/by-uuid/BD01-DF72";
@@ -35,6 +38,6 @@
   networking.useDHCP = lib.mkDefault true;
   # networking.interfaces.wlp0s20f3.useDHCP = lib.mkDefault true;
 
-  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+#  nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 }
