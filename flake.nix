@@ -21,7 +21,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.users.progressio = ./home.nix;
+              home-manager.users.progressio = import ./home/progressio.nix;
             }
           ];
         };
