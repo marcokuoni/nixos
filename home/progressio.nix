@@ -3,33 +3,47 @@
 {
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
-  home.keyboard.layout = "de(nodeadkeys)";
 
   programs.zsh.enable = true;
-  home.packages = [
+  programs.waybar.enable = true;
+
+  home.packages = with pkgs; [
     #IDE
-    pkgs.neovim
-    pkgs.git
+    neovim
+    git
 
-    pkgs.htop
+    htop
 
-    pkgs.foot
+    #sway
+    alacritty
+    rofi-wayland
+    swaybg
+    grim
+    slurp
+    wl-clipboard
+    waybar
   ];
   
   wayland.windowManager.sway = {
     enable = true;
     wrapperFeatures.gtk = true; # Fixes common issues with GTK 3 apps
     config = rec {
-      terminal = "foot"; 
-      startup = [
-        # Launch Firefox on start
-        {command = "firefox";}
-      ];
+      terminal = "alacritty"; 
+      input = {
+        "*" = {
+	  xkb_layout = "de(nodeadkeys)";
+	};
+      };
     };
   };
 
   services.gnome-keyring.enable = true;
-  # Optional: Apply changes automatically
+
+  home.sessionVariables = {
+    MOZ_ENABLE_WAYLAND = "1";
+    XDG_SESSION_TYPE = "wayland";
+  };
+ 
   home.stateVersion = "24.05";
 }
 
