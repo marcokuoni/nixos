@@ -127,24 +127,9 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
   ];
-
-  fonts.packages = with pkgs; [
-    nerd-fonts.ubuntu
-  ];
-
-  # Enable the gnome-keyring secrets vault. 
-  # Will be exposed through DBus to programs willing to store secrets.
-  services.gnome.gnome-keyring.enable = true;
   
   # We need this to enable homemanager with sway
   security.polkit.enable = true;
-
-  programs = {
-    sway = {
-      enable = true;
-      wrapperFeatures.gtk = true;
-    };
-  };
 
   system.stateVersion = "24.11"; # Did you read the comment?
 

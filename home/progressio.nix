@@ -3,6 +3,7 @@
 {
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
+  home.keyboard.layout = "de(nodeadkeys)";
 
   programs.zsh.enable = true;
   home.packages = [
@@ -12,13 +13,22 @@
 
     pkgs.htop
 
-    #Sway
-    grim # screenshot functionality
-    slurp # screenshot functionality
-    wl-clipboard # wl-copy and wl-paste for copy/paste from stdin / stdout
-    mako # notification system developed by swaywm maintaine	
+    pkgs.foot
   ];
+  
+  wayland.windowManager.sway = {
+    enable = true;
+    wrapperFeatures.gtk = true; # Fixes common issues with GTK 3 apps
+    config = rec {
+      terminal = "foot"; 
+      startup = [
+        # Launch Firefox on start
+        {command = "firefox";}
+      ];
+    };
+  };
 
+  services.gnome-keyring.enable = true;
   # Optional: Apply changes automatically
   home.stateVersion = "24.05";
 }
