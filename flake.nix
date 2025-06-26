@@ -1,10 +1,12 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOs/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
-    { self, nixpkgs, ... }@inputs:
+    { self, nixpkgs, home-manager, ... }@inputs:
     {
       nixosConfigurations = {
         laptop = nixpkgs.lib.nixosSystem {
@@ -15,6 +17,12 @@
           modules = [
             ./hardware/laptop.nix
             ./laptop.nix
+	    home-manager.nixosModules.home-manager
+            {
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users.progressio = ./home.nix;
+            }
           ];
         };
       };
