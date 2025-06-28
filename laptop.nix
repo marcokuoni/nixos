@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ pkgs, lib, ... }:
+{ inputs, pkgs, lib, ... }:
 
 {
   # Bootloader.
@@ -34,6 +34,8 @@
       ];
       auto-optimise-store = true;
       min-free = "50G";
+      substituters = ["https://hyprland.cachix.org"];
+      trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
     };
   };
 
@@ -43,21 +45,17 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # Enable the X11 windowing system.
-  services.xserver.enable = true;
+  # Load nvidia driver for Xorg and Wayland
+  services.xserver.videoDrivers = ["nvidia"];
 
-  # Enable the GNOME Desktop Environment.
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
-
-  # Configure keymap in X11
-  services.xserver.xkb = {
-    layout = "ch";
-    variant = "de_nodeadkeys";
-  };
+  services.xserver.enable = false;
+  # services.xserver.xkb = {
+  #   layout = "ch";
+  #   variant = "de_nodeadkeys";
+  # };
 
   # Configure console keymap
-  console.keyMap = "sg";
+  # console.keyMap = "sg";
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -81,13 +79,13 @@
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.progressio = {
+            # Basic user example
+  users.users.progressio= {
     isNormalUser = true;
-    description = "Progressio";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "wheel" "video" "audio" "networkmanager" ];
   };
 
+  # Define a user account. Don't forget to set a password with ‘passwd’.
   security.pam.services = {
     login = {
       u2fAuth = true;
@@ -126,8 +124,26 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    #nvidia
+    egl-wayland
   ];
   
+  programs.hyprland = {
+    enable = true;
+    # set the flake package
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    # make sure to also set the portal package, so that they are in sync
+    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+  };
+  
+  #for screensharing
+  xdg.portal = {
+    enable = true;
+    # extraPortals = with pkgs; [ xdg-desktop-portal-hyprland ];
+  };
+
+  security.pam.services.regreet.enableGnomeKeyring = true;
+
   # We need this to enable homemanager with sway
   security.polkit.enable = true;
 

@@ -4,44 +4,46 @@
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
 
-  programs.zsh.enable = true;
-  programs.waybar.enable = true;
+  wayland.windowManager.hyprland.settings = {
+    "$mod" = "SUPER";
+    bind =
+      [
+        "$mod, F, exec, firefox"
+        ", Print, exec, grimblast copy area"
+	"$mod, Return, exec, kitty"
+      ]
+      ++ (
+        # workspaces
+        # binds $mod + [shift +] {1..9} to [move to] workspace {1..9}
+        builtins.concatLists (builtins.genList (i:
+            let ws = i + 1;
+            in [
+              "$mod, code:1${toString i}, workspace, ${toString ws}"
+              "$mod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
+            ]
+          )
+          9)
+      );
+    env = [
+      "LIBVA_DRIVER_NAME,nvidia"
+      "__GLX_VENDOR_LIBRARY_NAME,nvidia"
+    ];
+    input = {
+        kb_layout = "ch";
+    };
+  };
 
   home.packages = with pkgs; [
     #IDE
     neovim
     git
-
-    htop
-
-    #sway
-    alacritty
-    rofi-wayland
-    swaybg
-    grim
-    slurp
-    wl-clipboard
-    waybar
+    kitty
   ];
-  
-  wayland.windowManager.sway = {
-    enable = true;
-    wrapperFeatures.gtk = true; # Fixes common issues with GTK 3 apps
-    config = rec {
-      terminal = "alacritty"; 
-      input = {
-        "*" = {
-	  xkb_layout = "de(nodeadkeys)";
-	};
-      };
-    };
-  };
-
-  services.gnome-keyring.enable = true;
 
   home.sessionVariables = {
     MOZ_ENABLE_WAYLAND = "1";
     XDG_SESSION_TYPE = "wayland";
+    NIXOS_OZONE_WL="1";
   };
  
   home.stateVersion = "24.05";
