@@ -55,7 +55,7 @@
   };
 
   # Configure console keymap
-  # console.keyMap = "sg";
+  console.keyMap = "de_CH-latin1";
 
   # Enable CUPS to print documents.
   services.printing.enable = true;
@@ -85,21 +85,28 @@
     extraGroups = [ "wheel" "video" "audio" "networkmanager" ];
   };
 
+  fonts.packages = with pkgs; [
+    nerd-fonts.ubuntu
+  ];
+
   # Define a user account. Don't forget to set a password with ‘passwd’.
   security.pam.services = {
     login = {
       u2fAuth = true;
-      rules.auth.u2f.args = lib.mkAfter [
-        "pinverification=1"
-      ];
+      rules.auth.u2f = {
+        args = lib.mkAfter [
+          "pinverification=1"
+        ];
+      };
     };
     sudo = {
+      # unixAuth = false;
       u2fAuth = true;
       rules.auth.u2f.args = lib.mkAfter [
         "pinverification=1"
       ];
     };
-    swaylock = {
+    hyprlock = {
       u2fAuth = true;
       rules.auth.u2f.args = lib.mkAfter [
         "pinverification=1"
@@ -107,12 +114,15 @@
     };
   };
 
-  security.pam.u2f.settings = {
-    authfile = pkgs.writeText "u2f-mappings" (lib.concatStrings [
-      "progressio"
-      ":EiIM/QYe93WmeZzozdS/mlSSAyr6WSP6AjdnSpkU9YOFgVH7xtz7IVjlT4RTD5m4tLchwfm5IGJc2ET52UDtAFaZuY+Idtm3Ma9eoxX9Jtohz1TTeCzT9whwrpX6usRd,h/Jdj53wbia4JC4oHpQgC0EZ5KniR9ImFM4/A1dCHy3AC0E6UPJ54OpJRugw9FHVbbffF9wUCaGV+zeYYMX9kA==,es256,+presence"
-      ":FgniLy8rpTkmdKfBWWayvXSxNlWYGIdcwDSSGJtb729FaMop0QXhdC5mKzhA/Bmvc+0rOCrcz3LdJmQfOfjKOGMhsbs/bwMd9TFg99PTBA0jLt44GgnY1B7sQ24qi+xf,V3O/CtCBu3qnniXRUhUmfIGCBTe9fgTouaRyYHMz/nXWjZPMU6vghGqpv0uhiwj1T07s8MZD3//tsg4kjXyw5A==,es256,+presence"
-    ]);
+  security.pam.u2f = {
+    enable = true;
+    settings = {
+      authfile = pkgs.writeText "u2f-mappings" (lib.concatStrings [
+        "progressio"
+        ":5a3ZpJl8dZkJZ1Fhy0YQ44NBUm0yvwTmb99u0uh93y7ovfsN3ooAYIuVqhWQO0BSjadSzlex/tH9xd9PDFlF7enR7VCsutYlLcYR0HhRm3Fo9Bz1IaB9LSjOFC7tPm/6,131W8LOSNyjno2PNMP577L7+VjLknSuPHvZqYzyygecd8ZyOgOEOJoCHKWLS/hcrX+sQ0iGyhx5y7qEK+lY2xA==,es256,+presence"
+        ":yk49+p8WGHWbmNL03ov/oBdv1HHkn1Q178StpRbyVr3oHzsPiguPoYGHwcnRNmRVgvCG9uoQ43whcFzATUg6FW8k5kMjINccq/+Ifd/ZoJhi1wIOIF+PY16Kxa7TRn7e,+2FYscYOkQexTeCS48kjR7sjg6HbLYM35ILMw3LhExypeM/DLSqe0bWs7rbklyY+oudXI/oJtxjLRDz2aOFrAQ==,es256,+presence"
+      ]);
+    };
   };
 
   # Install firefox.
@@ -132,6 +142,44 @@
 
   # We need this to enable homemanager with sway
   security.polkit.enable = true;
+
+  # https://nixos.wiki/wiki/Greetd
+  # tweaked for Hyprland
+  # ...
+  # launches swaylock with exec-once in home/hyprland/hyprland.conf
+  # ...
+  # single user and single window manager
+  # my goal here is auto-login with authentication
+  # so I can declare my user and environment (Hyprland) in this config
+  # my goal is NOT to allow user selection or environment selection at the the login screen
+  # (which a login manager provides beyond just the authentication check)
+  # so I don't need a login manager
+  # I just launch Hyprland as iancleary automatically, which starts swaylock (to authenticate)
+  # I thought I needed a greeter, but I really don't
+  # ...
+  services.greetd = {
+    enable = true;
+    settings = rec {
+      initial_session = {
+        command = "${pkgs.hyprland}/bin/Hyprland";
+        user = "progressio";
+      };
+      default_session = initial_session;
+    };
+  };
+
+  xdg.portal = {
+    enable = true;
+    xdgOpenUsePortal = true;
+    config = {
+      common.default = ["gtk"];
+      hyprland.default = ["gtk" "hyprland"];
+    };
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      pkgs.xdg-desktop-portal-hyprland
+    ];
+  };
 
   system.stateVersion = "24.11"; # Did you read the comment?
 
