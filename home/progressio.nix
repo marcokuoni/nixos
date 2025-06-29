@@ -4,13 +4,16 @@
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
 
+  programs.alacritty.enable = true;
+  wayland.windowManager.hyprland.enable = true;
+  wayland.windowManager.hyprland.systemd.variables = ["--all"];
   wayland.windowManager.hyprland.settings = {
     "$mod" = "SUPER";
     bind =
       [
         "$mod, F, exec, firefox"
         ", Print, exec, grimblast copy area"
-	"$mod, Return, exec, kitty"
+	"$mod, Return, exec, alacritty"
       ]
       ++ (
         # workspaces
@@ -29,7 +32,8 @@
       "__GLX_VENDOR_LIBRARY_NAME,nvidia"
     ];
     input = {
-        kb_layout = "ch";
+      kb_layout = "ch";
+      kb_variant = "de_nodeadkeys";
     };
   };
 
@@ -37,7 +41,6 @@
     #IDE
     neovim
     git
-    kitty
   ];
 
   home.sessionVariables = {

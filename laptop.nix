@@ -49,10 +49,10 @@
   services.xserver.videoDrivers = ["nvidia"];
 
   services.xserver.enable = false;
-  # services.xserver.xkb = {
-  #   layout = "ch";
-  #   variant = "de_nodeadkeys";
-  # };
+  services.xserver.xkb = {
+    layout = "ch";
+    variant = "de_nodeadkeys";
+  };
 
   # Configure console keymap
   # console.keyMap = "sg";
@@ -128,20 +128,6 @@
     egl-wayland
   ];
   
-  programs.hyprland = {
-    enable = true;
-    # set the flake package
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    # make sure to also set the portal package, so that they are in sync
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-  };
-  
-  #for screensharing
-  xdg.portal = {
-    enable = true;
-    # extraPortals = with pkgs; [ xdg-desktop-portal-hyprland ];
-  };
-
   security.pam.services.regreet.enableGnomeKeyring = true;
 
   # We need this to enable homemanager with sway
