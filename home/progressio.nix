@@ -20,6 +20,10 @@ let
   };
 in
 {
+  imports = [
+    ./scripts/test.nix
+  ];
+
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
 
@@ -44,20 +48,24 @@ in
   };
 
   # https://github.com/JaKooLit/Hyprland-v4/blob/main/config/hypr/configs/Keybinds.conf
+  # https://github.com/JaKooLit/Hyprland-Dots/blob/main/config/hypr/configs/Keybinds.conf
   wayland.windowManager.hyprland = {
     enable = true;
     xwayland.enable = true;
     systemd.variables = ["--all"];
     settings = {
-      "$mod" = "ALT";
+      "$mod" = "SUPER";
+      # "$scriptsDir" = "$HOME/.config/hypr/scripts"
       bind =
         [
-          "$mod, B, exec, firefox"
+	  "CTRL ALT, Delete, exec, hyprctl dispatch exit 0" # Exit Hyprland
+	  "$mod, Q, killactive" # close active (not kill)
+	  # "$mod SHIFT, Q, exec, $scriptsDir/KillActiveProcess.sh" # Kill active process
+          "$mod, F, exec, firefox"
           ", Print, exec, grimblast copy area"
-	  "$mod, Return, exec, alacritty"
+	  "$mod, T, exec, alacritty"
 	  "$mod SHIFT, C, exec, hyprctl reload"
-	  "$mod, Q, killactive"
-	  "$mod, F, exec, rofi -show drun -show-icons"
+	  "$mod, D, exec, rofi -show drun -show-icons"
 	  "$mod, L, exec, hyprlock"
         ]
         ++ (
