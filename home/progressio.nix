@@ -21,7 +21,7 @@ let
 in
 {
   imports = [
-    ./scripts/test.nix
+    ./scripts/KillActiveProcess.nix
   ];
 
   home.username = "progressio";
@@ -55,12 +55,11 @@ in
     systemd.variables = ["--all"];
     settings = {
       "$mod" = "SUPER";
-      # "$scriptsDir" = "$HOME/.config/hypr/scripts"
       bind =
         [
 	  "CTRL ALT, Delete, exec, hyprctl dispatch exit 0" # Exit Hyprland
 	  "$mod, Q, killactive" # close active (not kill)
-	  # "$mod SHIFT, Q, exec, $scriptsDir/KillActiveProcess.sh" # Kill active process
+	  "$mod SHIFT, Q, exec, kill-active-process" # Kill active process
           "$mod, F, exec, firefox"
           ", Print, exec, grimblast copy area"
 	  "$mod, T, exec, alacritty"
