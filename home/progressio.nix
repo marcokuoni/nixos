@@ -22,7 +22,6 @@ in
 {
   imports = [
     ./scripts/KillActiveProcess.nix
-    ./scripts/RefreshWaybar.nix
   ];
 
   home.username = "progressio";
@@ -61,11 +60,11 @@ in
         mainBar = {
           layer = "top";
           position = "bottom";
-          modules-left = [ "custom/appmenu" "wlr/taskbar" ];
-          modules-center = [ "hyprland/workspaces" "hyprland/window" "clock" ];
-          modules-right = [ "idle_inhibitor" "pulseaudio" "network" "power-profiles-daemon" "cpu" "memory" "temperature" "backlight" "keyboard-state" "sway/language" "battery" "battery#bat2" "clock" "tray"];
-# not working, maybe https://github.com/Alexays/Waybar/issues/2215#issuecomment-2819770477
-          "keyboard-state" = {
+          modules-left = [ "hyprland/workspaces" "wlr/taskbar" ];
+          modules-center = [ "hyprland/window" ];
+          modules-right = [ "idle_inhibitor" "pulseaudio" "network" "cpu" "memory" "temperature" "backlight" "keyboard-state" "battery" "clock" ];
+          
+	  "keyboard-state" = {
             numlock = false;
             capslock = true;
             format = "{name} {icon}";
@@ -73,14 +72,8 @@ in
               locked = "";
               unlocked = "";
             };
+	    # Refresh is done via capslock keybinding
           };
-
-	  "custom/appmenu" = {
-            format = "Menu {icon}";
-            format-icon = "󰻀";
-            rotate = 0;
-            on-click = "rofi -show drun -show-icons";
-    	  };
 
 	  "wlr/taskbar" = {
             format = "{icon}";
@@ -110,6 +103,76 @@ in
             on-scroll-up = "hyprctl dispatch workspace e+1";
             on-scroll-down = "hyprctl dispatch workspace e-1";
           };
+
+	  idle_inhibitor = {
+            format = "{icon}";
+            format-icons = {
+              activated = "";
+              deactivated = "";
+            };
+          };
+
+	  clock = {
+            tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+            format-alt = "{:%d.%m.%Y}";
+          };
+
+	  cpu = {
+            format = "{usage}% ";
+            tooltip = false;
+          };
+
+	  memory = {
+            format = "{}% ";
+          };
+          temperature = {
+            critical-threshold = 80;
+            format = "{temperatureC}°C {icon}";
+            format-icons = ["" "" ""];
+          };
+          backlight = {
+            format = "{percent}% {icon}";
+            format-icons = ["" "" "" "" "" "" "" "" ""];
+          };
+          battery = {
+            states = {
+              warning = 30;
+              critical = 15;
+            };
+            format = "{capacity}% {icon}";
+            format-full = "{capacity}% {icon}";
+            format-charging = "{capacity}% ";
+            format-plugged = "{capacity}% ";
+            format-alt = "{time} {icon}";
+            format-icons = ["" "" "" "" ""];
+          };
+
+	  network = {
+            format-wifi = "{essid} ({signalStrength}%) ";
+            format-ethernet = "{ipaddr}/{cidr} ";
+            tooltip-format = "{ifname} via {gwaddr} ";
+            format-linked = "{ifname} (No IP) ";
+            format-disconnected = "Disconnected ⚠";
+            format-alt = "{ifname}: {ipaddr}/{cidr}";
+          };
+          pulseaudio = {
+            format = "{volume}% {icon} {format_source}";
+            format-bluetooth = "{volume}% {icon} {format_source}";
+            format-bluetooth-muted = " {icon} {format_source}";
+            format-muted = " {format_source}";
+            format-source = "{volume}% ";
+            format-source-muted = "";
+            format-icons = {
+              headphone = "";
+              hands-free = "";
+              headset = "";
+              phone = "";
+              portable = "";
+              car = "";
+              default = ["" "" ""];
+            };
+            on-click = "pavucontrol";
+          };
         };
       };
     };
@@ -122,6 +185,15 @@ in
     xwayland.enable = true;
     systemd.variables = ["--all"];
     settings = {
+      general = {
+        # See https://wiki.hyprland.org/Configuring/Variables/ for more
+        gaps_in = 2;
+        gaps_out = 0;
+        border_size = 1;
+
+        no_border_on_floating = true;
+      };
+
       "$mod" = "SUPER";
       bind =
         [
@@ -188,7 +260,7 @@ in
 	  "$mod, T, exec, alacritty"
 	  "$mod SHIFT, C, exec, hyprctl reload"
 	  "$mod, SPACE, exec, rofi -show drun -show-icons"
-	  " , Caps_Lock, exec, refresh-waybar"
+	  " , Caps_Lock, exec, pkill waybar; waybar &" # use this to refresh capslock state in waybar
         ]
         ++ (
           # workspaces
@@ -226,6 +298,7 @@ in
     git
 
     #Desktop
+    pavucontrol # audio controller
     xdg-desktop-portal-gtk
     xdg-desktop-portal-hyprland # display portal for hyprland, required
     wl-clipboard # allows copying to clipboard (for hyprpicker)
