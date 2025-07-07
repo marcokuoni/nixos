@@ -82,7 +82,8 @@
             # Basic user example
   users.users.progressio= {
     isNormalUser = true;
-    extraGroups = [ "wheel" "video" "audio" "networkmanager" ];
+    extraGroups = [ "wheel" "video" "audio" "networkmanager" "input" "aspizu" ];
+    shell = pkgs.zsh;
   };
 
   fonts.packages = with pkgs; [
@@ -127,6 +128,11 @@
 
   # Install firefox.
   programs.firefox.enable = true;
+
+  # Shell
+  users.defaultUserShell = pkgs.zsh;
+  environment.shells = with pkgs; [ zsh ];
+  programs.zsh.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;

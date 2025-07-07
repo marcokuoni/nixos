@@ -22,29 +22,97 @@ in
 {
   imports = [
     ./scripts/KillActiveProcess.nix
+    ./scripts/RefreshWaybar.nix
   ];
 
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
 
   programs = {
+    alacritty = {
+      enable = true;
+    };
+
     zsh = {
       enable = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
       inherit shellAliases;
+
+      oh-my-zsh = {
+        enable = true;
+        plugins = [ "git" "vi-mode" ];
+        theme = "agnoster";
+      };
     };
 
     bash = {
       inherit shellAliases;
     };
   };
-  programs.rofi.enable = true;
-  programs.hyprlock.enable = true;
-  programs.alacritty.enable = true;
-  programs.waybar = {
-    enable = true;
-    systemd.enable = true;
+  programs = {
+    rofi.enable = true;
+    hyprlock.enable = true;
+    # https://github.com/Alexays/Waybar/blob/master/resources/config.jsonc
+    waybar = {
+      enable = true;
+      systemd.enable = true;
+      settings = {
+        mainBar = {
+          layer = "top";
+          position = "bottom";
+          modules-left = [ "custom/appmenu" "wlr/taskbar" ];
+          modules-center = [ "hyprland/workspaces" "hyprland/window" "clock" ];
+          modules-right = [ "idle_inhibitor" "pulseaudio" "network" "power-profiles-daemon" "cpu" "memory" "temperature" "backlight" "keyboard-state" "sway/language" "battery" "battery#bat2" "clock" "tray"];
+# not working, maybe https://github.com/Alexays/Waybar/issues/2215#issuecomment-2819770477
+          "keyboard-state" = {
+            numlock = false;
+            capslock = true;
+            format = "{name} {icon}";
+            format-icons = {
+              locked = "";
+              unlocked = "";
+            };
+          };
+
+	  "custom/appmenu" = {
+            format = "Menu {icon}";
+            format-icon = "󰻀";
+            rotate = 0;
+            on-click = "rofi -show drun -show-icons";
+    	  };
+
+	  "wlr/taskbar" = {
+            format = "{icon}";
+            tooltip = true;
+            tooltip-format = "{title}";
+            on-click = "activate";
+            on-click-middle = "close";
+            active-first = true;
+   	 };
+
+          "hyprland/window" = {
+            separate-outputs = true;
+          };
+
+          "hyprland/workspaces" = {
+	    format = "{name} : {icon}";
+            format-icons = {
+              "1" = "";
+              "2" = "";
+              "3" = "";
+              "4" = "";
+              "5" = "";
+	      "urgent" = "";
+              "active" = "";
+              "default" = "";
+            };
+            on-scroll-up = "hyprctl dispatch workspace e+1";
+            on-scroll-down = "hyprctl dispatch workspace e-1";
+          };
+        };
+      };
+    };
   };
 
   # https://github.com/JaKooLit/Hyprland-v4/blob/main/config/hypr/configs/Keybinds.conf
@@ -60,12 +128,67 @@ in
 	  "CTRL ALT, Delete, exec, hyprctl dispatch exit 0" # Exit Hyprland
 	  "$mod, Q, killactive" # close active (not kill)
 	  "$mod SHIFT, Q, exec, kill-active-process" # Kill active process
-          "$mod, F, exec, firefox"
+	  "CTRL ALT, L, exec, hyprlock" # Screen Lock
+	  "CTRL ALT, P, exec, wlogout" # Open Power Settings
+	  "$mod SHIFT, N, exec, swaync-client -t -sw" # swayNC notification panel
+
+	  # Master Layout
+          "$mod CTRL, D, layoutmsg, removemaster"
+	  "$mod, I, layoutmsg, addmaster"
+	  "$mod, J, layoutmsg, cyclenext"
+	  "$mod, K, layoutmsg, cycleprev"
+	  "$mod CTRL, Return, layoutmsg, swapwithmaster"
+
+	  # Dwindle Layout
+	  "$mod SHIFT, I, togglesplit" # only works on dwidle layout
+	  "$mod, P, pseudo, " # dwindle
+
+	  # Resize windows
+	  "$mod SHIFT, H, resizeactive, -50 0"
+	  "$mod SHIFT, L, resizeactive, 50 0"
+	  "$mod SHIFT, K, resizeactive, 0 -50"
+	  "$mod SHIFT, J, resizeactive, 0 50"
+
+          # Move windows
+	  "$mod CTRL, H, movewindow, l"
+	  "$mod CTRL, L, movewindow, r"
+	  "$mod CTRL, K, movewindow, u"
+	  "$mod CTRL, J, movewindow, d"
+
+	  # Swap windows
+	  "$mod ALT, H, swapwindow, l"
+	  "$mod ALT, L, swapwindow, r"
+	  "$mod ALT, K, swapwindow, u"
+	  "$mod ALT, J, swapwindow, d"
+
+          # Move focus with mainMod + arrow keys
+	  "$mod, H, movefocus, l"
+	  "$mod, L, movefocus, r"
+	  "$mod, K, movefocus, u"
+	  "$mod, J, movefocus, d"
+
+	  # Workspaces related
+	  "$mod, tab, workspace, m+1"
+	  "$mod SHIFT, tab, workspace, m-1"
+
+	  # Special workspace
+	  "$mod SHIFT, U, movetoworkspace, special"
+	  "$mod, U, togglespecialworkspace, "
+
+	  # Scroll through existing workspaces with mainMod + scroll
+	  "$mod, mouse_down, workspace, e+1"
+	  "$mod, mouse_up, workspace, e-1"
+
+          # Move/resize windows with mainMod + LMB/RMB and dragging
+	  "$mod, mouse:272, movewindow" # NOTE: mouse:272 = left click
+          "$mod, mouse:273, resizeactive" # NOTE: mouse:272 = right click
+
+          "$mod, B, exec, firefox"
           ", Print, exec, grimblast copy area"
 	  "$mod, T, exec, alacritty"
 	  "$mod SHIFT, C, exec, hyprctl reload"
-	  "$mod, D, exec, rofi -show drun -show-icons"
-	  "$mod, L, exec, hyprlock"
+	  "$mod, SPACE, exec, rofi -show drun -show-icons"
+	  " , Caps_Lock, exec, refresh-waybar"
         ]
         ++ (
           # workspaces
@@ -75,6 +198,7 @@ in
             in [
               "$mod, code:1${toString i}, workspace, ${toString ws}"
               "$mod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
+              "$mod CTRL, code:1${toString i}, movetoworkspacesilent, ${toString ws}"
             ]
           )
           9)
@@ -94,10 +218,14 @@ in
   services.hyprpolkitagent.enable = true; # for permission escalation
 
   home.packages = with pkgs; [
+    #Terminal
+    oh-my-zsh
+
     #IDE
     neovim
     git
 
+    #Desktop
     xdg-desktop-portal-gtk
     xdg-desktop-portal-hyprland # display portal for hyprland, required
     wl-clipboard # allows copying to clipboard (for hyprpicker)
@@ -106,6 +234,7 @@ in
     nautilus # file manager
     xdg-utils # allow xdg-open to work
     grimblast # screenshots
+    wlogout # menu for power settings (lock, reboot, power off)
   ];
 
   home.sessionVariables = {
