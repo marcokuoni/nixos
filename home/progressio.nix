@@ -290,6 +290,8 @@ in
   services.hyprpolkitagent.enable = true; # for permission escalation
 
   home.packages = with pkgs; [
+    curl
+
     #Terminal
     oh-my-zsh
 
