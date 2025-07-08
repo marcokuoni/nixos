@@ -3,15 +3,9 @@
   lib,
   pkgs,
   ...
-}:
-with lib;
+}
+:
 {
-      home.sessionVariables = {
-      };
-      programs.nushell.environmentVariables = {
-        EDITOR = "'nvim'";
-      };
-
       programs.neovim = {
         enable = true;
         vimAlias = true;
@@ -255,7 +249,6 @@ with lib;
               }
             },
             dev = {
-              path = "${pkgs.vimUtils.packDir config.home-manager.users.nixchad.programs.neovim.finalPackage.passthru.packpathDirs}/pack/myNeovimPackages/start",
               patterns = {""},
             },
             install = {

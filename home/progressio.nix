@@ -297,7 +297,6 @@ in
     oh-my-zsh
 
     #IDE
-    neovim
     git
 
     #Desktop
