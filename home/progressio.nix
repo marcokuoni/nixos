@@ -22,6 +22,7 @@ in
 {
   imports = [
     ./scripts/KillActiveProcess.nix
+    ./neovim
   ];
 
   home.username = "progressio";
@@ -318,6 +319,7 @@ in
     NIXOS_OZONE_WL="1";
     T_QPA_PLATFORM = "wayland";
     GDK_BACKEND = "wayland";
+    EDITOR = "nvim";
   };
  
   home.stateVersion = "24.05";

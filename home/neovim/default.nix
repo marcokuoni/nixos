@@ -5,18 +5,8 @@
   ...
 }:
 with lib;
-let
-  cfg = config.nixchad.neovim;
-in
 {
-  options.nixchad.neovim = {
-    enable = mkEnableOption "neovim";
-  };
-
-  config = mkIf cfg.enable {
-    hm = {
       home.sessionVariables = {
-        EDITOR = "nvim";
       };
       programs.nushell.environmentVariables = {
         EDITOR = "'nvim'";
@@ -279,6 +269,4 @@ in
         recursive = true;
         source = ./lua;
       };
-    };
-  };
 }
