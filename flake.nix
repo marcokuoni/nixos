@@ -9,10 +9,15 @@
       url = "github:hyprwm/hyprland-plugins";
       inputs.hyprland.follows = "hyprland";
     };
+
+    nixvim = {
+      url = "github:nix-community/nixvim";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { self, nixpkgs, home-manager, ... }@inputs:
+    { self, nixpkgs, home-manager, nixvim, ... }@inputs:
     {
       nixosConfigurations = {
         laptop = nixpkgs.lib.nixosSystem {
@@ -23,12 +28,13 @@
           modules = [
             ./hardware/laptop.nix
             ./laptop.nix
-	    home-manager.nixosModules.home-manager
+            home-manager.nixosModules.home-manager
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.users.progressio = import ./home/progressio.nix;
             }
+            nixvim.homeManagerModules.nixvim
           ];
         };
       };

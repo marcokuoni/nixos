@@ -22,7 +22,7 @@ in
 {
   imports = [
     ./scripts/KillActiveProcess.nix
-    ./neovim
+    # ./neovim
   ];
 
   home.username = "progressio";
