@@ -1,16 +1,20 @@
-{ pkgs, ... }:
-
+{ inputs, pkgs, nixvim, ... }:
 {
-# https://github.com/bkp5190/Home-Manager-Configs/blob/main/home.nix
-
-  programs = {
-    nixvim = {
+    programs.nixvim = {
       enable = true;
       defaultEditor = true;
+
+      nixpkgs.useGlobalPackages = true;
+
       viAlias = true;
       vimAlias = true;
-
-      luaLoader.enable = true;
     };
-  };
+
+    home.packages = with pkgs; [
+      neovim
+    ];
+
+    home.sessionVariables = {
+      EDITOR = "nvim";
+    };
 }
