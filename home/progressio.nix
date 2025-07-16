@@ -29,8 +29,9 @@ in
   home.homeDirectory = "/home/progressio";
 
   programs = {
-    alacritty = {
+    kitty = {
       enable = true;
+      themeFile = "Catppuccin-Mocha";
     };
 
     zsh = {
@@ -258,7 +259,7 @@ in
 
           "$mod, B, exec, firefox"
           ", Print, exec, grimblast copy area"
-	  "$mod, T, exec, alacritty"
+	  "$mod, T, exec, kitty"
 	  "$mod SHIFT, C, exec, hyprctl reload"
 	  "$mod, SPACE, exec, rofi -show drun -show-icons"
 	  " , Caps_Lock, exec, pkill waybar; waybar &" # use this to refresh capslock state in waybar
@@ -292,6 +293,7 @@ in
 
   home.packages = with pkgs; [
     curl
+    ripgrep
 
     #Terminal
     oh-my-zsh
