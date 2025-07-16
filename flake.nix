@@ -32,7 +32,7 @@
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
-              home-manager.users.progressio.imports = [ 
+              home-manager.users.progressio.imports = [
                 nixvim.homeModules.nixvim
 	        ./home/progressio.nix 
 	      ];
