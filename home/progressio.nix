@@ -27,18 +27,15 @@ in
   imports = [
     ./scripts/KillActiveProcess.nix
     ./scripts/LazyvimDiffPlugins.nix
+    ./kitty
     ./lazyvim
+    ./waybar
   ];
 
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
 
   programs = {
-    kitty = {
-      enable = true;
-      themeFile = "Catppuccin-Mocha";
-    };
-
     zsh = {
       enable = true;
       autosuggestion.enable = true;
