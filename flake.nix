@@ -10,14 +10,21 @@
       inputs.hyprland.follows = "hyprland";
     };
 
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    lazyvim.url = "github:pfassina/lazyvim-nix";
+    # nixvim = {
+    #   url = "github:nix-community/nixvim";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
   };
 
   outputs =
-    { self, nixpkgs, home-manager, nixvim, ... }@inputs:
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      lazyvim,
+      ...
+    }@inputs:
     {
       nixosConfigurations = {
         laptop = nixpkgs.lib.nixosSystem {
@@ -33,13 +40,12 @@
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.users.progressio.imports = [
-                nixvim.homeModules.nixvim
-	        ./home/progressio.nix 
-	      ];
+                lazyvim.homeManagerModules.default
+                ./home/progressio.nix
+              ];
             }
           ];
         };
       };
     };
 }
-
