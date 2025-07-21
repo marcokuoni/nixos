@@ -35,7 +35,9 @@
       ripgrep
     ];
 
-    extraPlugins = [ pkgs.vimPlugins.lazy-nvim ];
+    extraPlugins = with pkgs.vimPlugins; [
+      lazy-nvim
+    ];
 
     extraConfigLua =
       let
