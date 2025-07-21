@@ -1,7 +1,6 @@
 {
   config,
   pkgs,
-  lazyvim,
   ...
 }:
 
@@ -27,6 +26,7 @@ in
 {
   imports = [
     ./scripts/KillActiveProcess.nix
+    ./scripts/LazyvimDiffPlugins.nix
     ./lazyvim
   ];
 
@@ -243,90 +243,89 @@ in
       };
 
       "$mod" = "SUPER";
-      bind =
-        [
-          "CTRL ALT, Delete, exec, hyprctl dispatch exit 0" # Exit Hyprland
-          "$mod, Q, killactive" # close active (not kill)
-          "$mod SHIFT, Q, exec, kill-active-process" # Kill active process
-          "CTRL ALT, L, exec, hyprlock" # Screen Lock
-          "CTRL ALT, P, exec, wlogout" # Open Power Settings
-          "$mod SHIFT, N, exec, swaync-client -t -sw" # swayNC notification panel
+      bind = [
+        "CTRL ALT, Delete, exec, hyprctl dispatch exit 0" # Exit Hyprland
+        "$mod, Q, killactive" # close active (not kill)
+        "$mod SHIFT, Q, exec, kill-active-process" # Kill active process
+        "CTRL ALT, L, exec, hyprlock" # Screen Lock
+        "CTRL ALT, P, exec, wlogout" # Open Power Settings
+        "$mod SHIFT, N, exec, swaync-client -t -sw" # swayNC notification panel
 
-          # Master Layout
-          "$mod CTRL, D, layoutmsg, removemaster"
-          "$mod, I, layoutmsg, addmaster"
-          "$mod, J, layoutmsg, cyclenext"
-          "$mod, K, layoutmsg, cycleprev"
-          "$mod CTRL, Return, layoutmsg, swapwithmaster"
+        # Master Layout
+        "$mod CTRL, D, layoutmsg, removemaster"
+        "$mod, I, layoutmsg, addmaster"
+        "$mod, J, layoutmsg, cyclenext"
+        "$mod, K, layoutmsg, cycleprev"
+        "$mod CTRL, Return, layoutmsg, swapwithmaster"
 
-          # Dwindle Layout
-          "$mod SHIFT, I, togglesplit" # only works on dwidle layout
-          "$mod, P, pseudo, " # dwindle
+        # Dwindle Layout
+        "$mod SHIFT, I, togglesplit" # only works on dwidle layout
+        "$mod, P, pseudo, " # dwindle
 
-          # Resize windows
-          "$mod SHIFT, H, resizeactive, -50 0"
-          "$mod SHIFT, L, resizeactive, 50 0"
-          "$mod SHIFT, K, resizeactive, 0 -50"
-          "$mod SHIFT, J, resizeactive, 0 50"
+        # Resize windows
+        "$mod SHIFT, H, resizeactive, -50 0"
+        "$mod SHIFT, L, resizeactive, 50 0"
+        "$mod SHIFT, K, resizeactive, 0 -50"
+        "$mod SHIFT, J, resizeactive, 0 50"
 
-          # Move windows
-          "$mod CTRL, H, movewindow, l"
-          "$mod CTRL, L, movewindow, r"
-          "$mod CTRL, K, movewindow, u"
-          "$mod CTRL, J, movewindow, d"
+        # Move windows
+        "$mod CTRL, H, movewindow, l"
+        "$mod CTRL, L, movewindow, r"
+        "$mod CTRL, K, movewindow, u"
+        "$mod CTRL, J, movewindow, d"
 
-          # Swap windows
-          "$mod ALT, H, swapwindow, l"
-          "$mod ALT, L, swapwindow, r"
-          "$mod ALT, K, swapwindow, u"
-          "$mod ALT, J, swapwindow, d"
+        # Swap windows
+        "$mod ALT, H, swapwindow, l"
+        "$mod ALT, L, swapwindow, r"
+        "$mod ALT, K, swapwindow, u"
+        "$mod ALT, J, swapwindow, d"
 
-          # Move focus with mainMod + arrow keys
-          "$mod, H, movefocus, l"
-          "$mod, L, movefocus, r"
-          "$mod, K, movefocus, u"
-          "$mod, J, movefocus, d"
+        # Move focus with mainMod + arrow keys
+        "$mod, H, movefocus, l"
+        "$mod, L, movefocus, r"
+        "$mod, K, movefocus, u"
+        "$mod, J, movefocus, d"
 
-          # Workspaces related
-          "$mod, tab, workspace, m+1"
-          "$mod SHIFT, tab, workspace, m-1"
+        # Workspaces related
+        "$mod, tab, workspace, m+1"
+        "$mod SHIFT, tab, workspace, m-1"
 
-          # Special workspace
-          "$mod SHIFT, U, movetoworkspace, special"
-          "$mod, U, togglespecialworkspace, "
+        # Special workspace
+        "$mod SHIFT, U, movetoworkspace, special"
+        "$mod, U, togglespecialworkspace, "
 
-          # Scroll through existing workspaces with mainMod + scroll
-          "$mod, mouse_down, workspace, e+1"
-          "$mod, mouse_up, workspace, e-1"
+        # Scroll through existing workspaces with mainMod + scroll
+        "$mod, mouse_down, workspace, e+1"
+        "$mod, mouse_up, workspace, e-1"
 
-          # Move/resize windows with mainMod + LMB/RMB and dragging
-          "$mod, mouse:272, movewindow" # NOTE: mouse:272 = left click
-          "$mod, mouse:273, resizeactive" # NOTE: mouse:272 = right click
+        # Move/resize windows with mainMod + LMB/RMB and dragging
+        "$mod, mouse:272, movewindow" # NOTE: mouse:272 = left click
+        "$mod, mouse:273, resizeactive" # NOTE: mouse:272 = right click
 
-          "$mod, B, exec, firefox"
-          ", Print, exec, grimblast copy area"
-          "$mod, T, exec, kitty"
-          "$mod SHIFT, C, exec, hyprctl reload"
-          "$mod, SPACE, exec, rofi -show drun -show-icons"
-          " , Caps_Lock, exec, pkill waybar; waybar &" # use this to refresh capslock state in waybar
-        ]
-        ++ (
-          # workspaces
-          # binds $mod + [shift +] {1..9} to [move to] workspace {1..9}
-          builtins.concatLists (
-            builtins.genList (
-              i:
-              let
-                ws = i + 1;
-              in
-              [
-                "$mod, code:1${toString i}, workspace, ${toString ws}"
-                "$mod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
-                "$mod CTRL, code:1${toString i}, movetoworkspacesilent, ${toString ws}"
-              ]
-            ) 9
-          )
-        );
+        "$mod, B, exec, firefox"
+        ", Print, exec, grimblast copy area"
+        "$mod, T, exec, kitty"
+        "$mod SHIFT, C, exec, hyprctl reload"
+        "$mod, SPACE, exec, rofi -show drun -show-icons"
+        " , Caps_Lock, exec, pkill waybar; waybar &" # use this to refresh capslock state in waybar
+      ]
+      ++ (
+        # workspaces
+        # binds $mod + [shift +] {1..9} to [move to] workspace {1..9}
+        builtins.concatLists (
+          builtins.genList (
+            i:
+            let
+              ws = i + 1;
+            in
+            [
+              "$mod, code:1${toString i}, workspace, ${toString ws}"
+              "$mod SHIFT, code:1${toString i}, movetoworkspace, ${toString ws}"
+              "$mod CTRL, code:1${toString i}, movetoworkspacesilent, ${toString ws}"
+            ]
+          ) 9
+        )
+      );
       env = [
         "LIBVA_DRIVER_NAME,nvidia"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
