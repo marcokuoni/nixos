@@ -7,7 +7,7 @@
 
       if pgrep -af "openvpn.*int-vpn.conf" > /dev/null; then
         # Stop VPN
-        skitty -e sudo kill "$(pgrep -af 'openvpn.*int-vpn.conf' | awk '{print $1}')"
+        kitty -e sudo kill "$(pgrep -af 'openvpn.*int-vpn.conf' | awk '{print $1}')"
       else
         # Start VPN in background (redirect output)
         kitty -e bash -c "sudo vpn-int-start"
