@@ -10,6 +10,12 @@
     ./scripts/FortiStatus.nix
     ./scripts/FortiToggle.nix
     ./scripts/FortiStart.nix
+    ./scripts/VpnIntStatus.nix
+    ./scripts/VpnIntToggle.nix
+    ./scripts/VpnIntStart.nix
+    ./scripts/VpnPubStatus.nix
+    ./scripts/VpnPubToggle.nix
+    ./scripts/VpnPubStart.nix
     ./kitty
     ./zsh
     ./lazyvim
@@ -28,8 +34,9 @@
   home.packages = with pkgs; [
     curl
     ripgrep
-    # sudo openfortivpn gate2.exigo.ch --username lemonbrain  --trusted-cert 3308ac43ca0749e1f24756b3eacc5d16db3833f0830da7f780ca567a4c4969e8
     openfortivpn
+    openvpn
+    libreoffice
 
     #Terminal
     oh-my-zsh

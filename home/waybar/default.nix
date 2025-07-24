@@ -23,6 +23,8 @@
             "pulseaudio"
             "network"
             "custom/openfortivpn"
+            "custom/openvpn-int"
+            "custom/openvpn-pub"
             "cpu"
             "memory"
             "temperature"
@@ -31,6 +33,22 @@
             "battery"
             "clock"
           ];
+
+          "custom/openvpn-int" = {
+            exec = "vpn-int-status";
+            return-type = "json";
+            interval = 5;
+            on-click = "vpn-int-toggle";
+            format = "{}";
+          };
+
+          "custom/openvpn-pub" = {
+            exec = "vpn-pub-status";
+            return-type = "json";
+            interval = 5;
+            on-click = "vpn-pub-toggle";
+            format = "{}";
+          };
 
           "custom/openfortivpn" = {
             exec = "forti-status";
@@ -504,16 +522,22 @@
             background-color: #0069d4;
         }
 
-        #custom-openfortivpn {
+        #custom-openfortivpn,
+        #custom-openvpn-pub,
+        #custom-openvpn-int {
           padding: 0 10px;
         }
 
-        #custom-openfortivpn.on {
+        #custom-openfortivpn.on,
+        #custom-openvpn-pub.on,
+        #custom-openvpn-int.on  {
           color: lime;  
           background-color: rgba(0, 200, 0, 0.15);
         }
 
-        #custom-openfortivpn.off {
+        #custom-openfortivpn.off,
+        #custom-openvpn-pub.off,
+        #custom-openvpn-int.off  {
           color: red;
           background-color: rgba(200, 0, 0, 0.15);
         }
