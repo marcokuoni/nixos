@@ -109,6 +109,10 @@
 
   fonts.packages = with pkgs; [
     nerd-fonts.ubuntu
+    nerd-fonts.fira-code
+    nerd-fonts._0xproto
+    nerd-fonts.jetbrains-mono
+    nerd-fonts.hack
   ];
 
   # Define a user account. Don't forget to set a password with ‘passwd’.

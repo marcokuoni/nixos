@@ -1,11 +1,27 @@
 {
   config,
   pkgs,
+  lib,
   ...
 }:
 {
   programs = {
-    rofi.enable = true;
+    rofi = {
+      enable = true;
+      plugins = [
+        pkgs.rofi-calc
+        pkgs.rofi-emoji-wayland
+      ];
+      modes = [
+        "window"
+        "drun"
+        "run"
+        "ssh"
+        "calc"
+        "filebrowser"
+        "emoji"
+      ];
+    };
     hyprlock.enable = true;
   };
 
@@ -91,6 +107,11 @@
         "$mod SHIFT, C, exec, hyprctl reload"
         "$mod, SPACE, exec, rofi -show drun -show-icons"
         " , Caps_Lock, exec, pkill waybar; waybar &" # use this to refresh capslock state in waybar
+        "$mod, C, exec, rofi -show calc"
+        "$mod, F, exec, rofi -show filebrowser"
+        "$mod, S, exec, rofi -show ssh"
+        "$mod, W, exec, rofi-network-manager"
+        "$mod, E, exec, emoji"
       ]
       ++ (
         # workspaces
@@ -125,13 +146,15 @@
 
   home.packages = with pkgs; [
     #Desktop
+    rofi-network-manager # networkmanager
+    # bluez # bluetooth controller
+    # rofi-bluetooth # bluetooth menu
     pavucontrol # audio controller
     xdg-desktop-portal-gtk
     xdg-desktop-portal-hyprland # display portal for hyprland, required
     wl-clipboard # allows copying to clipboard (for hyprpicker)
     polkit_gnome # polkit agent for GNOME
     seahorse # keyring manager GUI
-    nautilus # file manager
     xdg-utils # allow xdg-open to work
     grimblast # screenshots
     wlogout # menu for power settings (lock, reboot, power off)

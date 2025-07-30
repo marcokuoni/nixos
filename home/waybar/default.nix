@@ -21,6 +21,7 @@
           modules-right = [
             "idle_inhibitor"
             "pulseaudio"
+            # "bluetooth"
             "network"
             "custom/openfortivpn"
             "custom/openvpn-int"
@@ -168,6 +169,7 @@
             format-linked = "{ifname} (No IP) ";
             format-disconnected = "Disconnected ⚠";
             format-alt = "{ifname}: {ipaddr}/{cidr}";
+            on-click = "rofi-network-manager";
           };
           pulseaudio = {
             format = "{volume}% {icon} {format_source}";
@@ -191,6 +193,16 @@
             };
             on-click = "pavucontrol";
           };
+          # bluetooth = {
+          #   controller = "controller1";
+          #   format = " {status}";
+          #   format-disabled = ""; # an empty format will hide the module
+          #   format-connected = " {num_connections} connected";
+          #   tooltip-format = "{controller_alias}\t{controller_address}";
+          #   tooltip-format-connected = "{controller_alias}\t{controller_address}\n\n{device_enumerate}";
+          #   tooltip-format-enumerate-connected = "{device_alias}\t{device_address}";
+          #   on-click = "rofi-bluetooth";
+          # };
         };
       };
       style = ''
