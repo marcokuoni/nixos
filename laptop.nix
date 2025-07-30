@@ -108,6 +108,7 @@
   };
 
   fonts.packages = with pkgs; [
+    # fc-list
     nerd-fonts.ubuntu
     nerd-fonts.fira-code
     nerd-fonts._0xproto
