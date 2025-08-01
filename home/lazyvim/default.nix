@@ -31,6 +31,8 @@
       markdownlint-cli2
       ast-grep
       python3
+      marksman
+      fish
       # Telescope
       ripgrep
     ];

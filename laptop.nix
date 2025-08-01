@@ -8,7 +8,6 @@
   lib,
   ...
 }:
-
 {
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -81,6 +80,12 @@
     #media-session.enable = true;
   };
 
+  # make it possible to configure on user level through browser
+  # https://docs.bastardkb.com/help/troubleshooting.html#custom-udev-rules
+  services.udev.extraRules = ''
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
+  '';
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -115,6 +120,10 @@
     nerd-fonts.jetbrains-mono
     nerd-fonts.hack
   ];
+
+  # Enable fontconfig (for fallback rules)
+  fonts.fontDir.enable = true;
+  fonts.fontconfig.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   security.pam.services = {

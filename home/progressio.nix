@@ -30,6 +30,15 @@
 
   programs.lazygit.enable = true;
   programs.lazydocker.enable = true;
+  programs.chromium.enable = true;
+  programs.ssh = {
+    enable = true;
+    extraConfig = ''
+      Host *
+        ServerAliveInterval 60
+        ServerAliveCountMax 5
+    '';
+  };
 
   home.packages = with pkgs; [
     curl
@@ -37,6 +46,10 @@
     openfortivpn
     openvpn
     libreoffice
+
+    # zip
+    zip
+    unzip
 
     #Terminal
     oh-my-zsh
