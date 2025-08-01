@@ -33,6 +33,8 @@
       python3
       marksman
       fish
+      nodejs_24
+      rust-analyzer
       # Telescope
       ripgrep
     ];
