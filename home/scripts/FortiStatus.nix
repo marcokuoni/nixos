@@ -6,9 +6,9 @@
       #!/usr/bin/env bash
 
       if pgrep -x openfortivpn > /dev/null; then
-          echo "{\"text\": \" Forti\", \"class\": \"on\"}"
+          echo "{\"text\": \"  Forti\", \"class\": \"on\"}"
       else
-          echo "{\"text\": \" Forti\", \"class\": \"off\"}"
+          echo "{\"text\": \"  Forti\", \"class\": \"off\"}"
       fi
     '')
   ];

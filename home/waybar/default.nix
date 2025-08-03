@@ -102,8 +102,8 @@
           idle_inhibitor = {
             format = "{icon}";
             format-icons = {
-              activated = "";
-              deactivated = "";
+              activated = " ";
+              deactivated = " ";
             };
           };
 
@@ -150,45 +150,45 @@
             };
             format = "{capacity}% {icon}";
             format-full = "{capacity}% {icon}";
-            format-charging = "{capacity}% ";
-            format-plugged = "{capacity}% ";
+            format-charging = "{capacity}% 󰂄";
+            format-plugged = "{capacity}%  ";
             format-alt = "{time} {icon}";
             format-icons = [
-              ""
-              ""
-              ""
-              ""
-              ""
+              " "
+              " "
+              " "
+              " "
+              " "
             ];
           };
 
           network = {
-            format-wifi = "{essid} ({signalStrength}%) ";
+            format-wifi = "{essid} ({signalStrength}%)  ";
             format-ethernet = "{ipaddr}/{cidr} ";
             tooltip-format = "{ifname} via {gwaddr} ";
             format-linked = "{ifname} (No IP) ";
-            format-disconnected = "Disconnected ⚠";
+            format-disconnected = "Disconnected ⚠ ";
             format-alt = "{ifname}: {ipaddr}/{cidr}";
             on-click = "rofi-network-manager";
           };
           pulseaudio = {
             format = "{volume}% {icon} {format_source}";
             format-bluetooth = "{volume}% {icon} {format_source}";
-            format-bluetooth-muted = " {icon} {format_source}";
-            format-muted = " {format_source}";
+            format-bluetooth-muted = "󰆪 {icon} {format_source}";
+            format-muted = "󰆪 {format_source}";
             format-source = "{volume}% ";
             format-source-muted = "";
             format-icons = {
-              headphone = "";
-              hands-free = "";
-              headset = "";
-              phone = "";
-              portable = "";
-              car = "";
+              headphone = " ";
+              hands-free = "󰋎 ";
+              headset = "󰋎 ";
+              phone = " ";
+              portable = " ";
+              car = " ";
               default = [
                 ""
-                ""
-                ""
+                " "
+                " "
               ];
             };
             on-click = "pavucontrol";
@@ -208,7 +208,7 @@
       style = ''
         * {
             /* `otf-font-awesome` is required to be installed for icons */
-            font-family: FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+            font-family: FiraCode Nerd Font, Roboto, Helvetica, Arial, sans-serif;
             font-size: 13px;
         }
 
@@ -327,7 +327,7 @@
 
         #battery {
             background-color: #ffffff;
-            color: #000000;
+            color: white;
         }
 
         #battery.charging, #battery.plugged {
@@ -369,7 +369,7 @@
 
         #power-profiles-daemon.power-saver {
             background-color: #2ecc71;
-            color: #000000;
+            color: white;
         }
 
         label:focus {
@@ -378,7 +378,7 @@
 
         #cpu {
             background-color: #2ecc71;
-            color: #000000;
+            color: white;
         }
 
         #memory {
@@ -402,8 +402,8 @@
         }
 
         #pulseaudio {
-            background-color: #f1c40f;
-            color: #000000;
+            background-color: #a37800;
+            color: white;
         }
 
         #pulseaudio.muted {
@@ -413,7 +413,7 @@
 
         #wireplumber {
             background-color: #fff0f5;
-            color: #000000;
+            color: white;
         }
 
         #wireplumber.muted {
@@ -422,7 +422,7 @@
 
         #custom-media {
             background-color: #66cc99;
-            color: #2a5c45;
+            color: white;
             min-width: 100px;
         }
 
@@ -461,12 +461,12 @@
 
         #idle_inhibitor.activated {
             background-color: #ecf0f1;
-            color: #2d3436;
+            color: white;
         }
 
         #mpd {
             background-color: #66cc99;
-            color: #2a5c45;
+            color: white;
         }
 
         #mpd.disconnected {
@@ -483,7 +483,7 @@
 
         #language {
             background: #00b093;
-            color: #740864;
+            color: white;
             padding: 0 5px;
             margin: 0 5px;
             min-width: 16px;
@@ -491,18 +491,8 @@
 
         #keyboard-state {
             background: #97e1ad;
-            color: #000000;
-            padding: 0 0px;
-            margin: 0 5px;
-            min-width: 16px;
-        }
-
-        #keyboard-state > label {
-            padding: 0 5px;
-        }
-
-        #keyboard-state > label.locked {
-            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            padding: 0 10px;
         }
 
         #scratchpad {
@@ -543,15 +533,15 @@
         #custom-openfortivpn.on,
         #custom-openvpn-pub.on,
         #custom-openvpn-int.on  {
-          color: lime;  
-          background-color: rgba(0, 200, 0, 0.15);
+          color: white;  
+          background-color: #990000;
         }
 
         #custom-openfortivpn.off,
         #custom-openvpn-pub.off,
         #custom-openvpn-int.off  {
-          color: red;
-          background-color: rgba(200, 0, 0, 0.15);
+          color: white;
+          background-color: #006600;;
         }
       '';
     };

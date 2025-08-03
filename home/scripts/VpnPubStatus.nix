@@ -6,9 +6,9 @@
       #!/usr/bin/env bash
 
       if pgrep -af "openvpn.*pub-vpn.conf" > /dev/null; then
-          echo "{\"text\": \" Pub\", \"class\": \"on\"}"
+          echo "{\"text\": \"  Pub\", \"class\": \"on\"}"
       else
-          echo "{\"text\": \" Pub\", \"class\": \"off\"}"
+          echo "{\"text\": \"  Pub\", \"class\": \"off\"}"
       fi
     '')
   ];
