@@ -164,9 +164,9 @@
 
           network = {
             format-wifi = "{essid} ({signalStrength}%)  ";
-            format-ethernet = "{ipaddr}/{cidr} ";
-            tooltip-format = "{ifname} via {gwaddr} ";
-            format-linked = "{ifname} (No IP) ";
+            format-ethernet = "{ipaddr}/{cidr}  ";
+            tooltip-format = "{ifname} via {gwaddr}  ";
+            format-linked = "{ifname} (No IP)  ";
             format-disconnected = "Disconnected ⚠ ";
             format-alt = "{ifname}: {ipaddr}/{cidr}";
             on-click = "rofi-network-manager";
@@ -327,7 +327,7 @@
 
         #battery {
             background-color: #ffffff;
-            color: white;
+            color: #006600;
         }
 
         #battery.charging, #battery.plugged {
@@ -534,14 +534,14 @@
         #custom-openvpn-pub.on,
         #custom-openvpn-int.on  {
           color: white;  
-          background-color: #990000;
+          background-color: #006600;
         }
 
         #custom-openfortivpn.off,
         #custom-openvpn-pub.off,
         #custom-openvpn-int.off  {
           color: white;
-          background-color: #006600;;
+          background-color: #990000;
         }
       '';
     };

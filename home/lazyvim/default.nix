@@ -153,8 +153,43 @@
             { "williamboman/mason.nvim", enabled = false },
             -- uncomment to import/override with your plugins
             -- { import = "plugins" },
+            {
+              "folke/snacks.nvim",
+              opts = {
+                notifier = { enabled = true },
+
+                -- show hidden files in snacks.explorer
+                picker = {
+                  sources = {
+                    explorer = {
+                      -- show hidden files like .env
+                      hidden = true,
+                      -- show files ignored by git like node_modules
+                      ignored = true,
+                    },
+                  },
+                },
+              },
+            },
             -- put this line at the end of spec to clear ensure_installed
-            { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {} end },
+            { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {
+                "bash",
+                "html",
+                "javascript",
+                "json",
+                "lua",
+                "markdown",
+                "markdown_inline",
+                "python",
+                "query",
+                "regex",
+                "tsx",
+                "typescript",
+                "vim",
+                "yaml",
+                "tsx",
+                "typescript",
+              } end },
           },
         })
       '';
