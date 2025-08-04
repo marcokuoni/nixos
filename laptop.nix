@@ -28,7 +28,16 @@
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
+  # networking.nameservers = [
+  #   "1.1.1.1"
+  #   "8.8.8.8"
+  # ];
+  # networking.firewall.enable = false;
   networking.networkmanager.enable = true;
+  # networking.networkmanager.dns = "default";
+  networking.extraHosts = ''
+    127.0.0.1 bank-avera.local
+  '';
 
   nix = {
     settings = {
@@ -106,10 +115,11 @@
 
   virtualisation.docker = {
     enable = true;
-    rootless = {
-      enable = true;
-      setSocketVariable = true;
-    };
+    # blocks dns resolution
+    # rootless = {
+    #   enable = true;
+    #   setSocketVariable = true;
+    # };
   };
 
   fonts.packages = with pkgs; [

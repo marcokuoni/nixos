@@ -172,24 +172,7 @@
               },
             },
             -- put this line at the end of spec to clear ensure_installed
-            { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {
-                "bash",
-                "html",
-                "javascript",
-                "json",
-                "lua",
-                "markdown",
-                "markdown_inline",
-                "python",
-                "query",
-                "regex",
-                "tsx",
-                "typescript",
-                "vim",
-                "yaml",
-                "tsx",
-                "typescript",
-              } end },
+            { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {} end },
           },
         })
       '';
