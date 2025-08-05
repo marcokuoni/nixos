@@ -187,12 +187,12 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     # mount (if you delete you delete on server)
-    # mkdir ~/remote-project
-    # sshfs root@192.168.10.12:/root/functions concrete_hub_functions -o uid=$(id -u) -o gid=$(id -g) -o allow_other
+    # mkdir remote_concrete_hub_functions
+    # sshfs root@192.168.10.12:/root/functions remote_concrete_hub_functions -o uid=$(id -u) -o gid=$(id -g) -o allow_other
     # cd ~/remote-project
     # nvim .
     # unmount
-    # fusermount -u concrete_hub_functions
+    # fusermount -u remote_concrete_hub_functions
     sshfs
 
     #nvidia
