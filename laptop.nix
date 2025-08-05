@@ -20,6 +20,7 @@
     };
     systemd.enable = true;
   };
+
   networking.hostName = "progressio"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -28,13 +29,7 @@
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Enable networking
-  # networking.nameservers = [
-  #   "1.1.1.1"
-  #   "8.8.8.8"
-  # ];
-  # networking.firewall.enable = false;
   networking.networkmanager.enable = true;
-  # networking.networkmanager.dns = "default";
   networking.extraHosts = ''
     127.0.0.1 bank-avera.local
   '';
@@ -184,9 +179,22 @@
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  environment.etc."fuse.conf".text = ''
+    user_allow_other
+  '';
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    # mount (if you delete you delete on server)
+    # mkdir ~/remote-project
+    # sshfs root@192.168.10.12:/root/functions concrete_hub_functions -o uid=$(id -u) -o gid=$(id -g) -o allow_other
+    # cd ~/remote-project
+    # nvim .
+    # unmount
+    # fusermount -u concrete_hub_functions
+    sshfs
+
     #nvidia
     egl-wayland
   ];

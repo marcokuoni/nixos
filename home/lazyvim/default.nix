@@ -35,6 +35,7 @@
       fish
       nodejs_24
       rust-analyzer
+      phpactor
       # Telescope
       ripgrep
     ];
@@ -103,6 +104,7 @@
           vim-markdown-toc
           markdown-preview-nvim
           render-markdown-nvim
+          phpactor
           {
             name = "catppuccin";
             path = catppuccin-nvim;
@@ -132,49 +134,69 @@
         lazyPath = pkgs.linkFarm "lazy-plugins" (builtins.map mkEntryFromDrv plugins);
       in
       ''
-        require("lazy").setup({
-          defaults = {
-            lazy = true,
-          },
-          dev = {
-            -- reuse files from pkgs.vimPlugins.*
-            path = "${lazyPath}",
-            patterns = { "" },
-            -- fallback to download
-            fallback = true,
-          },
-          spec = {
-            { "LazyVim/LazyVim", import = "lazyvim.plugins" },
-            -- The following configs are needed for fixing lazyvim on nix
-            -- force enable telescope-fzf-native.nvim
-            { "nvim-telescope/telescope-fzf-native.nvim", enabled = true },
-            -- disable mason.nvim, use config.extraPackages
-            { "williamboman/mason-lspconfig.nvim", enabled = false },
-            { "williamboman/mason.nvim", enabled = false },
-            -- uncomment to import/override with your plugins
-            -- { import = "plugins" },
-            {
-              "folke/snacks.nvim",
-              opts = {
-                notifier = { enabled = true },
+              require("lazy").setup({
+                defaults = {
+                  lazy = true,
+                },
+                dev = {
+                  -- reuse files from pkgs.vimPlugins.*
+                  path = "${lazyPath}",
+                  patterns = { "" },
+                  -- fallback to download
+                  fallback = true,
+                },
+                spec = {
+                  { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+                  -- The following configs are needed for fixing lazyvim on nix
+                  -- force enable telescope-fzf-native.nvim
+                  { "nvim-telescope/telescope-fzf-native.nvim", enabled = true },
+                  -- disable mason.nvim, use config.extraPackages
+                  { "williamboman/mason-lspconfig.nvim", enabled = false },
+                  { "williamboman/mason.nvim", enabled = false },
+                  -- uncomment to import/override with your plugins
+                  -- { import = "plugins" },
+                  {
+                    "folke/snacks.nvim",
+                    opts = {
+                      notifier = { enabled = true },
 
-                -- show hidden files in snacks.explorer
-                picker = {
-                  sources = {
-                    explorer = {
-                      -- show hidden files like .env
-                      hidden = true,
-                      -- show files ignored by git like node_modules
-                      ignored = true,
+                      -- show hidden files in snacks.explorer
+                      picker = {
+                        sources = {
+                          explorer = {
+                            -- show hidden files like .env
+                            hidden = true,
+                            -- show files ignored by git like node_modules
+                            ignored = true,
+                          },
+                        },
+                      },
                     },
                   },
-                },
-              },
+        {
+          -- Set Laravel Pint as the default PHP formatter with PHP CS Fixer as a fall back.
+          "stevearc/conform.nvim",
+          optional = true,
+          opts = {
+            formatters_by_ft = {
+              php = { { "pint", "php_cs_fixer" } },
             },
-            -- put this line at the end of spec to clear ensure_installed
-            { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {} end },
           },
-        })
+        },
+        {
+          -- Remove phpcs linter.
+          "mfussenegger/nvim-lint",
+          optional = true,
+          opts = {
+            linters_by_ft = {
+              php = {},
+            },
+          },
+        },
+                  -- put this line at the end of spec to clear ensure_installed
+                  { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {} end },
+                },
+              })
       '';
   };
 
