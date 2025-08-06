@@ -166,5 +166,14 @@
     NIXOS_OZONE_WL = "1";
     T_QPA_PLATFORM = "wayland";
     GDK_BACKEND = "wayland";
+
+    # NVIDIA + Wayland + Hyprland
+    WLR_NO_HARDWARE_CURSORS = "1";
+    LIBVA_DRIVER_NAME = "nvidia";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    WLR_RENDERER_ALLOW_SOFTWARE = "1";
+    GBM_BACKEND = "nvidia-drm";
+    __GL_GSYNC_ALLOWED = "0";
+    __GL_VRR_ALLOWED = "0";
   };
 }

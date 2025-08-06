@@ -17,7 +17,13 @@
   };
 
   outputs =
-    { self, nixpkgs, home-manager, nixvim, ... }@inputs:
+    {
+      self,
+      nixpkgs,
+      home-manager,
+      nixvim,
+      ...
+    }@inputs:
     {
       nixosConfigurations = {
         laptop = nixpkgs.lib.nixosSystem {
@@ -34,12 +40,11 @@
               home-manager.useUserPackages = true;
               home-manager.users.progressio.imports = [
                 nixvim.homeModules.nixvim
-	        ./home/progressio.nix 
-	      ];
+                ./home/progressio.nix
+              ];
             }
           ];
         };
       };
     };
 }
-
