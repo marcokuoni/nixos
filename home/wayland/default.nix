@@ -48,6 +48,10 @@
         "$mod, mouse:273, resizeactive" # NOTE: mouse:272 = right click
       ];
 
+      bindl = [
+        ", switch:lid, exec, hyprlock"
+      ];
+
       bind = [
         "CTRL ALT, Delete, exec, hyprctl dispatch exit 0" # Exit Hyprland
         "$mod, Q, killactive" # close active (not kill)
@@ -109,6 +113,7 @@
         "$mod, T, exec, kitty"
         "$mod SHIFT, C, exec, hyprctl reload"
         "$mod, SPACE, exec, rofi -show drun -show-icons"
+        "$mod, SUPER_L, exec, rofi -show drun -show-icons"
         " , Caps_Lock, exec, pkill waybar; waybar &" # use this to refresh capslock state in waybar
         "$mod, C, exec, rofi -show calc"
         "$mod, F, exec, rofi -show filebrowser"
