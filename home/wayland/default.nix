@@ -41,6 +41,10 @@
         no_border_on_floating = true;
       };
 
+      windowrulev2 = [
+        "workspace special:cloud silent, class:^(?i)nextcloud$"
+      ];
+
       "$mod" = "SUPER";
       bindm = [
         # Move/resize windows with mainMod + LMB/RMB and dragging
@@ -59,6 +63,7 @@
         "CTRL ALT, L, exec, hyprlock" # Screen Lock
         "CTRL ALT, P, exec, wlogout" # Open Power Settings
         "$mod SHIFT, N, exec, swaync-client -t -sw" # swayNC notification panel
+        "$mod, N, togglespecialworkspace, cloud"
 
         # Master Layout
         "$mod CTRL, D, layoutmsg, removemaster"
