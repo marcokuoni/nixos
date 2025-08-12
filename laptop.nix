@@ -33,6 +33,7 @@
   networking.networkmanager.enable = true;
   networking.extraHosts = ''
     127.0.0.1 bank-avera.local
+    127.0.0.1 ksgl.local
   '';
 
   nix = {

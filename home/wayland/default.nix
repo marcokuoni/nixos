@@ -42,6 +42,12 @@
       };
 
       "$mod" = "SUPER";
+      bindm = [
+        # Move/resize windows with mainMod + LMB/RMB and dragging
+        "$mod, mouse:272, movewindow" # NOTE: mouse:272 = left click
+        "$mod, mouse:273, resizeactive" # NOTE: mouse:272 = right click
+      ];
+
       bind = [
         "CTRL ALT, Delete, exec, hyprctl dispatch exit 0" # Exit Hyprland
         "$mod, Q, killactive" # close active (not kill)
@@ -85,6 +91,10 @@
         "$mod, K, movefocus, u"
         "$mod, J, movefocus, d"
 
+        # Scroll through existing workspaces with mainMod + scroll
+        "$mod, mouse_down, workspace, e+1"
+        "$mod, mouse_up, workspace, e-1"
+
         # Workspaces related
         "$mod, tab, workspace, m+1"
         "$mod SHIFT, tab, workspace, m-1"
@@ -93,16 +103,9 @@
         "$mod SHIFT, U, movetoworkspace, special"
         "$mod, U, togglespecialworkspace, "
 
-        # Scroll through existing workspaces with mainMod + scroll
-        "$mod, mouse_down, workspace, e+1"
-        "$mod, mouse_up, workspace, e-1"
-
-        # Move/resize windows with mainMod + LMB/RMB and dragging
-        "$mod, mouse:272, movewindow" # NOTE: mouse:272 = left click
-        "$mod, mouse:273, resizeactive" # NOTE: mouse:272 = right click
-
         "$mod, B, exec, firefox"
         ", Print, exec, grimblast copy area"
+        "SHIFT, Print, exec, grimblast save area ~/Downloads/screenshot.png"
         "$mod, T, exec, kitty"
         "$mod SHIFT, C, exec, hyprctl reload"
         "$mod, SPACE, exec, rofi -show drun -show-icons"
