@@ -50,6 +50,7 @@
         # Move/resize windows with mainMod + LMB/RMB and dragging
         "$mod, mouse:272, movewindow" # NOTE: mouse:272 = left click
         "$mod, mouse:273, resizeactive" # NOTE: mouse:272 = right click
+        "$mod ALT, mouse:272, resizewindow"
       ];
 
       bindl = [
