@@ -1,7 +1,6 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
 {
   inputs,
   pkgs,
@@ -9,18 +8,6 @@
   ...
 }:
 {
-  # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.systemd-boot.configurationLimit = 5;
-  boot.loader.efi.canTouchEfiVariables = true;
-
-  boot.initrd = {
-    luks.devices."luks-f61c12a1-ffc3-4e66-9d3e-ed879e8c585a" = {
-      crypttabExtraOpts = [ "fido2-device=auto" ];
-      device = "/dev/disk/by-uuid/f61c12a1-ffc3-4e66-9d3e-ed879e8c585a";
-    };
-    systemd.enable = true;
-  };
 
   networking.hostName = "progressio"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -54,9 +41,6 @@
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-
-  # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = [ "nvidia" ];
 
   services.xserver.enable = false;
   services.xserver.xkb = {
@@ -248,5 +232,4 @@
   };
 
   system.stateVersion = "24.11"; # Did you read the comment?
-
 }

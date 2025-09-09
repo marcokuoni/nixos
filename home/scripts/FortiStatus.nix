@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   home.packages = [
     (pkgs.writeShellScriptBin "forti-status" ''
       #!/usr/bin/env bash

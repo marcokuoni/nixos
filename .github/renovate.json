@@ -1,0 +1,22 @@
+{
+  "extends": ["config:base"],
+  "nix": {
+    "enabled": true
+  },
+  "flake": {
+    "enabled": true
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "schedule": ["before 6am on monday"]
+  },
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["*"],
+      "matchManagers": ["nix"],
+      "automerge": true,
+      "platformAutomerge": true
+    }
+  ]
+}

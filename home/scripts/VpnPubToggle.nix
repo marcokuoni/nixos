@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   home.packages = [
     (pkgs.writeShellScriptBin "vpn-pub-toggle" ''
       #!/usr/bin/env bash

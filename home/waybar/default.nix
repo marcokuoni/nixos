@@ -2,8 +2,7 @@
   inputs,
   pkgs,
   ...
-}:
-{
+}: {
   programs = {
     # https://github.com/Alexays/Waybar/blob/master/resources/config.jsonc
     waybar = {
@@ -17,7 +16,7 @@
             "hyprland/workspaces"
             "wlr/taskbar"
           ];
-          modules-center = [ "hyprland/window" ];
+          modules-center = ["hyprland/window"];
           modules-right = [
             "idle_inhibitor"
             "pulseaudio"
@@ -533,7 +532,7 @@
         #custom-openfortivpn.on,
         #custom-openvpn-pub.on,
         #custom-openvpn-int.on  {
-          color: white;  
+          color: white;
           background-color: #006600;
         }
 

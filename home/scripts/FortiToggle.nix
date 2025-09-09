@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   home.packages = [
     (pkgs.writeShellScriptBin "forti-toggle" ''
       #!/usr/bin/env bash

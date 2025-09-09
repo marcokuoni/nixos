@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  check:
+    name: Check & Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    # Downloads the repository code to the GitHub Actions runner
+    # This makes all project files available for the subsequent steps
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    # Installs the Nix package manager with flakes support enabled
+    # Required to run any nix commands and build the configuration
+    - name: Install Nix
+      uses: cachix/install-nix-action@v27
+      with:
+        extra_nix_config: |
+          experimental-features = nix-command flakes
+          
+    # Setup Cachix binary cache for faster builds
+    # Uses the public nix-community cache to avoid rebuilding common packages
+    - name: Setup Cachix
+      uses: cachix/cachix-action@v15
+      with:
+        name: nix-community
+        authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+          
+    # Verifies that all Nix code follows consistent formatting rules
+    # Uses alejandra formatter to ensure code style consistency across the project
+    - name: Check code formatting
+      run: nix run nixpkgs#alejandra -- --check .
+  
+    #Check that all Nix code adheres to best practices and style guidelines
+    - name: Run statix linter
+      run: nix run nixpkgs#statix check
+
+    # Validates the overall flake structure and all defined outputs
+    # Ensures inputs are reachable and outputs are properly configured
+    - name: Validate flake structure
+      run: nix flake check --impure
+      
+    # Scans for unused variables, imports, and dead code in Nix files
+    # Helps maintain clean codebase by failing CI if unused code is found
+    - name: Remove dead code check  
+      run: nix run nixpkgs#deadnix -- --fail .
+      
+    # Builds the complete home-manager configuration into an activation package
+    # This compiles all configurations and dependencies to ensure everything works
+    - name: Build configuration
+      run: nix build .#homeConfigurations.claudio.activationPackage --impure
+
+    # Checks the flake for common issues and best practices
+    - name: Flake checker
+      run: nix run "github:DeterminateSystems/flake-checker"

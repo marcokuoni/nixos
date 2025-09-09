@@ -19,14 +19,16 @@
     ./kitty
     ./zsh
     ./lazyvim
-    ./wayland
+    ./hyprland
     ./waybar
   ];
 
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
 
-  services.nextcloud-client.enable = true;
+  services.nextcloud-client = {
+    enable = true;
+  };
 
   programs.lazygit.enable = true;
   programs.lazydocker.enable = true;
