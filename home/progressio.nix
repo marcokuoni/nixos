@@ -12,10 +12,8 @@
     ./scripts/FortiStart.nix
     ./scripts/VpnIntStatus.nix
     ./scripts/VpnIntToggle.nix
-    ./scripts/VpnIntStart.nix
     ./scripts/VpnPubStatus.nix
     ./scripts/VpnPubToggle.nix
-    ./scripts/VpnPubStart.nix
     ./kitty
     ./zsh
     ./lazyvim

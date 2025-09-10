@@ -23,6 +23,71 @@
     127.0.0.1 ksgl.local
   '';
 
+  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
+  # (the default) this is the recommended approach. When using systemd-networkd it's
+  # still possible to use this option, but it's recommended to use it in conjunction
+  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
+  networking.useDHCP = lib.mkDefault true;
+  # networking.interfaces.wlp0s20f3.useDHCP = lib.mkDefault true;
+
+  # provide resolvconf/openresolv
+  networking.resolvconf.enable = true;
+
+  services.openvpn.servers = {
+    lb-pub = {
+      config = ''
+        client
+        dev tun
+        proto udp
+        remote 193.93.23.34 1194
+        resolv-retry infinite
+        nobind
+        persist-key
+        persist-tun
+
+        data-ciphers AES-256-GCM
+        remote-cert-tls server
+        auth-nocache
+
+        ca /home/progressio/lemonbrain/vpn/pub/lb-vpn-pub-ca.crt
+        cert /home/progressio/lemonbrain/vpn/pub/vpn-pub-marco.crt
+        key /home/progressio/lemonbrain/vpn/pub/vpn-pub-marco.key
+        tls-auth /home/progressio/lemonbrain/vpn/pub/lb-vpn-ta.key 1
+        askpass /tmp/openvpn-lb-pub.pass
+
+        verb 3
+      '';
+      updateResolvConf = true; # ← hook OpenVPN to resolvconf
+      autoStart = false; # or true if you want it started on boot
+    };
+    lb-int = {
+      config = ''
+        client
+        dev tun
+        proto udp
+        remote 193.93.23.35 1194
+        resolv-retry infinite
+        nobind
+        persist-key
+        persist-tun
+
+        data-ciphers AES-256-GCM
+        remote-cert-tls server
+        auth-nocache
+
+        ca /home/progressio/lemonbrain/vpn/int/lb-vpn-int-ca.crt
+        cert /home/progressio/lemonbrain/vpn/int/lb-vpn-int-marco-kuoni.crt
+        key /home/progressio/lemonbrain/vpn/int/lb-vpn-int-marco-kuoni.key
+        tls-auth /home/progressio/lemonbrain/vpn/int/lb-vpn-ta.key 1
+        askpass /tmp/openvpn-lb-int.pass
+
+        verb 3
+      '';
+      updateResolvConf = true; # ← hook OpenVPN to resolvconf
+      autoStart = false; # or true if you want it started on boot
+    };
+  };
+
   nix = {
     settings = {
       experimental-features = [
