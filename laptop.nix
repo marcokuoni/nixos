@@ -21,6 +21,7 @@
   networking.extraHosts = ''
     127.0.0.1 bank-avera.local
     127.0.0.1 ksgl.local
+    127.0.0.1 lemonbrain.local
   '';
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
