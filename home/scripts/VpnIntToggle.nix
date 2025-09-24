@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   home.packages = [
     pkgs.kitty
     (pkgs.writeShellScriptBin "vpn-int-toggle" ''

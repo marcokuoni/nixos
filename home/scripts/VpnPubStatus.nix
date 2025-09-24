@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-{
+{pkgs, ...}: {
   home.packages = [
     (pkgs.writeShellScriptBin "vpn-pub-status" ''
       #!/usr/bin/env bash

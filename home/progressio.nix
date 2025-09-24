@@ -14,6 +14,7 @@
     ./scripts/VpnIntToggle.nix
     ./scripts/VpnPubStatus.nix
     ./scripts/VpnPubToggle.nix
+    ./scripts/ToggleKeyboard.nix
     ./kitty
     ./zsh
     ./lazyvim

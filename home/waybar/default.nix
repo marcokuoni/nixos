@@ -2,7 +2,8 @@
   inputs,
   pkgs,
   ...
-}: {
+}:
+{
   programs = {
     # https://github.com/Alexays/Waybar/blob/master/resources/config.jsonc
     waybar = {
@@ -16,7 +17,7 @@
             "hyprland/workspaces"
             "wlr/taskbar"
           ];
-          modules-center = ["hyprland/window"];
+          modules-center = [ "hyprland/window" ];
           modules-right = [
             "idle_inhibitor"
             "pulseaudio"
@@ -492,6 +493,16 @@
             background: #97e1ad;
             color: white;
             padding: 0 10px;
+        }
+
+        #keyboard-state label.capslock.locked {
+            background-color: #f53c3c;
+            color: #ffffff;
+            animation-name: blink;
+            animation-duration: 0.5s;
+            animation-timing-function: steps(12);
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
         }
 
         #scratchpad {

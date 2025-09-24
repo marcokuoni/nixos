@@ -7,8 +7,7 @@
   pkgs,
   modulesPath,
   ...
-}:
-{
+}: {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
@@ -23,21 +22,19 @@
     };
     initrd = {
       availableKernelModules = [
-
       ];
-      kernelModules = [ ];
+      kernelModules = [];
       luks.devices = {
         "luks-f61c12a1-ffc3-4e66-9d3e-ed879e8c585a" = {
-          crypttabExtraOpts = [ "fido2-device=auto" ];
+          crypttabExtraOpts = ["fido2-device=auto"];
           device = "/dev/disk/by-uuid/f61c12a1-ffc3-4e66-9d3e-ed879e8c585a";
         };
-        "luks-a5737fa5-ed8a-487a-84d7-f0cdbd676b5f".device =
-          "/dev/disk/by-uuid/a5737fa5-ed8a-487a-84d7-f0cdbd676b5f";
+        "luks-a5737fa5-ed8a-487a-84d7-f0cdbd676b5f".device = "/dev/disk/by-uuid/a5737fa5-ed8a-487a-84d7-f0cdbd676b5f";
       };
       systemd.enable = true;
     };
-    kernelModules = [ "kvm-intel" ];
-    extraModulePackages = [ ];
+    kernelModules = ["kvm-intel"];
+    extraModulePackages = [];
   };
 
   fileSystems."/" = {
@@ -55,7 +52,7 @@
   };
 
   swapDevices = [
-    { device = "/dev/disk/by-uuid/dd8ed16f-75cf-41ff-9d3b-375b744a00a9"; }
+    {device = "/dev/disk/by-uuid/dd8ed16f-75cf-41ff-9d3b-375b744a00a9";}
   ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

@@ -8,7 +8,6 @@
   ...
 }:
 {
-
   networking.hostName = "progressio"; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
@@ -169,54 +168,57 @@
     # };
   };
 
-  fonts.packages = with pkgs; [
-    # fc-list
-    nerd-fonts.ubuntu
-    nerd-fonts.fira-code
-    nerd-fonts._0xproto
-    nerd-fonts.jetbrains-mono
-    nerd-fonts.hack
-  ];
+  fonts = {
+    packages = with pkgs; [
+      # fc-list
+      nerd-fonts.ubuntu
+      nerd-fonts.fira-code
+      nerd-fonts._0xproto
+      nerd-fonts.jetbrains-mono
+      nerd-fonts.hack
+    ];
 
-  # Enable fontconfig (for fallback rules)
-  fonts.fontDir.enable = true;
-  fonts.fontconfig.enable = true;
+    # Enable fontconfig (for fallback rules)
+    fontDir.enable = true;
+    fontconfig.enable = true;
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  security.pam.services = {
-    login = {
-      u2fAuth = true;
-      rules.auth.u2f = {
-        args = lib.mkAfter [
+  security.pam = {
+    services = {
+      login = {
+        u2fAuth = true;
+        rules.auth.u2f = {
+          args = lib.mkAfter [
+            "pinverification=1"
+          ];
+        };
+      };
+      sudo = {
+        # unixAuth = false;
+        u2fAuth = true;
+        rules.auth.u2f.args = lib.mkAfter [
+          "pinverification=1"
+        ];
+      };
+      hyprlock = {
+        u2fAuth = true;
+        rules.auth.u2f.args = lib.mkAfter [
           "pinverification=1"
         ];
       };
     };
-    sudo = {
-      # unixAuth = false;
-      u2fAuth = true;
-      rules.auth.u2f.args = lib.mkAfter [
-        "pinverification=1"
-      ];
-    };
-    hyprlock = {
-      u2fAuth = true;
-      rules.auth.u2f.args = lib.mkAfter [
-        "pinverification=1"
-      ];
-    };
-  };
-
-  security.pam.u2f = {
-    enable = true;
-    settings = {
-      authfile = pkgs.writeText "u2f-mappings" (
-        lib.concatStrings [
-          "progressio"
-          ":5a3ZpJl8dZkJZ1Fhy0YQ44NBUm0yvwTmb99u0uh93y7ovfsN3ooAYIuVqhWQO0BSjadSzlex/tH9xd9PDFlF7enR7VCsutYlLcYR0HhRm3Fo9Bz1IaB9LSjOFC7tPm/6,131W8LOSNyjno2PNMP577L7+VjLknSuPHvZqYzyygecd8ZyOgOEOJoCHKWLS/hcrX+sQ0iGyhx5y7qEK+lY2xA==,es256,+presence"
-          ":yk49+p8WGHWbmNL03ov/oBdv1HHkn1Q178StpRbyVr3oHzsPiguPoYGHwcnRNmRVgvCG9uoQ43whcFzATUg6FW8k5kMjINccq/+Ifd/ZoJhi1wIOIF+PY16Kxa7TRn7e,+2FYscYOkQexTeCS48kjR7sjg6HbLYM35ILMw3LhExypeM/DLSqe0bWs7rbklyY+oudXI/oJtxjLRDz2aOFrAQ==,es256,+presence"
-        ]
-      );
+    u2f = {
+      enable = true;
+      settings = {
+        authfile = pkgs.writeText "u2f-mappings" (
+          lib.concatStrings [
+            "progressio"
+            ":5a3ZpJl8dZkJZ1Fhy0YQ44NBUm0yvwTmb99u0uh93y7ovfsN3ooAYIuVqhWQO0BSjadSzlex/tH9xd9PDFlF7enR7VCsutYlLcYR0HhRm3Fo9Bz1IaB9LSjOFC7tPm/6,131W8LOSNyjno2PNMP577L7+VjLknSuPHvZqYzyygecd8ZyOgOEOJoCHKWLS/hcrX+sQ0iGyhx5y7qEK+lY2xA==,es256,+presence"
+            ":yk49+p8WGHWbmNL03ov/oBdv1HHkn1Q178StpRbyVr3oHzsPiguPoYGHwcnRNmRVgvCG9uoQ43whcFzATUg6FW8k5kMjINccq/+Ifd/ZoJhi1wIOIF+PY16Kxa7TRn7e,+2FYscYOkQexTeCS48kjR7sjg6HbLYM35ILMw3LhExypeM/DLSqe0bWs7rbklyY+oudXI/oJtxjLRDz2aOFrAQ==,es256,+presence"
+          ]
+        );
+      };
     };
   };
 
@@ -224,9 +226,26 @@
   programs.firefox.enable = true;
 
   # Shell
-  users.defaultUserShell = pkgs.zsh;
-  environment.shells = with pkgs; [ zsh ];
   programs.zsh.enable = true;
+  users.defaultUserShell = pkgs.zsh;
+  environment = {
+    shells = [ pkgs.zsh ];
+    # List packages installed in system profile. To search, run:
+    # $ nix search wget
+    systemPackages = with pkgs; [
+      # mount (if you delete you delete on server)
+      # mkdir remote_concrete_hub_functions
+      # sshfs root@192.168.10.12:/root/functions remote_concrete_hub_functions -o uid=$(id -u) -o gid=$(id -g) -o allow_other
+      # cd ~/remote-project
+      # nvim .
+      # unmount
+      # fusermount -u remote_concrete_hub_functions
+      sshfs
+
+      #nvidia
+      egl-wayland
+    ];
+  };
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -234,22 +253,6 @@
   environment.etc."fuse.conf".text = ''
     user_allow_other
   '';
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    # mount (if you delete you delete on server)
-    # mkdir remote_concrete_hub_functions
-    # sshfs root@192.168.10.12:/root/functions remote_concrete_hub_functions -o uid=$(id -u) -o gid=$(id -g) -o allow_other
-    # cd ~/remote-project
-    # nvim .
-    # unmount
-    # fusermount -u remote_concrete_hub_functions
-    sshfs
-
-    #nvidia
-    egl-wayland
-  ];
 
   security.pam.services.regreet.enableGnomeKeyring = true;
 
