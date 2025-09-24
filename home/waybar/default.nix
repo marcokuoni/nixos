@@ -67,6 +67,7 @@
               locked = "";
               unlocked = "";
             };
+            interval = 5;
             # Refresh is done via capslock keybinding
           };
 

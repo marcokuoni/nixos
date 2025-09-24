@@ -57,6 +57,10 @@
 
     #IDE
     git
+
+    # Desktop
+    libnotify
+    brightnessctl
   ];
 
   home.stateVersion = "24.05";

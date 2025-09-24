@@ -78,6 +78,7 @@
         "$mod, P, pseudo, " # dwindle
 
         # Resize windows
+        "$mod SHIFT, F, fullscreen"
         "$mod SHIFT, H, resizeactive, -50 0"
         "$mod SHIFT, L, resizeactive, 50 0"
         "$mod SHIFT, K, resizeactive, 0 -50"
@@ -121,7 +122,7 @@
         "$mod, SPACE, exec, rofi -show drun -show-icons"
         # "$mod, SUPER_L, exec, rofi -show drun -show-icons"
         # " , Caps_Lock, exec, pkill waybar; waybar &" # use this to refresh capslock state in waybar
-        " , Caps_Lock, exec, toggle-keyboard" # use this to refresh capslock state in waybar
+        " , Caps_Lock, exec, sleep 0.2; toggle-keyboard" # use this to refresh capslock state in waybar
         "$mod, C, exec, rofi -show calc"
         "$mod, F, exec, rofi -show filebrowser"
         "$mod, S, exec, rofi -show ssh"

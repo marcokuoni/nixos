@@ -6,17 +6,25 @@
       #!/usr/bin/env bash
       set -euo pipefail
 
-      DEV='*::kbd_backlight'
-      ICON_DIR="$HOME/.config/mako/icons"
+      DEV='*::kbd_backlight'                          # keyboard backlight device pattern
+      CAPS_GLOB='/sys/class/leds/*::capslock/brightness'  # caps lock LED(s)
 
-      caps_on_wayland() {
-        command -v swaymsg >/dev/null 2>&1 && swaymsg -r -t get_inputs | grep -q '"capslock": true'
-      }
-      caps_on_x11() {
-        command -v xset >/dev/null 2>&1 && xset q | grep -q 'Caps Lock:\s*on'
+      caps_on_sysfs() {
+        local f v any=0
+        for f in $CAPS_GLOB; do
+          [ -r "$f" ] || continue
+          any=1
+          v=$(cat "$f" 2>/dev/null || echo 0)
+          if [ "$v" != "0" ]; then
+            return 0   # caps is ON
+          fi
+        done
+        # If we didn’t find any capslock LED files, return failure
+        [ "$any" -eq 1 ] || return 2
+        return 1       # caps is OFF
       }
 
-      if caps_on_wayland || caps_on_x11; then
+      if caps_on_sysfs; then
         brightnessctl -d "$DEV" set 100%
         state="on"
       else
@@ -24,22 +32,13 @@
         state="off"
       fi
 
-      # ⬇️ Notify goes here (AFTER setting brightness)
-      cur=$(brightnessctl -d "$DEV" g) || exit 0
-      max=$(brightnessctl -d "$DEV" m) || exit 0
+      cur=$(brightnessctl -d "$DEV" g)
+      max=$(brightnessctl -d "$DEV" m)
       pct=$(( 100 * cur / max ))
 
-      # choose an icon (optional)
-      if   [ "$pct" -le 33 ]; then icon="$ICON_DIR/brightness-20.png"
-      elif [ "$pct" -le 66 ]; then icon="$ICON_DIR/brightness-60.png"
-      else icon="$ICON_DIR/brightness-100.png"
-      fi
+      # swaync/mako both understand notify-send
+      notify-send -u low "Keyboard Brightness: $pct% (Caps $state)"
 
-      notify-send \
-        -h string:x-canonical-private-synchronous:sys-notify \
-        -u low \
-        -i "$icon" \
-        "Keyboard Brightness: ${pct}% (Caps ${state})"
     '')
   ];
 }
