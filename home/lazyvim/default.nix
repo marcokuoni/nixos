@@ -182,7 +182,11 @@
               optional = true,
               opts = {
                 formatters_by_ft = {
-                  php = { { "pint", "php_cs_fixer" } },
+                  lua = { "stylua" },
+                  javascript = { "prettierd", "prettier", stop_after_first = true },
+                  php = { "pint", "php_cs_fixer", stop_after_first = true },
+                  json  = { "prettierd", "prettier", "jq", stop_after_first = true },
+                  jsonc = { "biome", "fixjson", "prettierd", "prettier", stop_after_first = true },
                 },
               },
             },
