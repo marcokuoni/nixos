@@ -40,6 +40,7 @@
       # Telescope
       ripgrep
       vtsls
+      vscode-json-languageserver
     ];
 
     extraPlugins = with pkgs.vimPlugins; [
