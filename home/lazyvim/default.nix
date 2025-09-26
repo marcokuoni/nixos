@@ -41,6 +41,8 @@
       ripgrep
       vtsls
       vscode-json-languageserver
+      vscode-extensions.xdebug.php-debug
+      vscode-js-debug
     ];
 
     extraPlugins = with pkgs.vimPlugins; [
@@ -93,6 +95,8 @@
           nvim-treesitter-parsers.bash
           nvim-ts-autotag
           nvim-dap
+          nvim-dap-ui
+          nvim-dap-virtual-text
           persistence-nvim
           plenary-nvim
           snacks-nvim
@@ -137,47 +141,132 @@
         lazyPath = pkgs.linkFarm "lazy-plugins" (builtins.map mkEntryFromDrv plugins);
       in
       ''
-                      require("lazy").setup({
-                        defaults = {
-                          lazy = true,
-                        },
-                        dev = {
-                          -- reuse files from pkgs.vimPlugins.*
-                          path = "${lazyPath}",
-                          patterns = { "" },
-                          -- fallback to download
-                          fallback = true,
-                        },
-                        spec = {
-                          { "LazyVim/LazyVim", import = "lazyvim.plugins" },
-                          -- The following configs are needed for fixing lazyvim on nix
-                          -- force enable telescope-fzf-native.nvim
-                          { "nvim-telescope/telescope-fzf-native.nvim", enabled = true },
-                          -- disable mason.nvim, use config.extraPackages
-                          { "williamboman/mason-lspconfig.nvim", enabled = false },
-                          { "williamboman/mason.nvim", enabled = false },
-                          -- uncomment to import/override with your plugins
-                          -- { import = "plugins" },
-                          {
-                            "folke/snacks.nvim",
-                            opts = {
-                              notifier = { enabled = true },
+        require("lazy").setup({
+          defaults = {
+            lazy = true,
+          },
+          dev = {
+            -- reuse files from pkgs.vimPlugins.*
+            path = "${lazyPath}",
+            patterns = { "" },
+            -- fallback to download
+            fallback = true,
+          },
+          spec = {
+            { "LazyVim/LazyVim", import = "lazyvim.plugins" },
 
-                -- show hidden files in snacks.explorer
+            -- Nix fixes
+            { "nvim-telescope/telescope-fzf-native.nvim", enabled = true },
+
+            -- ❌ No Mason anywhere
+            { "williamboman/mason.nvim", enabled = false },
+            { "williamboman/mason-lspconfig.nvim", enabled = false },
+            { "jay-babu/mason-nvim-dap.nvim", enabled = false },
+
+            -- ❌ Disable LazyVim's PHP extra (it expects Mason)
+            { import = "lazyvim.plugins.extras.lang.php", enabled = false },
+
+            -- ✅ Enable LazyVim’s DAP extra so <leader>d shows up
+            { import = "lazyvim.plugins.extras.dap.core" },
+
+            -- (optional) PHP LSP without Mason: use phpactor from Nix
+            {
+              "neovim/nvim-lspconfig",
+              opts = {
+                servers = {
+                  phpactor = {
+                    cmd = { "phpactor", "language-server" },
+                  },
+                },
+              },
+            },
+
+            -- =========================
+            -- PHP / Xdebug (no Mason)
+            -- =========================
+            {
+              "mfussenegger/nvim-dap",
+              dependencies = {
+                "rcarriga/nvim-dap-ui",
+                "theHamsta/nvim-dap-virtual-text",
+              },
+              ft = { "php" }, -- load when opening PHP
+              config = function()
+                -- ensure we register the adapter when PHP is opened
+                vim.api.nvim_create_autocmd("FileType", {
+                  pattern = "php",
+                  once = true,
+                  callback = function()
+                    local dap = require("dap")
+                    local dapui = require("dapui")
+
+                    -- VSCode Xdebug adapter from Nixpkgs
+                    local php_debug_js = "${pkgs.vscode-extensions.xdebug.php-debug}/share/vscode/extensions/xdebug.php-debug/out/phpDebug.js"
+
+                    if not dap.adapters.php then
+                      dap.adapters.php = {
+                        type = "executable",
+                        command = "node",
+                        args = { php_debug_js },
+                        options = { detached = false },
+                      }
+                    end
+
+                    dapui.setup()
+                    dap.listeners.after.event_initialized["dapui_open"] = function() dapui.open() end
+                    dap.listeners.before.event_terminated["dapui_close"] = function() dapui.close() end
+                    dap.listeners.before.event_exited["dapui_close"] = function() dapui.close() end
+
+                    -- handy keys
+                    vim.keymap.set("n", "<F5>", function() dap.continue() end)
+                    vim.keymap.set("n", "<F9>", function() dap.toggle_breakpoint() end)
+                    vim.keymap.set("n", "<F10>", function() dap.step_over() end)
+                    vim.keymap.set("n", "<F11>", function() dap.step_into() end)
+                    vim.keymap.set("n", "<F12>", function() dap.step_out() end)
+                  end,
+                })
+              end,
+            },
+
+            -- ======================================
+            -- JS / Node / Chrome (no Mason)
+            -- ======================================
+            {
+              "mxsdev/nvim-dap-vscode-js",
+              dependencies = { "mfussenegger/nvim-dap" },
+              ft = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
+              config = function()
+                -- VSCode js-debug extension from Nixpkgs
+                local debugger_path = "${pkgs.vscode-js-debug}/share/vscode/extensions/ms-vscode.js-debug"
+
+                require("dap-vscode-js").setup({
+                  debugger_path = debugger_path,
+                  adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "pwa-extensionHost" },
+                })
+
+                local dap = require("dap")
+                local pick = require("dap.utils").pick_process
+
+                local js_like = { "javascript", "typescript", "javascriptreact", "typescriptreact" }
+
+                for _, lang in ipairs(js_like) do
+                end
+              end,
+            },
+
+            -- your other extras & tweaks...
+            {
+              "folke/snacks.nvim",
+              opts = {
+                notifier = { enabled = true },
                 picker = {
                   sources = {
-                    explorer = {
-                      -- show hidden files like .env
-                      hidden = true,
-                      -- show files ignored by git like node_modules
-                      ignored = true,
-                    },
+                    explorer = { hidden = true, ignored = true },
                   },
                 },
               },
             },
             {
-              -- Set Laravel Pint as the default PHP formatter with PHP CS Fixer as a fall back.
               "stevearc/conform.nvim",
               optional = true,
               opts = {
@@ -191,30 +280,26 @@
               },
             },
             {
-              -- Remove phpcs linter.
               "mfussenegger/nvim-lint",
               optional = true,
               opts = {
-                linters_by_ft = {
-                  php = {},
-                },
+                linters_by_ft = { php = {} },
               },
             },
             {
-              'mikesmithgh/kitty-scrollback.nvim',
+              "mikesmithgh/kitty-scrollback.nvim",
               lazy = true,
               cmd = {
-                'KittyScrollbackGenerateKittens',
-                'KittyScrollbackCheckHealth',
-                'KittyScrollbackGenerateCommandLineEditing'
+                "KittyScrollbackGenerateKittens",
+                "KittyScrollbackCheckHealth",
+                "KittyScrollbackGenerateCommandLineEditing",
               },
               config = function()
-                require('kitty-scrollback').setup({
-                  -- optional custom config here
-                })
+                require("kitty-scrollback").setup({})
               end,
             },
-            -- put this line at the end of spec to clear ensure_installed
+
+            -- keep treesitter ensure_installed cleared
             { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {} end },
           },
         })
