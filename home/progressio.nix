@@ -34,6 +34,13 @@
   programs.chromium.enable = true;
   programs.ssh = {
     enable = true;
+    matchBlocks = {
+      "*.exigo.ch" = {
+        extraOptions = {
+          SetEnv = "TERM=xterm-256color";
+        };
+      };
+    };
     extraConfig = ''
       Host *
         ServerAliveInterval 60
