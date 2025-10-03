@@ -25,8 +25,10 @@
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
 
-  services.nextcloud-client = {
-    enable = true;
+  services = {
+    nextcloud-client = {
+      enable = true;
+    };
   };
 
   programs.lazygit.enable = true;
