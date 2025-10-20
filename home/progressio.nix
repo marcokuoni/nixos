@@ -56,6 +56,7 @@
     openfortivpn
     openvpn
     libreoffice
+    openconnect
 
     # zip
     zip

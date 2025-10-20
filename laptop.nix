@@ -17,7 +17,10 @@
     # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
     # Enable networking
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+    };
+
     extraHosts = ''
       127.0.0.1 bank-avera.local
       127.0.0.1 ksgl.local
@@ -125,6 +128,7 @@
     };
     printing = {
       enable = true;
+      drivers = [ pkgs.gutenprint ];
     };
     # Für automatische Erkennung (AirPrint/mDNS/IPP)
     avahi = {
