@@ -494,16 +494,6 @@
             padding: 0 10px;
         }
 
-        #keyboard-state label.capslock.locked {
-            background-color: #f53c3c;
-            color: #ffffff;
-            animation-name: blink;
-            animation-duration: 0.5s;
-            animation-timing-function: steps(12);
-            animation-iteration-count: infinite;
-            animation-direction: alternate;
-        }
-
         #scratchpad {
             background: rgba(0, 0, 0, 0.2);
         }
