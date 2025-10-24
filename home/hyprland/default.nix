@@ -57,6 +57,10 @@
         ", switch:lid, exec, hyprlock"
       ];
 
+      exec-once = [
+        "nm-applet"
+      ];
+
       bind = [
         "CTRL ALT, Delete, exec, hyprctl dispatch exit 0" # Exit Hyprland
         "$mod, Q, killactive" # close active (not kill)
@@ -126,7 +130,6 @@
         "$mod, C, exec, rofi -show calc"
         "$mod, F, exec, rofi -show filebrowser"
         "$mod, S, exec, rofi -show ssh"
-        "$mod, W, exec, rofi-network-manager"
         "$mod, E, exec, emoji"
       ]
       ++ (
@@ -162,10 +165,10 @@
 
   home.packages = with pkgs; [
     #Desktop
-    rofi-network-manager # networkmanager
     # bluez # bluetooth controller
     # rofi-bluetooth # bluetooth menu
     pavucontrol # audio controller
+    libappindicator-gtk3 # für AppIndicator-Unterstützung
     xdg-desktop-portal-gtk
     xdg-desktop-portal-hyprland # display portal for hyprland, required
     wl-clipboard # allows copying to clipboard (for hyprpicker)
@@ -174,6 +177,7 @@
     xdg-utils # allow xdg-open to work
     grimblast # screenshots
     wlogout # menu for power settings (lock, reboot, power off)
+    networkmanagerapplet
   ];
 
   home.sessionVariables = {

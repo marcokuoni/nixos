@@ -22,7 +22,7 @@
             "idle_inhibitor"
             "pulseaudio"
             # "bluetooth"
-            "network"
+            "tray"
             "custom/openfortivpn"
             "custom/openvpn-int"
             "custom/openvpn-pub"
@@ -161,15 +161,11 @@
             ];
           };
 
-          network = {
-            format-wifi = "{essid} ({signalStrength}%)  ";
-            format-ethernet = "{ipaddr}/{cidr}  ";
-            tooltip-format = "{ifname} via {gwaddr}  ";
-            format-linked = "{ifname} (No IP)  ";
-            format-disconnected = "Disconnected ⚠ ";
-            format-alt = "{ifname}: {ipaddr}/{cidr}";
-            on-click = "rofi-network-manager";
+          tray = {
+            icon-size = 16;
+            spacing = 8;
           };
+
           pulseaudio = {
             format = "{volume}% {icon} {format_source}";
             format-bluetooth = "{volume}% {icon} {format_source}";
@@ -291,7 +287,6 @@
         #disk,
         #temperature,
         #backlight,
-        #network,
         #pulseaudio,
         #wireplumber,
         #custom-media,
@@ -390,14 +385,6 @@
 
         #backlight {
             background-color: #90b1b1;
-        }
-
-        #network {
-            background-color: #2980b9;
-        }
-
-        #network.disconnected {
-            background-color: #f53c3c;
         }
 
         #pulseaudio {

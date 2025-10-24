@@ -18,8 +18,8 @@
     ./kitty
     ./zsh
     ./lazyvim
-    ./hyprland
     ./waybar
+    ./hyprland
   ];
 
   home.username = "progressio";
@@ -56,7 +56,7 @@
     openfortivpn
     openvpn
     libreoffice
-    openconnect
+    qutebrowser
 
     # zip
     zip

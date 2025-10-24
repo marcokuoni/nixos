@@ -5,6 +5,7 @@
   inputs,
   pkgs,
   lib,
+  config,
   ...
 }:
 {
@@ -19,6 +20,44 @@
     # Enable networking
     networkmanager = {
       enable = true;
+      plugins = with pkgs; [
+        (networkmanager-openconnect.override { withGnome = true; })
+      ];
+      ensureProfiles = {
+        # secrets.entries = [
+        #   {
+        #     file = config.sops.secrets."school/vpn".path;
+        #     matchId = "school";
+        #     matchType = "vpn";
+        #     matchSetting = "vpn-secrets";
+        #     key = "password";
+        #   }
+        # ];
+        profiles.school = {
+          connection = {
+            id = "school";
+            type = "vpn";
+          };
+          vpn = {
+            service-type = "org.freedesktop.NetworkManager.openconnect";
+
+            cookie-flags = "1";
+
+            gateway = "vpn.ost.ch";
+            remote = "vpn.ost.ch";
+            protocol = "anyconnect";
+            useragent = "AnyConnect";
+            username = "marco.kuoni@ost.ch";
+            authtype = "password";
+          };
+          vpn-secrets = {
+            gateway = "vpn.ost.ch";
+            gwcert = "";
+            cookie = "";
+            resolve = "";
+          };
+        };
+      };
     };
 
     extraHosts = ''
@@ -65,6 +104,7 @@
   console.keyMap = "de_CH-latin1";
 
   services = {
+    dbus.enable = true;
     openvpn.servers = {
       lb-pub = {
         config = ''
@@ -296,6 +336,10 @@
 
       #nvidia
       egl-wayland
+      networkmanagerapplet # liefert das 'nm-applet' Binary
+      networkmanager-openconnect
+      openconnect
+      lxqt.lxqt-policykit
     ];
   };
 
