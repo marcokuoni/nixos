@@ -41,6 +41,19 @@
         no_border_on_floating = true;
       };
 
+      cursor = {
+        sync_gsettings_theme = false;
+        zoom_factor = 1;
+      };
+
+      windowrulev2 = [
+        "float,title:^(Spotlight Circle)$"
+        "pin,title:^(Spotlight Circle)$"
+        "noborder,title:^(Spotlight Circle)$"
+        "noanim,title:^(Spotlight Circle)$"
+        "noblur,title:^(Spotlight Circle)$"
+      ];
+
       windowrule = [
         "workspace special:cloud silent, class:^(nextcloud)$"
       ];
@@ -119,6 +132,7 @@
         "$mod, U, togglespecialworkspace, "
 
         "$mod, B, exec, firefox"
+        "$mod SHIFT, B, exec, qutebrowser"
         ", Print, exec, grimblast copy area"
         "SHIFT, Print, exec, grimblast save area ~/Downloads/screenshot.png"
         "$mod, T, exec, kitty"
@@ -152,6 +166,8 @@
       env = [
         "LIBVA_DRIVER_NAME,nvidia"
         "__GLX_VENDOR_LIBRARY_NAME,nvidia"
+        "HYPRCURSOR_THEME,Bibata-Modern-Ice" # I think the theme is installed in the wrong directory cause nvg-look gives this an i cant find ~/.local/share/icon folder
+        "HYPRCURSOR_SIZE,40"
       ];
       input = {
         kb_layout = "ch";
