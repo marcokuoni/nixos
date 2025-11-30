@@ -29,14 +29,11 @@
           #crypttabExtraOpts = [ "fido2-device=auto" ];
           device = "/dev/disk/by-partlabel/CRYPTROOT";
         };
-        "luks-a5737fa5-ed8a-487a-84d7-f0cdbd676b5f".device =
-          "/dev/disk/by-uuid/a5737fa5-ed8a-487a-84d7-f0cdbd676b5f";
       };
       systemd.enable = true;
     };
     kernelModules = [ "kvm-intel" ];
     extraModulePackages = [ ];
-    resumeDevice = "/dev/disk/by-label/SWAP";
   };
 
   fileSystems."/" = {
