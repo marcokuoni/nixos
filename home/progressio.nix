@@ -31,6 +31,7 @@
     };
   };
 
+  programs.vscode.enable = true;
   programs.lazygit.enable = true;
   programs.lazydocker.enable = true;
   programs.chromium.enable = true;
@@ -57,6 +58,9 @@
     openvpn
     libreoffice
     qutebrowser
+    nautilus
+    projecteur
+    bibata-cursors
 
     # zip
     zip

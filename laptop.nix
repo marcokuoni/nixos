@@ -64,6 +64,7 @@
       127.0.0.1 bank-avera.local
       127.0.0.1 ksgl.local
       127.0.0.1 lemonbrain.local
+      152.96.10.67 ins-lab
     '';
     # 9003 XDebug, 631 CUPS
     firewall.allowedTCPPorts = [
@@ -238,6 +239,7 @@
         "aspizu"
         "lp"
         "lpadmin"
+        "dialout"
       ];
       shell = pkgs.zsh;
     };
@@ -318,6 +320,7 @@
   programs = {
     firefox.enable = true;
     # Shell
+    nix-ld.enable = true;
     zsh.enable = true;
   };
   environment = {
@@ -332,7 +335,7 @@
       # nvim .
       # unmount
       # fusermount -u remote_concrete_hub_functions
-      sshfs
+      # sshfs
 
       #nvidia
       egl-wayland
@@ -340,6 +343,10 @@
       networkmanager-openconnect
       openconnect
       lxqt.lxqt-policykit
+      nwg-displays
+      nwg-look
+      bibata-cursors
+
     ];
   };
 
