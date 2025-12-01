@@ -43,7 +43,10 @@ Boot partition
 # NIXOS
 
 `sudo mkdir -p /mnt/etc/nixos`
-copy inside the nixos from git
+copy inside the nixos from git and all home backups you have remember to `sudo chown progressio:users /home/progressio -R`
 `sudo nixos-install --root /mnt --flake /mnt/etc/nixos#laptop`
 `sudo reboot`
 
+Maybe you cant use sudo of your user. So change to root user and add a password for your sudo user
+`sud -`
+`passwd progressio`
