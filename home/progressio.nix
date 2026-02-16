@@ -15,8 +15,9 @@
     ./scripts/VpnPubStatus.nix
     ./scripts/VpnPubToggle.nix
     ./scripts/ToggleKeyboard.nix
-    ./kitty
     ./zsh
+    # ./kitty
+    ./tmux
     ./lazyvim
     ./waybar
     ./hyprland
@@ -61,6 +62,7 @@
     nautilus
     projecteur
     bibata-cursors
+    k9s
 
     # zip
     zip
@@ -75,6 +77,9 @@
     # Desktop
     libnotify
     brightnessctl
+
+    #Cloud solution
+    railway
   ];
 
   home.stateVersion = "24.05";

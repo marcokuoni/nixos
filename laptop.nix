@@ -64,7 +64,10 @@
       127.0.0.1 bank-avera.local
       127.0.0.1 ksgl.local
       127.0.0.1 lemonbrain.local
+      127.0.0.1 backoffice.local
+      127.0.0.1 ksgl.local
       152.96.10.67 ins-lab
+      193.93.22.14 elma-ag.ch
     '';
     # 9003 XDebug, 631 CUPS
     firewall.allowedTCPPorts = [
