@@ -77,9 +77,6 @@
     # Desktop
     libnotify
     brightnessctl
-
-    #Cloud solution
-    railway
   ];
 
   home.stateVersion = "24.05";
