@@ -10,7 +10,7 @@
       enable = true;
       plugins = [
         pkgs.rofi-calc
-        pkgs.rofi-emoji-wayland
+        pkgs.rofi-emoji
       ];
       modes = [
         "window"
