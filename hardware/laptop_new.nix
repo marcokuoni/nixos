@@ -22,7 +22,7 @@
       efi.canTouchEfiVariables = true;
     };
     initrd = {
-      boot.initrd.availableKernelModules = [
+      availableKernelModules = [
         "nvme"
         "xhci_pci"
         "thunderbolt"
