@@ -178,8 +178,6 @@
     };
     xserver = {
       enable = true;
-      displayManager.gdm.enable = true;
-      desktopManager.gnome.enable = true;
 
       # Configure keymap in X11
       xkb = {
@@ -187,6 +185,8 @@
         variant = "de_nodeadkeys";
       };
     };
+    displayManager.gdm.enable = true;
+    desktopManager.gnome.enable = true;
     printing = {
       enable = true;
       drivers = [ pkgs.gutenprint ];

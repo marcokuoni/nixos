@@ -26,7 +26,7 @@
       python313Packages.pylatexenc
       prettier
       shfmt
-      nixfmt-rfc-style
+      nixfmt
       php83Packages.php-cs-fixer
       markdownlint-cli2
       ast-grep
