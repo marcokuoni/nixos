@@ -16,11 +16,8 @@
     ./scripts/VpnPubToggle.nix
     ./scripts/ToggleKeyboard.nix
     ./zsh
-    ./kitty
     ./tmux
     ./lazyvim
-    ./waybar
-    ./hyprland
   ];
 
   home.username = "progressio";
@@ -67,9 +64,6 @@
     # zip
     zip
     unzip
-
-    #Terminal
-    oh-my-zsh
 
     #IDE
     git

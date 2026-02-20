@@ -22,14 +22,12 @@
       efi.canTouchEfiVariables = true;
     };
     initrd = {
-      availableKernelModules = [
-        "xhci_pci"
+      boot.initrd.availableKernelModules = [
         "nvme"
-        "usbhid"
+        "xhci_pci"
+        "thunderbolt"
         "uas"
         "sd_mod"
-        "rtsx_pci_sdmmc"
-        "thunderbolt"
       ];
       kernelModules = [
         "dm-snapshot"
@@ -67,11 +65,5 @@
 
   networking.useDHCP = lib.mkDefault true;
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-  hardware.enableAllFirmware = true;
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
-  # Enable OpenGL
-  hardware.graphics = {
-    enable = true;
-  };
 }

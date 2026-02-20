@@ -104,6 +104,19 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "de_CH.UTF-8";
+    LC_COLLATE = "de_CH.UTF-8";
+    LC_CTYPE = "de_CH.UTF-8";
+    LC_IDENTIFICATION = "de_CH.UTF-8";
+    LC_MEASUREMENT = "de_CH.UTF-8";
+    LC_MONETARY = "de_CH.UTF-8";
+    LC_NAME = "de_CH.UTF-8";
+    LC_NUMERIC = "de_CH.UTF-8";
+    LC_PAPER = "de_CH.UTF-8";
+    LC_TELEPHONE = "de_CH.UTF-8";
+    LC_TIME = "de_CH.UTF-8";
+  };
   # Configure console keymap
   console.keyMap = "de_CH-latin1";
 
@@ -164,7 +177,11 @@
       };
     };
     xserver = {
-      enable = false;
+      enable = true;
+      displayManager.gdm.enable = true;
+      desktopManager.gnome.enable = true;
+
+      # Configure keymap in X11
       xkb = {
         layout = "ch";
         variant = "de_nodeadkeys";
@@ -199,30 +216,6 @@
     udev.extraRules = ''
       KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
     '';
-    # https://nixos.wiki/wiki/Greetd
-    # tweaked for Hyprland
-    # ...
-    # launches swaylock with exec-once in home/hyprland/hyprland.conf
-    # ...
-    # single user and single window manager
-    # my goal here is auto-login with authentication
-    # so I can declare my user and environment (Hyprland) in this config
-    # my goal is NOT to allow user selection or environment selection at the the login screen
-    # (which a login manager provides beyond just the authentication check)
-    # so I don't need a login manager
-    # I just launch Hyprland as iancleary automatically, which starts swaylock (to authenticate)
-    # I thought I needed a greeter, but I really don't
-    # ...
-    greetd = {
-      enable = true;
-      settings = rec {
-        initial_session = {
-          command = "${pkgs.hyprland}/bin/Hyprland";
-          user = "progressio";
-        };
-        default_session = initial_session;
-      };
-    };
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -276,47 +269,43 @@
   security = {
     rtkit.enable = true;
     # Define a user account. Don't forget to set a password with ‘passwd’.
-    pam = {
-      services = {
-        login = {
-          u2fAuth = true;
-          rules.auth.u2f = {
-            args = lib.mkAfter [
-              "pinverification=1"
-            ];
-          };
-        };
-        sudo = {
-          # unixAuth = false;
-          u2fAuth = true;
-          rules.auth.u2f.args = lib.mkAfter [
-            "pinverification=1"
-          ];
-        };
-        hyprlock = {
-          u2fAuth = true;
-          rules.auth.u2f.args = lib.mkAfter [
-            "pinverification=1"
-          ];
-        };
-      };
-      u2f = {
-        enable = true;
-        settings = {
-          authfile = pkgs.writeText "u2f-mappings" (
-            lib.concatStrings [
-              "progressio"
-              ":5a3ZpJl8dZkJZ1Fhy0YQ44NBUm0yvwTmb99u0uh93y7ovfsN3ooAYIuVqhWQO0BSjadSzlex/tH9xd9PDFlF7enR7VCsutYlLcYR0HhRm3Fo9Bz1IaB9LSjOFC7tPm/6,131W8LOSNyjno2PNMP577L7+VjLknSuPHvZqYzyygecd8ZyOgOEOJoCHKWLS/hcrX+sQ0iGyhx5y7qEK+lY2xA==,es256,+presence"
-              ":yk49+p8WGHWbmNL03ov/oBdv1HHkn1Q178StpRbyVr3oHzsPiguPoYGHwcnRNmRVgvCG9uoQ43whcFzATUg6FW8k5kMjINccq/+Ifd/ZoJhi1wIOIF+PY16Kxa7TRn7e,+2FYscYOkQexTeCS48kjR7sjg6HbLYM35ILMw3LhExypeM/DLSqe0bWs7rbklyY+oudXI/oJtxjLRDz2aOFrAQ==,es256,+presence"
-            ]
-          );
-        };
-      };
-    };
-    pam.services.regreet.enableGnomeKeyring = true;
-
-    # We need this to enable homemanager with sway
-    polkit.enable = true;
+    # pam = {
+    #   services = {
+    #     login = {
+    #       u2fAuth = true;
+    #       rules.auth.u2f = {
+    #         args = lib.mkAfter [
+    #           "pinverification=1"
+    #         ];
+    #       };
+    #     };
+    #     sudo = {
+    #       # unixAuth = false;
+    #       u2fAuth = true;
+    #       rules.auth.u2f.args = lib.mkAfter [
+    #         "pinverification=1"
+    #       ];
+    #     };
+    #     hyprlock = {
+    #       u2fAuth = true;
+    #       rules.auth.u2f.args = lib.mkAfter [
+    #         "pinverification=1"
+    #       ];
+    #     };
+    #   };
+    #   u2f = {
+    #     enable = true;
+    #     settings = {
+    #       authfile = pkgs.writeText "u2f-mappings" (
+    #         lib.concatStrings [
+    #           "progressio"
+    #           ":5a3ZpJl8dZkJZ1Fhy0YQ44NBUm0yvwTmb99u0uh93y7ovfsN3ooAYIuVqhWQO0BSjadSzlex/tH9xd9PDFlF7enR7VCsutYlLcYR0HhRm3Fo9Bz1IaB9LSjOFC7tPm/6,131W8LOSNyjno2PNMP577L7+VjLknSuPHvZqYzyygecd8ZyOgOEOJoCHKWLS/hcrX+sQ0iGyhx5y7qEK+lY2xA==,es256,+presence"
+    #           ":yk49+p8WGHWbmNL03ov/oBdv1HHkn1Q178StpRbyVr3oHzsPiguPoYGHwcnRNmRVgvCG9uoQ43whcFzATUg6FW8k5kMjINccq/+Ifd/ZoJhi1wIOIF+PY16Kxa7TRn7e,+2FYscYOkQexTeCS48kjR7sjg6HbLYM35ILMw3LhExypeM/DLSqe0bWs7rbklyY+oudXI/oJtxjLRDz2aOFrAQ==,es256,+presence"
+    #         ]
+    #       );
+    #     };
+    #   };
+    # };
   };
 
   # Install firefox.
@@ -341,7 +330,6 @@
       # sshfs
 
       #nvidia
-      egl-wayland
       networkmanagerapplet # liefert das 'nm-applet' Binary
       networkmanager-openconnect
       openconnect
@@ -359,22 +347,6 @@
   environment.etc."fuse.conf".text = ''
     user_allow_other
   '';
-
-  xdg.portal = {
-    enable = true;
-    xdgOpenUsePortal = true;
-    config = {
-      common.default = [ "gtk" ];
-      hyprland.default = [
-        "gtk"
-        "hyprland"
-      ];
-    };
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal-hyprland
-    ];
-  };
 
   system.stateVersion = "25.05"; # Did you read the comment?
 }

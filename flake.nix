@@ -41,7 +41,7 @@
                 useUserPackages = true;
                 users.progressio.imports = [
                   nixvim.homeModules.nixvim
-                  ./home/progressio.nix
+                  ./home_new/progressio.nix
                 ];
               };
             }
