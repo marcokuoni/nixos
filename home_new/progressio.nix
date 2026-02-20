@@ -5,7 +5,6 @@
 }:
 {
   imports = [
-    ./scripts/KillActiveProcess.nix
     ./scripts/LazyvimDiffPlugins.nix
     ./scripts/FortiStatus.nix
     ./scripts/FortiToggle.nix
