@@ -44,7 +44,7 @@
               permissions = "user:progressio:;";
             };
             vpn = {
-              ca = "/home/progressio/lemonbrain/vpn/int/lb-vpn-int-ca.crt";
+              ca = "/home/progressio/vpn/int/lb-vpn-int-ca.crt";
               cert = "/home/progressio/vpn/int/lb-vpn-int-marco-kuoni.crt";
               key = "/home/progressio/vpn/int/lb-vpn-int-marco-kuoni.key";
               cert-pass-flags = "1";
@@ -66,13 +66,13 @@
               permissions = "user:progressio:;";
             };
             vpn = {
-              ca = "/home/progressio/lemonbrain/vpn/pub/lb-vpn-pub-ca.crt";
-              cert = "/home/progressio/lemonbrain/vpn/pub/vpn-pub-marco.crt";
-              key = "/home/progressio/lemonbrain/vpn/pub/vpn-pub-marco.key";
+              ca = "/home/progressio/vpn/pub/lb-vpn-pub-ca.crt";
+              cert = "/home/progressio/vpn/pub/vpn-pub-marco.crt";
+              key = "/home/progressio/vpn/pub/vpn-pub-marco.key";
               cert-pass-flags = "1";
               connection-type = "tls";
               remote = "193.93.23.34";
-              ta = "/home/progressio/lemonbrain/vpn/pub/lb-vpn-ta.key";
+              ta = "/home/progressio/vpn/pub/lb-vpn-ta.key";
               ta-dir = "1";
               service-type = "org.freedesktop.NetworkManager.openvpn";
               remote-cert-tls = "server";
