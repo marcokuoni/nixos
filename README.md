@@ -1,6 +1,7 @@
 # My NixOS Configurations
 ## Rebuild
-´nixos-rebuild switch --flake '.#laptop'´
+´sudo nixos-rebuild switch --flake '.#laptop'´
+´sudo nixos-rebuild switch --flake '.#laptop_new'´
 
 ## Update
 ´nix flake update´
