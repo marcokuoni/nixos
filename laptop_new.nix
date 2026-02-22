@@ -357,7 +357,6 @@
       nwg-displays
       nwg-look
       bibata-cursors
-
     ];
   };
 

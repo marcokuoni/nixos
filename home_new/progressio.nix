@@ -6,13 +6,6 @@
 {
   imports = [
     ./scripts/LazyvimDiffPlugins.nix
-    ./scripts/FortiStatus.nix
-    ./scripts/FortiToggle.nix
-    ./scripts/FortiStart.nix
-    ./scripts/VpnIntStatus.nix
-    ./scripts/VpnIntToggle.nix
-    ./scripts/VpnPubStatus.nix
-    ./scripts/VpnPubToggle.nix
     ./scripts/ToggleKeyboard.nix
     ./zsh
     ./tmux
@@ -21,6 +14,31 @@
 
   home.username = "progressio";
   home.homeDirectory = "/home/progressio";
+
+  dconf = {
+    enable = true;
+    settings = {
+      "org/gnome/shell" = {
+        # disable-user-extensions = true; # Optionally disable user extensions entirely
+        enabled-extensions = [
+          pkgs.gnomeExtensions.forge.extensionUuid
+          pkgs.gnomeExtensions.mouse-follows-focus-2.extensionUuid
+        ];
+      };
+      "org/gnome/desktop/interface".color-scheme = "prefer-dark";
+      "org/gnome/settings-daemon/plugins/media-keys" = {
+        custom-keybindings = [
+          "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/"
+        ];
+      };
+
+      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal" = {
+        name = "Terminal";
+        command = "kgx";
+        binding = "<Control><Alt>t";
+      };
+    };
+  };
 
   services = {
     nextcloud-client = {
@@ -74,6 +92,11 @@
     brightnessctl
 
     vscode
+
+    # https://wiki.nixos.org/wiki/GNOME
+    # https://github.com/forge-ext/forge
+    gnomeExtensions.forge
+    gnomeExtensions.mouse-follows-focus-2
   ];
 
   home.stateVersion = "25.05";

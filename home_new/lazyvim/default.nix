@@ -286,19 +286,6 @@
                 linters_by_ft = { php = {} },
               },
             },
-            {
-              "mikesmithgh/kitty-scrollback.nvim",
-              lazy = true,
-              cmd = {
-                "KittyScrollbackGenerateKittens",
-                "KittyScrollbackCheckHealth",
-                "KittyScrollbackGenerateCommandLineEditing",
-              },
-              config = function()
-                require("kitty-scrollback").setup({})
-              end,
-            },
-
             -- keep treesitter ensure_installed cleared
             { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {} end },
           },
