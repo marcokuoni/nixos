@@ -22,7 +22,6 @@
         # disable-user-extensions = true; # Optionally disable user extensions entirely
         enabled-extensions = [
           pkgs.gnomeExtensions.forge.extensionUuid
-          pkgs.gnomeExtensions.mouse-follows-focus-2.extensionUuid
         ];
       };
       "org/gnome/desktop/interface".color-scheme = "prefer-dark";
@@ -96,7 +95,6 @@
     # https://wiki.nixos.org/wiki/GNOME
     # https://github.com/forge-ext/forge
     gnomeExtensions.forge
-    gnomeExtensions.mouse-follows-focus-2
   ];
 
   home.stateVersion = "25.05";
