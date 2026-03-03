@@ -24,18 +24,6 @@
           pkgs.gnomeExtensions.forge.extensionUuid
         ];
       };
-      "org/gnome/desktop/interface".color-scheme = "prefer-dark";
-      "org/gnome/settings-daemon/plugins/media-keys" = {
-        custom-keybindings = [
-          "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal/"
-        ];
-      };
-
-      "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminal" = {
-        name = "Terminal";
-        command = "kgx";
-        binding = "<Super>t";
-      };
     };
   };
 
