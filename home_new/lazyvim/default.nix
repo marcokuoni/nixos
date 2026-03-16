@@ -288,6 +288,12 @@
             },
             -- keep treesitter ensure_installed cleared
             { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {} end },
+            { "hrsh7th/nvim-cmp",
+              opts = function(_, opts)
+              opts.completion = {
+                autocomplete = false,
+              } end,
+            },
           },
         })
       '';
