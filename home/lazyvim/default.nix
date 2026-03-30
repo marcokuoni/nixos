@@ -26,7 +26,7 @@
       python313Packages.pylatexenc
       prettier
       shfmt
-      nixfmt-rfc-style
+      nixfmt
       php83Packages.php-cs-fixer
       markdownlint-cli2
       ast-grep
@@ -43,7 +43,40 @@
       vscode-json-languageserver
       vscode-extensions.xdebug.php-debug
       vscode-js-debug
+
+      # Haskell
+      haskell-language-server
+      haskellPackages.fourmolu
+      haskellPackages.cabal-fmt
+      haskellPackages.fast-tags
+
+      # Nix LSP
+      nil # or nixd
+      statix
+
+      # Tree-sitter
+      tree-sitter
+      gcc # C compiler for parser compilation
+
+      # Formatters
+      nodePackages.fixjson
+      jq
+      nodePackages.markdownlint-cli2
+
+      imagemagick
     ];
+
+    extraFiles = {
+      "parser/haskell.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.haskell}/parser/haskell.so";
+      "parser/bash.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.bash}/parser/bash.so";
+      "parser/regex.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.regex}/parser/regex.so";
+      "parser/html.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.html}/parser/html.so";
+      "parser/latex.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.latex}/parser/latex.so";
+      "parser/yaml.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.yaml}/parser/yaml.so";
+      "parser/css.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.css}/parser/css.so";
+      "parser/javascript.so".source =
+        "${pkgs.vimPlugins.nvim-treesitter-parsers.javascript}/parser/javascript.so";
+    };
 
     extraPlugins = with pkgs.vimPlugins; [
       lazy-nvim
@@ -96,6 +129,7 @@
           nvim-ts-autotag
           nvim-dap
           nvim-dap-ui
+          nvim-nio
           nvim-dap-virtual-text
           persistence-nvim
           plenary-nvim
@@ -145,6 +179,7 @@
           defaults = {
             lazy = true,
           },
+          rocks = { enabled = false },
           dev = {
             -- reuse files from pkgs.vimPlugins.*
             path = "${lazyPath}",
@@ -153,21 +188,30 @@
             fallback = true,
           },
           spec = {
-            { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+            { "LazyVim/LazyVim", 
+              import = "lazyvim.plugins",
+              opts = {
+                colorscheme = "catppuccin",
+              },
+            },
+            {
+              "catppuccin/nvim",
+              name = "catppuccin",
+              -- opts = { flavour = "latte" },
+            },
 
             -- Nix fixes
             { "nvim-telescope/telescope-fzf-native.nvim", enabled = true },
 
             -- ❌ No Mason anywhere
-            { "williamboman/mason.nvim", enabled = false },
-            { "williamboman/mason-lspconfig.nvim", enabled = false },
+            { "mason-org/mason.nvim", enabled = false },
+            { "mason-org/mason-lspconfig.nvim", enabled = false },
             { "jay-babu/mason-nvim-dap.nvim", enabled = false },
 
             -- ❌ Disable LazyVim's PHP extra (it expects Mason)
             { import = "lazyvim.plugins.extras.lang.php", enabled = false },
 
-            -- ✅ Enable LazyVim’s DAP extra so <leader>d shows up
-            { import = "lazyvim.plugins.extras.dap.core" },
+            { import = "lazyvim.plugins.extras.dap.core", enabled = true },
 
             -- (optional) PHP LSP without Mason: use phpactor from Nix
             {
@@ -188,43 +232,35 @@
               "mfussenegger/nvim-dap",
               dependencies = {
                 "rcarriga/nvim-dap-ui",
+                "nvim-neotest/nvim-nio",
                 "theHamsta/nvim-dap-virtual-text",
               },
-              ft = { "php" }, -- load when opening PHP
+              ft = { "php" },
               config = function()
-                -- ensure we register the adapter when PHP is opened
-                vim.api.nvim_create_autocmd("FileType", {
-                  pattern = "php",
-                  once = true,
-                  callback = function()
-                    local dap = require("dap")
-                    local dapui = require("dapui")
+                local dap = require("dap")
+                local dapui = require("dapui")
 
-                    -- VSCode Xdebug adapter from Nixpkgs
-                    local php_debug_js = "${pkgs.vscode-extensions.xdebug.php-debug}/share/vscode/extensions/xdebug.php-debug/out/phpDebug.js"
+                local php_debug_js = "${pkgs.vscode-extensions.xdebug.php-debug}/share/vscode/extensions/xdebug.php-debug/out/phpDebug.js"
 
-                    if not dap.adapters.php then
-                      dap.adapters.php = {
-                        type = "executable",
-                        command = "node",
-                        args = { php_debug_js },
-                        options = { detached = false },
-                      }
-                    end
+                -- Register adapter immediately (not inside autocmd)
+                dap.adapters.php = {
+                  type = "executable",
+                  command = "node",
+                  args = { php_debug_js },
+                  options = { detached = false },
+                }
+                dap.adapters["php-debug-adapter"] = dap.adapters.php
 
-                    dapui.setup()
-                    dap.listeners.after.event_initialized["dapui_open"] = function() dapui.open() end
-                    dap.listeners.before.event_terminated["dapui_close"] = function() dapui.close() end
-                    dap.listeners.before.event_exited["dapui_close"] = function() dapui.close() end
+                dapui.setup()
+                dap.listeners.after.event_initialized["dapui_open"] = function() dapui.open() end
+                dap.listeners.before.event_terminated["dapui_close"] = function() dapui.close() end
+                dap.listeners.before.event_exited["dapui_close"] = function() dapui.close() end
 
-                    -- handy keys
-                    vim.keymap.set("n", "<F5>", function() dap.continue() end)
-                    vim.keymap.set("n", "<F9>", function() dap.toggle_breakpoint() end)
-                    vim.keymap.set("n", "<F10>", function() dap.step_over() end)
-                    vim.keymap.set("n", "<F11>", function() dap.step_into() end)
-                    vim.keymap.set("n", "<F12>", function() dap.step_out() end)
-                  end,
-                })
+                vim.keymap.set("n", "<F5>", function() dap.continue() end)
+                vim.keymap.set("n", "<F9>", function() dap.toggle_breakpoint() end)
+                vim.keymap.set("n", "<F10>", function() dap.step_over() end)
+                vim.keymap.set("n", "<F11>", function() dap.step_into() end)
+                vim.keymap.set("n", "<F12>", function() dap.step_out() end)
               end,
             },
 
@@ -286,21 +322,18 @@
                 linters_by_ft = { php = {} },
               },
             },
-            {
-              "mikesmithgh/kitty-scrollback.nvim",
-              lazy = true,
-              cmd = {
-                "KittyScrollbackGenerateKittens",
-                "KittyScrollbackCheckHealth",
-                "KittyScrollbackGenerateCommandLineEditing",
-              },
-              config = function()
-                require("kitty-scrollback").setup({})
-              end,
-            },
-
             -- keep treesitter ensure_installed cleared
-            { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) opts.ensure_installed = {} end },
+            { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) 
+                opts.ensure_installed = {}
+                opts.auto_install = false
+                end 
+            },
+            { "hrsh7th/nvim-cmp",
+              opts = function(_, opts)
+              opts.completion = {
+                autocomplete = false,
+              } end,
+            },
           },
         })
       '';

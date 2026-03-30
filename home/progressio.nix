@@ -1,26 +1,19 @@
 {
   config,
+  inputs,
   pkgs,
   ...
 }:
 {
   imports = [
-    ./scripts/KillActiveProcess.nix
+    ./niri
+    ./noctalia
     ./scripts/LazyvimDiffPlugins.nix
-    ./scripts/FortiStatus.nix
-    ./scripts/FortiToggle.nix
-    ./scripts/FortiStart.nix
-    ./scripts/VpnIntStatus.nix
-    ./scripts/VpnIntToggle.nix
-    ./scripts/VpnPubStatus.nix
-    ./scripts/VpnPubToggle.nix
-    ./scripts/ToggleKeyboard.nix
+    ./ghosty
     ./zsh
-    ./kitty
+    ./ghosty
     ./tmux
     ./lazyvim
-    ./waybar
-    ./hyprland
   ];
 
   home.username = "progressio";
@@ -32,26 +25,31 @@
     };
   };
 
-  programs.vscode.enable = true;
-  programs.lazygit.enable = true;
-  programs.lazydocker.enable = true;
-  programs.chromium.enable = true;
-  programs.ssh = {
-    enable = true;
-    matchBlocks = {
-      "*.exigo.ch" = {
-        extraOptions = {
-          SetEnv = "TERM=xterm-256color";
+  programs = {
+    vscode.enable = true;
+    zen-browser = {
+      enable = true;
+      setAsDefaultBrowser = true;
+    };
+    chromium.enable = true;
+    ssh = {
+      enable = true;
+      enableDefaultConfig = false;
+
+      matchBlocks = {
+        "*" = {
+          serverAliveInterval = 60;
+          serverAliveCountMax = 5;
+        };
+
+        "*.exigo.ch" = {
+          extraOptions = {
+            SetEnv = "TERM=xterm-256color";
+          };
         };
       };
     };
-    extraConfig = ''
-      Host *
-        ServerAliveInterval 60
-        ServerAliveCountMax 5
-    '';
   };
-
   home.packages = with pkgs; [
     curl
     ripgrep
@@ -59,17 +57,12 @@
     openvpn
     libreoffice
     qutebrowser
-    nautilus
     projecteur
-    bibata-cursors
     k9s
 
     # zip
     zip
     unzip
-
-    #Terminal
-    oh-my-zsh
 
     #IDE
     git
@@ -79,6 +72,8 @@
     brightnessctl
 
     vscode
+
+    xwayland-satellite # xwayland support
   ];
 
   home.stateVersion = "25.05";

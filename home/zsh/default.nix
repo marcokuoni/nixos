@@ -2,7 +2,8 @@
   config,
   pkgs,
   ...
-}: let
+}:
+let
   shellAliases = {
     g = "git";
     ga = "git add";
@@ -20,7 +21,8 @@
 
     mv = "mv -i";
   };
-in {
+in
+{
   programs = {
     zsh = {
       enable = true;

@@ -20,7 +20,9 @@
     # Enable networking
     networkmanager = {
       enable = true;
+
       plugins = with pkgs; [
+        networkmanager-openvpn
         (networkmanager-openconnect.override { withGnome = true; })
       ];
       ensureProfiles = {
@@ -33,28 +35,99 @@
         #     key = "password";
         #   }
         # ];
-        profiles.school = {
-          connection = {
-            id = "school";
-            type = "vpn";
+        profiles = {
+          lb-int = {
+            connection = {
+              id = "lb-int";
+              type = "vpn";
+              autoconnect = false;
+              permissions = "user:progressio:;";
+            };
+            vpn = {
+              ca = "/home/progressio/vpn/int/lb-vpn-int-ca.crt";
+              cert = "/home/progressio/vpn/int/lb-vpn-int-marco-kuoni.crt";
+              key = "/home/progressio/vpn/int/lb-vpn-int-marco-kuoni.key";
+              cert-pass-flags = "1";
+              connection-type = "tls";
+              remote = "193.93.23.35";
+              ta = "/home/progressio/vpn/int/lb-vpn-ta.key";
+              ta-dir = "1";
+              service-type = "org.freedesktop.NetworkManager.openvpn";
+              remote-cert-tls = "server";
+              data-ciphers = "AES-256-GCM";
+            };
           };
-          vpn = {
-            service-type = "org.freedesktop.NetworkManager.openconnect";
-
-            cookie-flags = "1";
-
-            gateway = "vpn.ost.ch";
-            remote = "vpn.ost.ch";
-            protocol = "anyconnect";
-            useragent = "AnyConnect";
-            username = "marco.kuoni@ost.ch";
-            authtype = "password";
+          # nmcli connection up "lb-pub" --ask
+          lb-pub = {
+            connection = {
+              id = "lb-pub";
+              type = "vpn";
+              autoconnect = false;
+              permissions = "user:progressio:;";
+            };
+            vpn = {
+              ca = "/home/progressio/vpn/pub/lb-vpn-pub-ca.crt";
+              cert = "/home/progressio/vpn/pub/vpn-pub-marco.crt";
+              key = "/home/progressio/vpn/pub/vpn-pub-marco.key";
+              cert-pass-flags = "1";
+              connection-type = "tls";
+              remote = "193.93.23.34";
+              ta = "/home/progressio/vpn/pub/lb-vpn-ta.key";
+              ta-dir = "1";
+              service-type = "org.freedesktop.NetworkManager.openvpn";
+              remote-cert-tls = "server";
+              data-ciphers = "AES-256-GCM";
+            };
           };
-          vpn-secrets = {
-            gateway = "vpn.ost.ch";
-            gwcert = "";
-            cookie = "";
-            resolve = "";
+          exigo = {
+            connection = {
+              id = "exigo";
+              type = "vpn";
+              autoconnect = false;
+              permissions = "user:progressio:;";
+            };
+            vpn = {
+              authtype = "password";
+              autoconnect-flags = "0";
+              certsigs-flags = "0";
+              cookie-flags = "2";
+              disable_udp = "no";
+              enable_csd_trojan = "no";
+              gateway = "gate2.exigo.ch";
+              gateway-flags = "2";
+              gwcert-flags = "2";
+              lasthost-flags = "0";
+              pem_passphrase_fsid = "no";
+              prevent_invalid_cert = "no";
+              protocol = "fortinet";
+              resolve-flags = "2";
+              stoken_source = "disabled";
+              useragent = "";
+              xmlconfig-flags = "0";
+              service-type = "org.freedesktop.NetworkManager.openconnect";
+            };
+            vpn-secrets = {
+              "certificate:193.93.23.20:443" = "pin-sha256:6EuCXl3bvo3RctLhzkfSRCf4KP4+f5CossNjRokrJ2o=";
+              "form:_login:username" = "lemonbrain";
+              lasthost = "gate2.exigo.ch";
+            };
+          };
+          school = {
+            connection = {
+              id = "school";
+              type = "vpn";
+              autoconnect = false;
+              permissions = "user:progressio:;";
+            };
+            vpn = {
+              service-type = "org.freedesktop.NetworkManager.openconnect";
+              gateway = "vpn.ost.ch";
+              protocol = "anyconnect";
+              useragent = "AnyConnect";
+              username = "marco.kuoni@ost.ch";
+              authtype = "password";
+            };
+            vpn-secrets = { };
           };
         };
       };
@@ -66,8 +139,9 @@
       127.0.0.1 lemonbrain.local
       127.0.0.1 backoffice.local
       127.0.0.1 ksgl.local
+      127.0.0.1 formidable.local
+      127.0.0.1 kulturkarussell.local
       152.96.10.67 ins-lab
-      193.93.22.14 elma-ag.ch
     '';
     # 9003 XDebug, 631 CUPS
     firewall.allowedTCPPorts = [
@@ -93,8 +167,15 @@
       ];
       auto-optimise-store = true;
       min-free = "50G";
-      substituters = [ "https://hyprland.cachix.org" ];
-      trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
+      substituters = [ "https://niri.cachix.org" ];
+      trusted-public-keys = [
+        "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
+      ];
+    };
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 7d";
     };
   };
 
@@ -104,72 +185,47 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
+  i18n.extraLocaleSettings = {
+    LC_ADDRESS = "de_CH.UTF-8";
+    LC_COLLATE = "de_CH.UTF-8";
+    LC_CTYPE = "de_CH.UTF-8";
+    LC_IDENTIFICATION = "de_CH.UTF-8";
+    LC_MEASUREMENT = "de_CH.UTF-8";
+    LC_MONETARY = "de_CH.UTF-8";
+    LC_NAME = "de_CH.UTF-8";
+    LC_NUMERIC = "de_CH.UTF-8";
+    LC_PAPER = "de_CH.UTF-8";
+    LC_TELEPHONE = "de_CH.UTF-8";
+    LC_TIME = "de_CH.UTF-8";
+  };
   # Configure console keymap
   console.keyMap = "de_CH-latin1";
 
   services = {
+    power-profiles-daemon.enable = true;
+    upower.enable = true;
     dbus.enable = true;
-    openvpn.servers = {
-      lb-pub = {
-        config = ''
-          client
-          dev tun
-          proto udp
-          remote 193.93.23.34 1194
-          resolv-retry infinite
-          nobind
-          persist-key
-          persist-tun
-
-          data-ciphers AES-256-GCM
-          remote-cert-tls server
-          auth-nocache
-
-          ca /home/progressio/lemonbrain/vpn/pub/lb-vpn-pub-ca.crt
-          cert /home/progressio/lemonbrain/vpn/pub/vpn-pub-marco.crt
-          key /home/progressio/lemonbrain/vpn/pub/vpn-pub-marco.key
-          tls-auth /home/progressio/lemonbrain/vpn/pub/lb-vpn-ta.key 1
-          askpass /tmp/openvpn-lb-pub.pass
-
-          verb 3
-        '';
-        updateResolvConf = true; # ← hook OpenVPN to resolvconf
-        autoStart = false; # or true if you want it started on boot
-      };
-      lb-int = {
-        config = ''
-          client
-          dev tun
-          proto udp
-          remote 193.93.23.35 1194
-          resolv-retry infinite
-          nobind
-          persist-key
-          persist-tun
-
-          data-ciphers AES-256-GCM
-          remote-cert-tls server
-          auth-nocache
-
-          ca /home/progressio/lemonbrain/vpn/int/lb-vpn-int-ca.crt
-          cert /home/progressio/lemonbrain/vpn/int/lb-vpn-int-marco-kuoni.crt
-          key /home/progressio/lemonbrain/vpn/int/lb-vpn-int-marco-kuoni.key
-          tls-auth /home/progressio/lemonbrain/vpn/int/lb-vpn-ta.key 1
-          askpass /tmp/openvpn-lb-int.pass
-
-          verb 3
-        '';
-        updateResolvConf = true; # ← hook OpenVPN to resolvconf
-        autoStart = false; # or true if you want it started on boot
-      };
-    };
+    #todelete
     xserver = {
-      enable = false;
+      enable = true;
+
+      # Configure keymap in X11
       xkb = {
         layout = "ch";
         variant = "de_nodeadkeys";
       };
     };
+    displayManager = {
+      gdm.enable = true;
+
+      defaultSession = "niri";
+
+      sessionPackages = [
+        pkgs.niri
+      ];
+    };
+    desktopManager.gnome.enable = true;
+    gnome.gnome-keyring.enable = true;
     printing = {
       enable = true;
       drivers = [ pkgs.gutenprint ];
@@ -199,30 +255,6 @@
     udev.extraRules = ''
       KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
     '';
-    # https://nixos.wiki/wiki/Greetd
-    # tweaked for Hyprland
-    # ...
-    # launches swaylock with exec-once in home/hyprland/hyprland.conf
-    # ...
-    # single user and single window manager
-    # my goal here is auto-login with authentication
-    # so I can declare my user and environment (Hyprland) in this config
-    # my goal is NOT to allow user selection or environment selection at the the login screen
-    # (which a login manager provides beyond just the authentication check)
-    # so I don't need a login manager
-    # I just launch Hyprland as iancleary automatically, which starts swaylock (to authenticate)
-    # I thought I needed a greeter, but I really don't
-    # ...
-    greetd = {
-      enable = true;
-      settings = rec {
-        initial_session = {
-          command = "${pkgs.hyprland}/bin/Hyprland";
-          user = "progressio";
-        };
-        default_session = initial_session;
-      };
-    };
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -275,48 +307,45 @@
 
   security = {
     rtkit.enable = true;
+    pam.services.login.enableGnomeKeyring = true;
     # Define a user account. Don't forget to set a password with ‘passwd’.
-    pam = {
-      services = {
-        login = {
-          u2fAuth = true;
-          rules.auth.u2f = {
-            args = lib.mkAfter [
-              "pinverification=1"
-            ];
-          };
-        };
-        sudo = {
-          # unixAuth = false;
-          u2fAuth = true;
-          rules.auth.u2f.args = lib.mkAfter [
-            "pinverification=1"
-          ];
-        };
-        hyprlock = {
-          u2fAuth = true;
-          rules.auth.u2f.args = lib.mkAfter [
-            "pinverification=1"
-          ];
-        };
-      };
-      u2f = {
-        enable = true;
-        settings = {
-          authfile = pkgs.writeText "u2f-mappings" (
-            lib.concatStrings [
-              "progressio"
-              ":5a3ZpJl8dZkJZ1Fhy0YQ44NBUm0yvwTmb99u0uh93y7ovfsN3ooAYIuVqhWQO0BSjadSzlex/tH9xd9PDFlF7enR7VCsutYlLcYR0HhRm3Fo9Bz1IaB9LSjOFC7tPm/6,131W8LOSNyjno2PNMP577L7+VjLknSuPHvZqYzyygecd8ZyOgOEOJoCHKWLS/hcrX+sQ0iGyhx5y7qEK+lY2xA==,es256,+presence"
-              ":yk49+p8WGHWbmNL03ov/oBdv1HHkn1Q178StpRbyVr3oHzsPiguPoYGHwcnRNmRVgvCG9uoQ43whcFzATUg6FW8k5kMjINccq/+Ifd/ZoJhi1wIOIF+PY16Kxa7TRn7e,+2FYscYOkQexTeCS48kjR7sjg6HbLYM35ILMw3LhExypeM/DLSqe0bWs7rbklyY+oudXI/oJtxjLRDz2aOFrAQ==,es256,+presence"
-            ]
-          );
-        };
-      };
-    };
-    pam.services.regreet.enableGnomeKeyring = true;
-
-    # We need this to enable homemanager with sway
-    polkit.enable = true;
+    # pam = {
+    #   services = {
+    #     login = {
+    #       u2fAuth = true;
+    #       rules.auth.u2f = {
+    #         args = lib.mkAfter [
+    #           "pinverification=1"
+    #         ];
+    #       };
+    #     };
+    #     sudo = {
+    #       # unixAuth = false;
+    #       u2fAuth = true;
+    #       rules.auth.u2f.args = lib.mkAfter [
+    #         "pinverification=1"
+    #       ];
+    #     };
+    #     hyprlock = {
+    #       u2fAuth = true;
+    #       rules.auth.u2f.args = lib.mkAfter [
+    #         "pinverification=1"
+    #       ];
+    #     };
+    #   };
+    #   u2f = {
+    #     enable = true;
+    #     settings = {
+    #       authfile = pkgs.writeText "u2f-mappings" (
+    #         lib.concatStrings [
+    #           "progressio"
+    #           ":5a3ZpJl8dZkJZ1Fhy0YQ44NBUm0yvwTmb99u0uh93y7ovfsN3ooAYIuVqhWQO0BSjadSzlex/tH9xd9PDFlF7enR7VCsutYlLcYR0HhRm3Fo9Bz1IaB9LSjOFC7tPm/6,131W8LOSNyjno2PNMP577L7+VjLknSuPHvZqYzyygecd8ZyOgOEOJoCHKWLS/hcrX+sQ0iGyhx5y7qEK+lY2xA==,es256,+presence"
+    #           ":yk49+p8WGHWbmNL03ov/oBdv1HHkn1Q178StpRbyVr3oHzsPiguPoYGHwcnRNmRVgvCG9uoQ43whcFzATUg6FW8k5kMjINccq/+Ifd/ZoJhi1wIOIF+PY16Kxa7TRn7e,+2FYscYOkQexTeCS48kjR7sjg6HbLYM35ILMw3LhExypeM/DLSqe0bWs7rbklyY+oudXI/oJtxjLRDz2aOFrAQ==,es256,+presence"
+    #         ]
+    #       );
+    #     };
+    #   };
+    # };
   };
 
   # Install firefox.
@@ -341,7 +370,6 @@
       # sshfs
 
       #nvidia
-      egl-wayland
       networkmanagerapplet # liefert das 'nm-applet' Binary
       networkmanager-openconnect
       openconnect
@@ -349,7 +377,7 @@
       nwg-displays
       nwg-look
       bibata-cursors
-
+      xwayland-satellite
     ];
   };
 
@@ -360,21 +388,5 @@
     user_allow_other
   '';
 
-  xdg.portal = {
-    enable = true;
-    xdgOpenUsePortal = true;
-    config = {
-      common.default = [ "gtk" ];
-      hyprland.default = [
-        "gtk"
-        "hyprland"
-      ];
-    };
-    extraPortals = [
-      pkgs.xdg-desktop-portal-gtk
-      pkgs.xdg-desktop-portal-hyprland
-    ];
-  };
-
-  system.stateVersion = "24.11"; # Did you read the comment?
+  system.stateVersion = "25.05"; # Did you read the comment?
 }
