@@ -70,6 +70,8 @@
     # Desktop
     libnotify
     brightnessctl
+    wl-mirror
+    wlr-randr
 
     vscode
 

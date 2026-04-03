@@ -6,6 +6,12 @@
   ...
 }:
 {
+  home.file.".config/noctalia/user-templates.toml".text = ''
+    [templates.nvim-base16]
+    input_path = "~/.config/nvim/lua/matugen-template.lua"
+    output_path = "~/.config/nvim/lua/matugen.lua"
+    post_hook = 'pkill -SIGUSR1 nvim'
+  '';
   # https://github.com/azuwis/lazyvim-nixvim/tree/master
   programs.nixvim = {
     enable = true;
@@ -76,10 +82,46 @@
       "parser/css.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.css}/parser/css.so";
       "parser/javascript.so".source =
         "${pkgs.vimPlugins.nvim-treesitter-parsers.javascript}/parser/javascript.so";
+      "lua/matugen-template.lua".text = ''
+        local M = {}
+
+        function M.setup()
+          require('base16-colorscheme').setup {
+            base00 = '{{colors.surface.default.hex}}',
+            base01 = '{{colors.surface_container.default.hex}}',
+            base02 = '{{colors.surface_container_high.default.hex}}',
+            base03 = '{{colors.outline.default.hex}}',
+            base04 = '{{colors.on_surface_variant.default.hex}}',
+            base05 = '{{colors.on_surface.default.hex}}',
+            base06 = '{{colors.on_surface.default.hex}}',
+            base07 = '{{colors.on_background.default.hex}}',
+            base08 = '{{colors.error.default.hex}}',
+            base09 = '{{colors.tertiary.default.hex}}',
+            base0A = '{{colors.secondary.default.hex}}',
+            base0B = '{{colors.primary.default.hex}}',
+            base0C = '{{colors.tertiary_fixed_dim.default.hex}}',
+            base0D = '{{colors.primary_fixed_dim.default.hex}}',
+            base0E = '{{colors.secondary_fixed_dim.default.hex}}',
+            base0F = '{{colors.error_container.default.hex}}',
+          }
+        end
+
+        local signal = vim.uv.new_signal()
+        signal:start(
+          'sigusr1',
+          vim.schedule_wrap(function()
+            package.loaded['matugen'] = nil
+            require('matugen').setup()
+          end)
+        )
+
+        return M
+      '';
     };
 
     extraPlugins = with pkgs.vimPlugins; [
       lazy-nvim
+      base16-nvim
     ];
 
     extraConfigLua =
@@ -191,13 +233,31 @@
             { "LazyVim/LazyVim", 
               import = "lazyvim.plugins",
               opts = {
-                colorscheme = "catppuccin",
+                --colorscheme = "catppuccin",
+                colorscheme = function()
+                  local ok, matugen = pcall(require, 'matugen')
+                  if ok then
+                    matugen.setup()  -- applies base16 colors directly, no vim colorscheme command needed
+                  else
+                    vim.cmd.colorscheme("catppuccin")  -- fallback
+                  end
+                end,
               },
+            },
+            {
+              "RRethy/base16-nvim",
+              lazy = false,
+              priority = 1000,
+              config = function()
+                -- matugen.lua is written by Noctalia at runtime
+                local ok, _ = pcall(require, 'matugen')
+                if ok then require('matugen').setup() end
+              end,
             },
             {
               "catppuccin/nvim",
               name = "catppuccin",
-              -- opts = { flavour = "latte" },
+              --opts = { flavour = "latte" },
             },
 
             -- Nix fixes
