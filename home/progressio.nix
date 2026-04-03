@@ -70,6 +70,7 @@
     # Desktop
     libnotify
     brightnessctl
+    jq
     wl-mirror
     wlr-randr
 

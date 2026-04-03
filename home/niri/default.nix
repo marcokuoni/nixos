@@ -18,8 +18,11 @@
         backdrop-color = "#26233a";
       };
       layout = {
-        gaps = 4;
+        gaps = 6;
         border.width = 1;
+        tab-indicator = {
+          place-within-column = true;
+        };
       };
       layer-rules = [
         {
@@ -34,18 +37,14 @@
       ];
       window-rules = [
         {
-          geometry-corner-radius = {
-            top-left = 5.0;
-            top-right = 5.0;
-            bottom-left = 5.0;
-            bottom-right = 5.0;
-          };
-          clip-to-geometry = true;
-        }
-        {
           matches = [ { app-id = "wl-mirror"; } ];
           open-fullscreen = true;
           open-on-output = "HDMI-A-1"; # your beamer output name
+        }
+        {
+          matches = [ { app-id = "zen-beta"; } ];
+          open-fullscreen = true;
+          open-on-workspace = "1";
         }
         {
           matches = [
@@ -105,7 +104,7 @@
             #
             #Mod-Shift-/, which is usually the same as Mod-?,
             #shows a list of important hotkeys.
-            "Mod+Ctrl+Slash".action.show-hotkey-overlay = { };
+            "Mod+Shift+Slash".action.show-hotkey-overlay = { };
 
             # Terminal öffnen
             "Mod+T".action.spawn = "ghostty";
@@ -117,7 +116,7 @@
 
             # App-Launcher
             "Mod+D".action.spawn-sh = "noctalia-shell ipc call launcher toggle";
-            "Ctrl+Alt+L".action.spawn-sh = "noctalia-shell ipc call lockScreen toggle";
+            "Ctrl+Alt+L".action.spawn-sh = "noctalia-shell ipc call lockScreen lock";
 
             # # Audio (Media-Tasten)
             "XF86AudioRaiseVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
@@ -205,8 +204,8 @@
             # The following binds move the focused window in and out of a column.
             # If the window is alone, they will consume it into the nearby column to the side.
             # If the window is already in a column, they will expel it out.
-            "Mod+BracketLeft".action.consume-or-expel-window-left = { };
-            "Mod+BracketRight".action.consume-or-expel-window-right = { };
+            "Mod+odiaeresis".action.consume-or-expel-window-left = { };
+            "Mod+udiaeresis".action.consume-or-expel-window-right = { };
 
             #Consume one window from the right to the bottom of the focused column.
             "Mod+Comma".action.consume-window-into-column = { };
@@ -240,11 +239,11 @@
             #Pixel sizes use logical, or scaled, pixels. I.e. on an output with scale 2.0,
             #set-column-width "100" will make the column occupy 200 physical screen pixels.
             "Mod+Minus".action = set-column-width "-10%";
-            "Mod+Equal".action = set-column-width "+10%";
+            "Mod+Less".action = set-column-width "+10%";
 
             #Finer height adjustments when in column with other windows.
             "Mod+Shift+Minus".action = set-window-height "-10%";
-            "Mod+Shift+Equal".action = set-window-height "+10%";
+            "Mod+Shift+Less".action = set-window-height "+10%";
 
             #Move the focused window between the floating and the tiling layout.
             "Mod+V".action.toggle-window-floating = { };
