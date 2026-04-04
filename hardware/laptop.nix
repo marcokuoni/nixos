@@ -35,6 +35,7 @@
       ];
       luks.devices = {
         "cryptroot" = {
+          # https://nixos.org/manual/nixos/stable/#sec-luks-file-systems-fido2-systemd
           crypttabExtraOpts = [ "fido2-device=auto" ];
           device = "/dev/disk/by-partlabel/CRYPTROOT";
         };
