@@ -309,43 +309,39 @@
     rtkit.enable = true;
     pam.services.login.enableGnomeKeyring = true;
     # Define a user account. Don't forget to set a password with ‘passwd’.
-    # pam = {
-    #   services = {
-    #     login = {
-    #       u2fAuth = true;
-    #       rules.auth.u2f = {
-    #         args = lib.mkAfter [
-    #           "pinverification=1"
-    #         ];
-    #       };
-    #     };
-    #     sudo = {
-    #       # unixAuth = false;
-    #       u2fAuth = true;
-    #       rules.auth.u2f.args = lib.mkAfter [
-    #         "pinverification=1"
-    #       ];
-    #     };
-    #     hyprlock = {
-    #       u2fAuth = true;
-    #       rules.auth.u2f.args = lib.mkAfter [
-    #         "pinverification=1"
-    #       ];
-    #     };
-    #   };
-    #   u2f = {
-    #     enable = true;
-    #     settings = {
-    #       authfile = pkgs.writeText "u2f-mappings" (
-    #         lib.concatStrings [
-    #           "progressio"
-    #           ":5a3ZpJl8dZkJZ1Fhy0YQ44NBUm0yvwTmb99u0uh93y7ovfsN3ooAYIuVqhWQO0BSjadSzlex/tH9xd9PDFlF7enR7VCsutYlLcYR0HhRm3Fo9Bz1IaB9LSjOFC7tPm/6,131W8LOSNyjno2PNMP577L7+VjLknSuPHvZqYzyygecd8ZyOgOEOJoCHKWLS/hcrX+sQ0iGyhx5y7qEK+lY2xA==,es256,+presence"
-    #           ":yk49+p8WGHWbmNL03ov/oBdv1HHkn1Q178StpRbyVr3oHzsPiguPoYGHwcnRNmRVgvCG9uoQ43whcFzATUg6FW8k5kMjINccq/+Ifd/ZoJhi1wIOIF+PY16Kxa7TRn7e,+2FYscYOkQexTeCS48kjR7sjg6HbLYM35ILMw3LhExypeM/DLSqe0bWs7rbklyY+oudXI/oJtxjLRDz2aOFrAQ==,es256,+presence"
-    #         ]
-    #       );
-    #     };
-    #   };
-    # };
+    pam = {
+      services = {
+        login = {
+          u2fAuth = true;
+          rules.auth.u2f = {
+            args = lib.mkAfter [
+              "pinverification=1"
+            ];
+          };
+        };
+        sudo = {
+          # unixAuth = false;
+          u2fAuth = true;
+          rules.auth.u2f.args = lib.mkAfter [
+            "pinverification=1"
+          ];
+        };
+      };
+      u2f = {
+        enable = true;
+        settings = {
+          authfile = pkgs.writeText "u2f-mappings" (
+            # nix-shell -p pam_u2f
+            # pamu2fcfg > /tmp/u2f_mappings
+            lib.concatStrings [
+              "progressio"
+              ":Dld2Hwn9kVGjImdI2x37Iho6m8dG/H/INYW+5DjGn6s6s8rzH9SjjFUS4fas88WtHLC6hlOni5RlANRzGzvKhgbu7VkO6IKe4r+RSv8lZrg3/jVc/7jZ+0OQ5h90LOwx,GFi3pUUcIpF7fWAZ/1FBGoG84osWS7z2LbYiYY0e2uJGGNfdQfPDfoBJzayOvyDK9nAW5hs9vU1JGIGbYZoC1Q==,es256,+presence"
+              ":X1FGyZEu3GwF6ILuT3cDFE9yElO60EvmXRw1XjCDNj/TLjOoAkCSrnIxT6S1pK+oW1vaicCHDk46slBMvCt+0BB937mOyBQb4bPXjv5RnMeTcodfFPd90IeFY/nBRxtg,G8mdY+E9qmQv89VC/AGH0qtC+iQEJtKDVmzqLvBFZZOEq1B829FOVpd9pAsp7JYiy6uaSxt7YDt0urGlXkptRg==,es256,+presence"
+            ]
+          );
+        };
+      };
+    };
   };
 
   # Install firefox.
