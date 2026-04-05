@@ -10,6 +10,9 @@
     enable = true;
     package = pkgs.niri-stable;
     settings = {
+      outputs."DP-8" = {
+        transform.rotation = 270;
+      };
       input.keyboard.xkb = {
         layout = "ch";
         variant = "de_nodeadkeys";
