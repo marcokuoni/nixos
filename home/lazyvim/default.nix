@@ -70,6 +70,11 @@
       nodePackages.markdownlint-cli2
 
       imagemagick
+
+      # C#
+      omnisharp-roslyn
+      csharpier
+      dotnet-sdk_10
     ];
 
     extraFiles = {
@@ -82,6 +87,7 @@
       "parser/css.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.css}/parser/css.so";
       "parser/javascript.so".source =
         "${pkgs.vimPlugins.nvim-treesitter-parsers.javascript}/parser/javascript.so";
+      "parser/c_sharp.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.c_sharp}/parser/c_sharp.so";
       "lua/matugen-template.lua".text = ''
         local M = {}
 
@@ -122,6 +128,7 @@
     extraPlugins = with pkgs.vimPlugins; [
       lazy-nvim
       base16-nvim
+      nvim-treesitter-parsers.c_sharp
     ];
 
     extraConfigLua =
@@ -281,6 +288,11 @@
                   phpactor = {
                     cmd = { "phpactor", "language-server" },
                   },
+                  omnisharp = {
+                    enable_roslyn_analyzers = true,
+                    organize_imports_on_format = true,
+                    enable_import_completion = true,
+                  },
                 },
               },
             },
@@ -372,6 +384,7 @@
                   php = { "pint", "php_cs_fixer", stop_after_first = true },
                   json  = { "prettierd", "prettier", "jq", stop_after_first = true },
                   jsonc = { "biome", "fixjson", "prettierd", "prettier", stop_after_first = true },
+                  cs = { "csharpier" },
                 },
               },
             },
