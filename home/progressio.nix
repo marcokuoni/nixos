@@ -9,9 +9,9 @@
     ./niri
     ./noctalia
     ./scripts/LazyvimDiffPlugins.nix
-    ./ghosty
+    ./ghostty
     ./zsh
-    ./ghosty
+    ./ghostty
     ./tmux
     ./lazyvim
   ];
