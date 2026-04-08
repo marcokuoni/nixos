@@ -54,8 +54,8 @@ jobs:
       
     # Builds the complete home-manager configuration into an activation package
     # This compiles all configurations and dependencies to ensure everything works
-    - name: Build configuration
-      run: nix build .#homeConfigurations.claudio.activationPackage --impure
+    - name: Build NixOS configuration
+      run: nix build .#nixosConfigurations.laptop.config.system.build.toplevel --impure
 
     # Checks the flake for common issues and best practices
     - name: Flake checker

@@ -1,8 +1,11 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOs/nixpkgs/nixos-unstable";
-    home-manager.url = "github:nix-community/home-manager";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     nixvim = {
       url = "github:nix-community/nixvim";
@@ -20,6 +23,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # niri Wayland compositor flake — provides stable + unstable packages
+    # and home-manager/nixos modules
     niri = {
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -31,49 +36,49 @@
     };
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      home-manager,
-      nixvim,
-      niri,
-      noctalia,
-      zen-browser,
-      ...
-    }@inputs:
-    {
-      nixosConfigurations = {
-        laptop = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs;
-          };
+  outputs = {
+    nixpkgs,
+    home-manager,
+    nixvim,
+    niri,
+    noctalia,
+    zen-browser,
+    ...
+  } @ inputs: {
+    nixosConfigurations = {
+      laptop = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs;};
+        modules = [
+          ./hardware/laptop.nix
+          ./laptop.nix
 
-          modules = [
-            ./hardware/laptop.nix
-            ./laptop.nix
-            { nixpkgs.overlays = [ niri.overlays.niri ]; }
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                useUserPackages = true;
-                extraSpecialArgs = {
-                  inherit inputs;
-                };
-                sharedModules = [
-                  niri.homeModules.niri
-                  noctalia.homeModules.default
-                  zen-browser.homeModules.beta
-                ];
-                users.progressio.imports = [
-                  nixvim.homeModules.nixvim
-                  ./home/progressio.nix
-                ];
-              };
-            }
-          ];
-        };
+          # niri overlay provides pkgs.niri-stable and pkgs.niri-unstable
+          {nixpkgs.overlays = [niri.overlays.niri];}
+
+          home-manager.nixosModules.home-manager
+          {
+            home-manager = {
+              # use system nixpkgs instead of a separate home-manager instance
+              useGlobalPkgs = true;
+              # install user packages into /etc/profiles instead of ~/.nix-profile
+              useUserPackages = true;
+              extraSpecialArgs = {inherit inputs;};
+
+              # shared home-manager modules available to all users
+              sharedModules = [
+                niri.homeModules.niri
+                noctalia.homeModules.default
+                zen-browser.homeModules.beta
+                nixvim.homeModules.nixvim
+              ];
+
+              users.progressio.imports = [
+                ./home/progressio.nix
+              ];
+            };
+          }
+        ];
       };
     };
+  };
 }

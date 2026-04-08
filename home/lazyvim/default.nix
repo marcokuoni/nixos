@@ -1,74 +1,78 @@
 {
-  inputs,
   pkgs,
   lib,
-  nixvim,
   ...
 }:
 {
+  # Noctalia matugen template — Noctalia writes matugen.lua at runtime from this
+  # template whenever the color scheme changes, then signals nvim to reload it
   home.file.".config/noctalia/user-templates.toml".text = ''
     [templates.nvim-base16]
     input_path = "~/.config/nvim/lua/matugen-template.lua"
     output_path = "~/.config/nvim/lua/matugen.lua"
     post_hook = 'pkill -SIGUSR1 nvim'
   '';
-  # https://github.com/azuwis/lazyvim-nixvim/tree/master
+
   programs.nixvim = {
     enable = true;
-
     withRuby = false;
 
+    # ── External tools ────────────────────────────────────────────────────────
+    # All LSPs, formatters, linters and DAP adapters come from Nix — no Mason
     extraPackages = with pkgs; [
-      # LazyVim
+      # LazyVim core tools
       lua-language-server
-      stylua
-      fd
-      fzf
-      lazygit
-      mermaid-cli
-      tectonic
-      ghostscript
+      stylua # Lua formatter
+      fd # faster find (telescope)
+      fzf # fuzzy finder
+      lazygit # git TUI (snacks integration)
+      mermaid-cli # diagram rendering in markdown
+      tectonic # LaTeX compiler
+      ghostscript # PDF/PS processing
       libgcc
-      python313Packages.pylatexenc
+      python313Packages.pylatexenc # LaTeX → unicode in nvim
       prettier
-      shfmt
-      nixfmt
+      shfmt # shell formatter
+      nixfmt # Nix formatter
       php83Packages.php-cs-fixer
       markdownlint-cli2
-      ast-grep
+      ast-grep # structural code search
       python3
-      marksman
-      fish
+      marksman # Markdown LSP
+      fish # used by some LazyVim extras internally
       nodejs_24
       rust-analyzer
       php84Packages.composer
-      phpactor
+      phpactor # PHP LSP (Mason-free)
+
       # Telescope
       ripgrep
-      vtsls
+
+      # LSPs
+      vtsls # TypeScript/JS LSP
       vscode-json-languageserver
+
+      # DAP adapters (pulled from nixpkgs instead of Mason)
       vscode-extensions.xdebug.php-debug
       vscode-js-debug
 
       # Haskell
       haskell-language-server
-      haskellPackages.fourmolu
+      haskellPackages.fourmolu # Haskell formatter
       haskellPackages.cabal-fmt
       haskellPackages.fast-tags
 
-      # Nix LSP
-      nil # or nixd
-      statix
+      # Nix
+      nil # Nix LSP
+      statix # Nix linter
 
       # Tree-sitter
       tree-sitter
-      gcc # C compiler for parser compilation
+      gcc # needed to compile tree-sitter parsers
 
       # Formatters
-      nodePackages.fixjson
+      fixjson
       jq
-      nodePackages.markdownlint-cli2
-
       imagemagick
 
       # C#
@@ -77,6 +81,8 @@
       dotnet-sdk_10
     ];
 
+    # ── Pre-compiled tree-sitter parsers ──────────────────────────────────────
+    # Provided by Nix so tree-sitter never tries to compile them at runtime
     extraFiles = {
       "parser/haskell.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.haskell}/parser/haskell.so";
       "parser/bash.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.bash}/parser/bash.so";
@@ -88,6 +94,9 @@
       "parser/javascript.so".source =
         "${pkgs.vimPlugins.nvim-treesitter-parsers.javascript}/parser/javascript.so";
       "parser/c_sharp.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.c_sharp}/parser/c_sharp.so";
+
+      # matugen-template.lua is the source template — Noctalia reads this and
+      # writes matugen.lua with actual color values at runtime
       "lua/matugen-template.lua".text = ''
         local M = {}
 
@@ -112,6 +121,7 @@
           }
         end
 
+        -- Listen for SIGUSR1 from Noctalia's post_hook to reload colors live
         local signal = vim.uv.new_signal()
         signal:start(
           'sigusr1',
@@ -125,6 +135,8 @@
       '';
     };
 
+    # ── Plugins loaded outside lazy ───────────────────────────────────────────
+    # lazy-nvim itself and base16-nvim need to be available before lazy bootstraps
     extraPlugins = with pkgs.vimPlugins; [
       lazy-nvim
       base16-nvim
@@ -133,8 +145,9 @@
 
     extraConfigLua =
       let
+        # All plugins that lazy will manage — sourced from nixpkgs instead of
+        # being downloaded at runtime. This is the key to a fully offline setup.
         plugins = with pkgs.vimPlugins; [
-          # LazyVim
           LazyVim
           bufferline-nvim
           cmp-buffer
@@ -165,7 +178,6 @@
           nvim-treesitter-parsers.css
           nvim-treesitter-parsers.html
           nvim-treesitter-parsers.javascript
-          # not in nix unstable nvim-treesitter-parsers.norg
           nvim-treesitter-parsers.scss
           nvim-treesitter-parsers.svelte
           nvim-treesitter-parsers.tsx
@@ -212,6 +224,8 @@
             path = mini-nvim;
           }
         ];
+
+        # convert derivations to { name, path } entries for linkFarm
         mkEntryFromDrv =
           drv:
           if lib.isDerivation drv then
@@ -221,66 +235,66 @@
             }
           else
             drv;
+
+        # symlink farm that lazy uses as its local dev path —
+        # means lazy finds all plugins without network access
         lazyPath = pkgs.linkFarm "lazy-plugins" (builtins.map mkEntryFromDrv plugins);
       in
       ''
         require("lazy").setup({
-          defaults = {
-            lazy = true,
-          },
+          defaults = { lazy = true },
           rocks = { enabled = false },
           dev = {
-            -- reuse files from pkgs.vimPlugins.*
+            -- point lazy at the nix-built plugin farm
             path = "${lazyPath}",
             patterns = { "" },
-            -- fallback to download
             fallback = true,
           },
           spec = {
-            { "LazyVim/LazyVim", 
+            {
+              "LazyVim/LazyVim",
               import = "lazyvim.plugins",
               opts = {
-                --colorscheme = "catppuccin",
+                -- use Noctalia's matugen colors if available, fallback to catppuccin
                 colorscheme = function()
                   local ok, matugen = pcall(require, 'matugen')
                   if ok then
-                    matugen.setup()  -- applies base16 colors directly, no vim colorscheme command needed
+                    matugen.setup()
                   else
-                    vim.cmd.colorscheme("catppuccin")  -- fallback
+                    vim.cmd.colorscheme("catppuccin")
                   end
                 end,
               },
             },
+
+            -- base16-nvim loads first so matugen colors apply immediately
             {
               "RRethy/base16-nvim",
               lazy = false,
               priority = 1000,
               config = function()
-                -- matugen.lua is written by Noctalia at runtime
                 local ok, _ = pcall(require, 'matugen')
                 if ok then require('matugen').setup() end
               end,
             },
-            {
-              "catppuccin/nvim",
-              name = "catppuccin",
-              --opts = { flavour = "latte" },
-            },
 
-            -- Nix fixes
+            { "catppuccin/nvim", name = "catppuccin" },
+
+            -- telescope fzf native works fine from nix
             { "nvim-telescope/telescope-fzf-native.nvim", enabled = true },
 
-            -- ❌ No Mason anywhere
-            { "mason-org/mason.nvim", enabled = false },
+            -- ── No Mason — all tools come from Nix ─────────────────────────
+            { "mason-org/mason.nvim",           enabled = false },
             { "mason-org/mason-lspconfig.nvim", enabled = false },
-            { "jay-babu/mason-nvim-dap.nvim", enabled = false },
+            { "jay-babu/mason-nvim-dap.nvim",   enabled = false },
 
-            -- ❌ Disable LazyVim's PHP extra (it expects Mason)
+            -- disable LazyVim's PHP extra (expects Mason for phpactor)
             { import = "lazyvim.plugins.extras.lang.php", enabled = false },
 
+            -- DAP core (nvim-dap + dap-ui) without Mason
             { import = "lazyvim.plugins.extras.dap.core", enabled = true },
 
-            -- (optional) PHP LSP without Mason: use phpactor from Nix
+            -- LSP servers configured directly (no Mason)
             {
               "neovim/nvim-lspconfig",
               opts = {
@@ -297,9 +311,7 @@
               },
             },
 
-            -- =========================
-            -- PHP / Xdebug (no Mason)
-            -- =========================
+            -- ── PHP / Xdebug DAP ───────────────────────────────────────────
             {
               "mfussenegger/nvim-dap",
               dependencies = {
@@ -309,60 +321,48 @@
               },
               ft = { "php" },
               config = function()
-                local dap = require("dap")
-                local dapui = require("dapui")
+                local dap    = require("dap")
+                local dapui  = require("dapui")
 
                 local php_debug_js = "${pkgs.vscode-extensions.xdebug.php-debug}/share/vscode/extensions/xdebug.php-debug/out/phpDebug.js"
 
-                -- Register adapter immediately (not inside autocmd)
                 dap.adapters.php = {
-                  type = "executable",
+                  type    = "executable",
                   command = "node",
-                  args = { php_debug_js },
+                  args    = { php_debug_js },
                   options = { detached = false },
                 }
                 dap.adapters["php-debug-adapter"] = dap.adapters.php
 
                 dapui.setup()
-                dap.listeners.after.event_initialized["dapui_open"] = function() dapui.open() end
+                dap.listeners.after.event_initialized["dapui_open"]  = function() dapui.open()  end
                 dap.listeners.before.event_terminated["dapui_close"] = function() dapui.close() end
-                dap.listeners.before.event_exited["dapui_close"] = function() dapui.close() end
+                dap.listeners.before.event_exited["dapui_close"]     = function() dapui.close() end
 
-                vim.keymap.set("n", "<F5>", function() dap.continue() end)
-                vim.keymap.set("n", "<F9>", function() dap.toggle_breakpoint() end)
-                vim.keymap.set("n", "<F10>", function() dap.step_over() end)
-                vim.keymap.set("n", "<F11>", function() dap.step_into() end)
-                vim.keymap.set("n", "<F12>", function() dap.step_out() end)
+                vim.keymap.set("n", "<F5>",  function() dap.continue()          end)
+                vim.keymap.set("n", "<F9>",  function() dap.toggle_breakpoint()  end)
+                vim.keymap.set("n", "<F10>", function() dap.step_over()          end)
+                vim.keymap.set("n", "<F11>", function() dap.step_into()          end)
+                vim.keymap.set("n", "<F12>", function() dap.step_out()           end)
               end,
             },
 
-            -- ======================================
-            -- JS / Node / Chrome (no Mason)
-            -- ======================================
+            -- ── JS / Node / Chrome DAP ─────────────────────────────────────
             {
               "mxsdev/nvim-dap-vscode-js",
               dependencies = { "mfussenegger/nvim-dap" },
               ft = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
               config = function()
-                -- VSCode js-debug extension from Nixpkgs
                 local debugger_path = "${pkgs.vscode-js-debug}/share/vscode/extensions/ms-vscode.js-debug"
 
                 require("dap-vscode-js").setup({
                   debugger_path = debugger_path,
                   adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "pwa-extensionHost" },
                 })
-
-                local dap = require("dap")
-                local pick = require("dap.utils").pick_process
-
-                local js_like = { "javascript", "typescript", "javascriptreact", "typescriptreact" }
-
-                for _, lang in ipairs(js_like) do
-                end
               end,
             },
 
-            -- your other extras & tweaks...
+            -- snacks: notifier replaces vim.notify, picker for file explorer
             {
               "folke/snacks.nvim",
               opts = {
@@ -374,38 +374,47 @@
                 },
               },
             },
+
+            -- formatters per filetype — all binaries come from extraPackages above
             {
               "stevearc/conform.nvim",
               optional = true,
               opts = {
                 formatters_by_ft = {
-                  lua = { "stylua" },
+                  lua        = { "stylua" },
                   javascript = { "prettierd", "prettier", stop_after_first = true },
-                  php = { "pint", "php_cs_fixer", stop_after_first = true },
-                  json  = { "prettierd", "prettier", "jq", stop_after_first = true },
-                  jsonc = { "biome", "fixjson", "prettierd", "prettier", stop_after_first = true },
-                  cs = { "csharpier" },
+                  php        = { "pint", "php_cs_fixer", stop_after_first = true },
+                  json       = { "prettierd", "prettier", "jq", stop_after_first = true },
+                  jsonc      = { "biome", "fixjson", "prettierd", "prettier", stop_after_first = true },
+                  cs         = { "csharpier" },
                 },
               },
             },
+
             {
               "mfussenegger/nvim-lint",
               optional = true,
               opts = {
+                -- php linting handled by phpactor LSP instead
                 linters_by_ft = { php = {} },
               },
             },
-            -- keep treesitter ensure_installed cleared
-            { "nvim-treesitter/nvim-treesitter", opts = function(_, opts) 
-                opts.ensure_installed = {}
-                opts.auto_install = false
-                end 
-            },
-            { "hrsh7th/nvim-cmp",
+
+            -- disable auto-install — all parsers come from Nix
+            {
+              "nvim-treesitter/nvim-treesitter",
               opts = function(_, opts)
-              opts.completion = {
-                autocomplete = false,
-              } end,
+                opts.ensure_installed = {}
+                opts.auto_install     = false
+              end,
+            },
+
+            -- disable autocomplete popup — trigger manually with C-n/C-p
+            {
+              "hrsh7th/nvim-cmp",
+              opts = function(_, opts)
+                opts.completion = { autocomplete = false }
+              end,
             },
           },
         })

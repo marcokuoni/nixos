@@ -1,41 +1,27 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
 {
-  inputs,
   pkgs,
   lib,
-  config,
   ...
 }:
 {
   networking = {
-    hostName = "progressio"; # Define your hostname.
-    # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+    # System hostname
+    hostName = "progressio";
 
-    # Configure network proxy if necessary
-    # networking.proxy.default = "http://user:password@proxy:port/";
-    # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-    # Enable networking
+    # NetworkManager handles all network connections including VPN
     networkmanager = {
       enable = true;
 
+      # VPN plugins for OpenVPN and OpenConnect (Cisco/Fortinet)
       plugins = with pkgs; [
         networkmanager-openvpn
         (networkmanager-openconnect.override { withGnome = true; })
       ];
+
+      # Declarative VPN profiles — no manual setup needed after rebuild
       ensureProfiles = {
-        # secrets.entries = [
-        #   {
-        #     file = config.sops.secrets."school/vpn".path;
-        #     matchId = "school";
-        #     matchType = "vpn";
-        #     matchSetting = "vpn-secrets";
-        #     key = "password";
-        #   }
-        # ];
         profiles = {
+          # Internal LB VPN (certificate-based OpenVPN)
           lb-int = {
             connection = {
               id = "lb-int";
@@ -57,7 +43,8 @@
               data-ciphers = "AES-256-GCM";
             };
           };
-          # nmcli connection up "lb-pub" --ask
+
+          # Public LB VPN (certificate-based OpenVPN)
           lb-pub = {
             connection = {
               id = "lb-pub";
@@ -79,6 +66,8 @@
               data-ciphers = "AES-256-GCM";
             };
           };
+
+          # Exigo VPN (Fortinet via OpenConnect)
           exigo = {
             connection = {
               id = "exigo";
@@ -112,6 +101,8 @@
               lasthost = "gate2.exigo.ch";
             };
           };
+
+          # School VPN (Cisco AnyConnect via OpenConnect)
           school = {
             connection = {
               id = "school";
@@ -133,45 +124,47 @@
       };
     };
 
+    # Local dev domains and lab server
     extraHosts = ''
       127.0.0.1 bank-avera.local
       127.0.0.1 ksgl.local
       127.0.0.1 lemonbrain.local
       127.0.0.1 backoffice.local
-      127.0.0.1 ksgl.local
       127.0.0.1 formidable.local
       127.0.0.1 kulturkarussell.local
       152.96.10.67 ins-lab
     '';
-    # 9003 XDebug, 631 CUPS
-    firewall.allowedTCPPorts = [
-      9003
-      631
-    ];
-    # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-    # (the default) this is the recommended approach. When using systemd-networkd it's
-    # still possible to use this option, but it's recommended to use it in conjunction
-    # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-    useDHCP = lib.mkDefault true;
-    # networking.interfaces.wlp0s20f3.useDHCP = lib.mkDefault true;
 
-    # provide resolvconf/openresolv
+    firewall.allowedTCPPorts = [
+      9003 # XDebug (PHP)
+      631 # CUPS (printing)
+    ];
+
+    # Use DHCP on all interfaces by default
+    useDHCP = lib.mkDefault true;
+
+    # Needed for VPN DNS to work correctly with NetworkManager
     resolvconf.enable = true;
   };
 
   nix = {
     settings = {
+      # Enable flakes and new nix CLI
       experimental-features = [
         "nix-command"
         "flakes"
       ];
+      # Deduplicate store paths automatically
       auto-optimise-store = true;
+      # Trigger GC when less than 50GB free
       min-free = "50G";
+      # Binary cache for niri compositor
       substituters = [ "https://niri.cachix.org" ];
       trusted-public-keys = [
         "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
       ];
     };
+    # Auto garbage collect weekly, keep last 7 days
     gc = {
       automatic = true;
       dates = "weekly";
@@ -179,12 +172,10 @@
     };
   };
 
-  # Set your time zone.
   time.timeZone = "Europe/Zurich";
 
-  # Select internationalisation properties.
+  # English UI, Swiss German formats (dates, currency, paper size etc.)
   i18n.defaultLocale = "en_US.UTF-8";
-
   i18n.extraLocaleSettings = {
     LC_ADDRESS = "de_CH.UTF-8";
     LC_COLLATE = "de_CH.UTF-8";
@@ -198,141 +189,123 @@
     LC_TELEPHONE = "de_CH.UTF-8";
     LC_TIME = "de_CH.UTF-8";
   };
-  # Configure console keymap
+
+  # Swiss German keyboard layout for TTY
   console.keyMap = "de_CH-latin1";
 
   services = {
+    # Battery/power management
     power-profiles-daemon.enable = true;
     upower.enable = true;
-    dbus.enable = true;
-    #todelete
-    xserver = {
-      enable = true;
 
-      # Configure keymap in X11
-      xkb = {
-        layout = "ch";
-        variant = "de_nodeadkeys";
+    # DBus is required by almost everything (keyring, NM, pipewire...)
+    dbus.enable = true;
+
+    # greetd is a minimal login manager, tuigreet gives a TUI login screen
+    # much lighter than GDM, no GNOME dependencies
+    greetd = {
+      enable = true;
+      settings = {
+        default_session = {
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${pkgs.niri-unstable}/bin/niri-session";
+          user = "greeter";
+        };
       };
     };
-    displayManager = {
-      gdm.enable = true;
 
-      defaultSession = "niri";
-
-      sessionPackages = [
-        pkgs.niri
-      ];
-    };
-    desktopManager.gnome.enable = true;
+    # GNOME Keyring stores secrets, SSH keys, VPN passwords etc.
+    # Runs as a standalone daemon — no full GNOME desktop needed
     gnome.gnome-keyring.enable = true;
+
+    # Printing via CUPS
     printing = {
       enable = true;
       drivers = [ pkgs.gutenprint ];
     };
-    # Für automatische Erkennung (AirPrint/mDNS/IPP)
+
+    # Avahi enables mDNS so .local hostnames and AirPrint work
     avahi = {
       enable = true;
-      nssmdns4 = true; # .local-Namen auflösen
-      openFirewall = true; # mDNS-Port freigeben
+      nssmdns4 = true;
+      openFirewall = true;
     };
-    # Enable sound with pipewire.
+
+    # PipeWire for audio (replaces PulseAudio)
     pulseaudio.enable = false;
     pipewire = {
       enable = true;
       alsa.enable = true;
       alsa.support32Bit = true;
+      # PulseAudio compatibility layer
       pulse.enable = true;
-      # If you want to use JACK applications, uncomment this
-      #jack.enable = true;
-
-      # use the example session manager (no others are packaged yet so this is enabled by default,
-      # no need to redefine it in your config for now)
-      #media-session.enable = true;
     };
-    # make it possible to configure on user level through browser
-    # https://docs.bastardkb.com/help/troubleshooting.html#custom-udev-rules
+
+    # Allow users to configure Bastard Keyboard via browser (WebHID)
     udev.extraRules = ''
       KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
     '';
   };
 
-  # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
-
-  # Basic user example
   users = {
     users.progressio = {
       isNormalUser = true;
       extraGroups = [
         "docker"
-        "wheel"
+        "wheel" # sudo access
         "video"
         "audio"
         "networkmanager"
         "input"
-        "aspizu"
-        "lp"
-        "lpadmin"
-        "dialout"
+        "lp" # printing
+        "lpadmin" # manage printers
+        "dialout" # serial ports
       ];
       shell = pkgs.zsh;
     };
     defaultUserShell = pkgs.zsh;
   };
 
-  virtualisation.docker = {
-    enable = true;
-    # blocks dns resolution
-    # rootless = {
-    #   enable = true;
-    #   setSocketVariable = true;
-    # };
-  };
+  virtualisation.docker.enable = true;
 
   fonts = {
     packages = with pkgs; [
-      # fc-list
       nerd-fonts.ubuntu
       nerd-fonts.fira-code
       nerd-fonts._0xproto
       nerd-fonts.jetbrains-mono
       nerd-fonts.hack
     ];
-
-    # Enable fontconfig (for fallback rules)
     fontDir.enable = true;
     fontconfig.enable = true;
   };
 
   security = {
+    # Needed by PipeWire for low-latency audio
     rtkit.enable = true;
-    pam.services.login.enableGnomeKeyring = true;
-    # Define a user account. Don't forget to set a password with ‘passwd’.
+
     pam = {
       services = {
         login = {
+          # Unlock GNOME keyring automatically on login with your password
+          enableGnomeKeyring = true;
+          # Require YubiKey (U2F) with PIN on login
           u2fAuth = true;
-          rules.auth.u2f = {
-            args = lib.mkAfter [
-              "pinverification=1"
-            ];
-          };
+          rules.auth.u2f.args = lib.mkAfter [ "pinverification=1" ];
         };
         sudo = {
-          # unixAuth = false;
+          # Require YubiKey (U2F) with PIN for sudo
           u2fAuth = true;
-          rules.auth.u2f.args = lib.mkAfter [
-            "pinverification=1"
-          ];
+          rules.auth.u2f.args = lib.mkAfter [ "pinverification=1" ];
         };
+        # Also unlock keyring on greetd login
+        greetd.enableGnomeKeyring = true;
       };
+
+      # YubiKey U2F config — generated with pamu2fcfg
       u2f = {
         enable = true;
         settings = {
           authfile = pkgs.writeText "u2f-mappings" (
-            # nix-shell -p pam_u2f
-            # pamu2fcfg > /tmp/u2f_mappings
             lib.concatStrings [
               "progressio"
               ":Dld2Hwn9kVGjImdI2x37Iho6m8dG/H/INYW+5DjGn6s6s8rzH9SjjFUS4fas88WtHLC6hlOni5RlANRzGzvKhgbu7VkO6IKe4r+RSv8lZrg3/jVc/7jZ+0OQ5h90LOwx,GFi3pUUcIpF7fWAZ/1FBGoG84osWS7z2LbYiYY0e2uJGGNfdQfPDfoBJzayOvyDK9nAW5hs9vU1JGIGbYZoC1Q==,es256,+presence"
@@ -344,45 +317,43 @@
     };
   };
 
-  # Install firefox.
   programs = {
     firefox.enable = true;
-    # Shell
+    # nix-ld allows running unpatched binaries (e.g. downloaded scripts)
     nix-ld.enable = true;
     zsh.enable = true;
   };
+
   environment = {
     shells = [ pkgs.zsh ];
-    # List packages installed in system profile. To search, run:
-    # $ nix search wget
+    # Required for xdg-desktop-portal to work with home-manager useUserPackages
+    pathsToLink = [
+      "/share/applications"
+      "/share/xdg-desktop-portal"
+    ];
     systemPackages = with pkgs; [
-      # mount (if you delete you delete on server)
-      # mkdir remote_concrete_hub_functions
-      # sshfs root@192.168.10.12:/root/functions remote_concrete_hub_functions -o uid=$(id -u) -o gid=$(id -g) -o allow_other
-      # cd ~/remote-project
-      # nvim .
-      # unmount
-      # fusermount -u remote_concrete_hub_functions
-      # sshfs
-
-      #nvidia
-      networkmanagerapplet # liefert das 'nm-applet' Binary
+      # NetworkManager tray applet (for nm-applet in niri bar)
+      networkmanagerapplet
       networkmanager-openconnect
       openconnect
+      # Polkit agent — handles privilege escalation popups in non-GNOME setups
       lxqt.lxqt-policykit
+      # Wayland display management (multi-monitor setup)
       nwg-displays
+      # GTK theme/cursor/font configuration for Wayland
       nwg-look
       bibata-cursors
+      # XWayland bridge for running X11 apps under niri
       xwayland-satellite
     ];
   };
 
-  # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
+  # Required for SSHFS with allow_other option
   environment.etc."fuse.conf".text = ''
     user_allow_other
   '';
 
-  system.stateVersion = "25.05"; # Did you read the comment?
+  system.stateVersion = "25.05";
 }

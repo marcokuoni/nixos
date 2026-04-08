@@ -1,70 +1,69 @@
-{ config, pkgs, ... }:
-
 {
   programs.noctalia-shell = {
     enable = true;
     settings = {
       bar = {
         density = "normal";
-        position = "left";
+        position = "left"; # vertical bar on the left, suits niri's column layout
         showCapsule = false;
         widgets = {
           left = [
             {
+              # system menu / distro logo area
               id = "ControlCenter";
               useDistroLogo = false;
               icon = "home";
             }
-            {
-              id = "Network";
-            }
-            {
-              id = "Bluetooth";
-            }
-            {
-              id = "plugin:kde-connect";
-            }
-            {
-              id = "plugin:privacy-indicator";
-            }
+            {id = "Network";}
+            {id = "Bluetooth";}
+            # KDE Connect — phone integration
+            {id = "plugin:kde-connect";}
+            # shows mic/camera indicator when in use
+            {id = "plugin:privacy-indicator";}
           ];
           center = [
             {
-              hideUnoccupied = false;
               id = "Workspace";
-              labelMode = "none";
+              hideUnoccupied = false;
+              labelMode = "none"; # show dots only, no workspace numbers
             }
           ];
           right = [
             {
-              alwaysShowPercentage = false;
               id = "Battery";
+              alwaysShowPercentage = false;
               warningThreshold = 30;
             }
             {
+              id = "Clock";
               formatHorizontal = "HH:mm";
               formatVertical = "HH mm";
-              id = "Clock";
               useMonospacedFont = true;
               usePrimaryColor = true;
             }
           ];
         };
       };
+
       appLauncher = {
         enableClipboardHistory = true;
-        terminalCommand = "konsole -e";
+        # use ghostty as terminal for launching terminal apps
+        terminalCommand = "ghostty -e";
         showCategories = false;
       };
+
       colorSchemes.predefinedScheme = "Ayu";
+
       general = {
         avatarImage = "";
         radiusRatio = 0.2;
       };
+
       location = {
-        monthBeforeDay = false;
+        monthBeforeDay = false; # Swiss date format: day before month
         name = "Zurich, Switzerland";
       };
+
       plugins = {
         sources = [
           {

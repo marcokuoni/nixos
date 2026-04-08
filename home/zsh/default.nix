@@ -1,10 +1,7 @@
-{
-  config,
-  pkgs,
-  ...
-}:
+{ pkgs, ... }:
 let
   shellAliases = {
+    # git shortcuts
     g = "git";
     ga = "git add";
     gc = "git commit";
@@ -17,8 +14,10 @@ let
     gsh = "git show";
     gst = "git status";
 
+    # always open nix-shell with zsh instead of bash
     nix-shell = "nix-shell --command zsh";
 
+    # safer mv — prompt before overwriting
     mv = "mv -i";
   };
 in
@@ -34,15 +33,22 @@ in
         enable = true;
         plugins = [
           "git"
-          "vi-mode"
+          "vi-mode" # vim keybindings in the shell, consistent with nvim/tmux
         ];
         theme = "agnoster";
       };
+
+      # initContent = ''
+      #   # Auto-attach to tmux on shell start.
+      #   # $TMUX check prevents nesting when opening new panes inside tmux.
+      #   if [ -z "$TMUX" ]; then
+      #     tmux attach-session -t main || tmux new-session -s main
+      #   fi
+      # '';
     };
 
-    bash = {
-      inherit shellAliases;
-    };
+    # share the same aliases in bash (for scripts / fallback shells)
+    bash.shellAliases = shellAliases;
   };
 
   home.packages = with pkgs; [

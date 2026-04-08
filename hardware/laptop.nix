@@ -6,8 +6,7 @@
   lib,
   modulesPath,
   ...
-}:
-{
+}: {
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
@@ -35,14 +34,14 @@
       luks.devices = {
         "cryptroot" = {
           # https://nixos.org/manual/nixos/stable/#sec-luks-file-systems-fido2-systemd
-          crypttabExtraOpts = [ "fido2-device=auto" ];
+          crypttabExtraOpts = ["fido2-device=auto"];
           device = "/dev/disk/by-partlabel/CRYPTROOT";
         };
       };
       systemd.enable = true;
     };
-    kernelModules = [ "kvm-amd" ];
-    extraModulePackages = [ ];
+    kernelModules = ["kvm-amd"];
+    extraModulePackages = [];
   };
 
   fileSystems."/" = {
@@ -60,7 +59,7 @@
   };
 
   swapDevices = [
-    { device = "/dev/disk/by-label/NIXOS_SWAP"; }
+    {device = "/dev/disk/by-label/NIXOS_SWAP";}
   ];
 
   networking.useDHCP = lib.mkDefault true;
