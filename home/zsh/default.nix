@@ -1,5 +1,4 @@
-{ pkgs, ... }:
-let
+{pkgs, ...}: let
   shellAliases = {
     # git shortcuts
     g = "git";
@@ -20,8 +19,7 @@ let
     # safer mv — prompt before overwriting
     mv = "mv -i";
   };
-in
-{
+in {
   programs = {
     zsh = {
       enable = true;
