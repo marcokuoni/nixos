@@ -1,4 +1,5 @@
-{pkgs, ...}: let
+{ pkgs, ... }:
+let
   shellAliases = {
     # git shortcuts
     g = "git";
@@ -18,8 +19,12 @@
 
     # safer mv — prompt before overwriting
     mv = "mv -i";
+
+    # use bsdtar instead of unzip for better encoding handling
+    # unzip = "bsdtar -xf";
   };
-in {
+in
+{
   programs = {
     zsh = {
       enable = true;
@@ -31,7 +36,7 @@ in {
         enable = true;
         plugins = [
           "git"
-          "vi-mode" # vim keybindings in the shell, consistent with nvim/tmux
+          # "vi-mode" # vim keybindings in the shell, consistent with nvim/tmux
         ];
         theme = "agnoster";
       };
@@ -43,6 +48,14 @@ in {
       #     tmux attach-session -t main || tmux new-session -s main
       #   fi
       # '';
+      #
+      initContent = ''
+        # extract zip into folder with same name as the archive
+        unzip() {
+          local name=$(basename "$1" .zip)
+          mkdir -p "$name" && bsdtar -xf "$1" -C "$name"
+        }
+      '';
     };
 
     # share the same aliases in bash (for scripts / fallback shells)

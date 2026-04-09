@@ -1,10 +1,10 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   imports = [
     ./niri
     ./noctalia
     ./ghostty
     ./zsh
-    ./tmux
     ./lazyvim
     ./scripts/LazyvimDiffPlugins.nix
     ./scripts/BeamerMirror.nix
@@ -52,7 +52,7 @@
       qutebrowser
       projecteur # laser pointer for presentations
       zip
-      unzip
+      libarchive # provides bsdtar — same extraction backend as GNOME
       git
       libnotify # notify-send for desktop notifications
       brightnessctl # backlight control (used in niri binds)

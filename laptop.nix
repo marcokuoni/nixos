@@ -2,7 +2,8 @@
   pkgs,
   lib,
   ...
-}: {
+}:
+{
   networking = {
     # System hostname
     hostName = "progressio";
@@ -14,7 +15,7 @@
       # VPN plugins for OpenVPN and OpenConnect (Cisco/Fortinet)
       plugins = with pkgs; [
         networkmanager-openvpn
-        (networkmanager-openconnect.override {withGnome = true;})
+        (networkmanager-openconnect.override { withGnome = true; })
       ];
 
       # Declarative VPN profiles — no manual setup needed after rebuild
@@ -117,7 +118,7 @@
               username = "marco.kuoni@ost.ch";
               authtype = "password";
             };
-            vpn-secrets = {};
+            vpn-secrets = { };
           };
         };
       };
@@ -158,7 +159,7 @@
       # Trigger GC when less than 50GB free
       min-free = "50G";
       # Binary cache for niri compositor
-      substituters = ["https://niri.cachix.org"];
+      substituters = [ "https://niri.cachix.org" ];
       trusted-public-keys = [
         "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
       ];
@@ -219,7 +220,7 @@
     # Printing via CUPS
     printing = {
       enable = true;
-      drivers = [pkgs.gutenprint];
+      drivers = [ pkgs.gutenprint ];
     };
 
     # Avahi enables mDNS so .local hostnames and AirPrint work
@@ -289,12 +290,12 @@
           enableGnomeKeyring = true;
           # Require YubiKey (U2F) with PIN on login
           u2fAuth = true;
-          rules.auth.u2f.args = lib.mkAfter ["pinverification=1"];
+          rules.auth.u2f.args = lib.mkAfter [ "pinverification=1" ];
         };
         sudo = {
           # Require YubiKey (U2F) with PIN for sudo
           u2fAuth = true;
-          rules.auth.u2f.args = lib.mkAfter ["pinverification=1"];
+          rules.auth.u2f.args = lib.mkAfter [ "pinverification=1" ];
         };
         # Also unlock keyring on greetd login
         greetd.enableGnomeKeyring = true;
@@ -323,8 +324,16 @@
     zsh.enable = true;
   };
 
+  xdg.portal = {
+    enable = true;
+    # GTK file chooser dialog for browser uploads etc.
+    # lighter than xdg-desktop-portal-gnome, no full GNOME deps needed
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    config.common.default = "*";
+  };
+
   environment = {
-    shells = [pkgs.zsh];
+    shells = [ pkgs.zsh ];
     # Required for xdg-desktop-portal to work with home-manager useUserPackages
     pathsToLink = [
       "/share/applications"

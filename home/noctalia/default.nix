@@ -2,6 +2,10 @@
   programs.noctalia-shell = {
     enable = true;
     settings = {
+      wallpaper = {
+        automationEnabled = true;
+        randomIntervalSec = 600;
+      };
       bar = {
         density = "normal";
         position = "left"; # vertical bar on the left, suits niri's column layout
@@ -14,12 +18,12 @@
               useDistroLogo = false;
               icon = "home";
             }
-            {id = "Network";}
-            {id = "Bluetooth";}
+            { id = "Network"; }
+            { id = "Bluetooth"; }
             # KDE Connect — phone integration
-            {id = "plugin:kde-connect";}
+            { id = "plugin:kde-connect"; }
             # shows mic/camera indicator when in use
-            {id = "plugin:privacy-indicator";}
+            { id = "plugin:privacy-indicator"; }
           ];
           center = [
             {
