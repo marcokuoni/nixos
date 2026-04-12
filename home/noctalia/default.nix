@@ -33,6 +33,7 @@
             }
           ];
           right = [
+            { id = "Tray"; } # system tray — shows nextcloud, nm-applet etc.
             {
               id = "Battery";
               alwaysShowPercentage = false;

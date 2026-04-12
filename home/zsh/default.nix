@@ -51,7 +51,7 @@ in
       #
       initContent = ''
         # extract zip into folder with same name as the archive
-        unzip() {
+        unzip_folder() {
           local name=$(basename "$1" .zip)
           mkdir -p "$name" && bsdtar -xf "$1" -C "$name"
         }

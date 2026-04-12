@@ -11,7 +11,9 @@
   ];
 
   # Nextcloud desktop sync client
-  services.nextcloud-client.enable = true;
+  services = {
+    nextcloud-client.enable = true;
+  };
 
   programs = {
     vscode.enable = true;
@@ -52,6 +54,7 @@
       qutebrowser
       projecteur # laser pointer for presentations
       zip
+      unzip
       libarchive # provides bsdtar — same extraction backend as GNOME
       git
       libnotify # notify-send for desktop notifications

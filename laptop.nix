@@ -4,6 +4,11 @@
   ...
 }:
 {
+  imports = [
+    ./remarkable-sync
+    ./remarkable-sync/rmdoc-to-pdf.nix
+  ];
+
   networking = {
     # System hostname
     hostName = "progressio";
@@ -194,6 +199,21 @@
   console.keyMap = "de_CH-latin1";
 
   services = {
+    #remarkable syncing script
+    remarkable-sync = {
+      enable = true;
+      user = "progressio";
+      interval = "5min";
+      extraArgs = [ "--verbose" ];
+    };
+    rmdoc-to-pdf = {
+      enable = true;
+      user = "progressio";
+      # inputDir  = "/home/progressio/remarkable";    # default
+      # outputDir = "/home/progressio/remarkable-pdf"; # default
+      # interval  = "10min";                           # default
+    };
+
     # Battery/power management
     power-profiles-daemon.enable = true;
     upower.enable = true;
