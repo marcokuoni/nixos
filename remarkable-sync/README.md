@@ -33,6 +33,14 @@ When your tablet is connected via **USB**, the sync automatically downloads perf
 
 ---
 
+## Requirements
+
+- A **reMarkable Connect subscription** (or free cloud account) — rmapi uses the reMarkable cloud API
+- Run `rmapi` **once manually** after first install to authenticate (see step 4)
+- For USB mode: tablet connected via USB cable, USB web interface enabled on device
+
+---
+
 ## Setup
 
 ### 1. Copy files to your NixOS config
