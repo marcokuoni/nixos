@@ -16,66 +16,57 @@
 #   Plug tablet in via USB, enable Settings -> Storage -> USB web interface.
 #   The sync will automatically use it when detected.
 #
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ config, lib, pkgs, ... }:
 
 let
   cfg = config.services.remarkable-sync;
   stateDir = builtins.dirOf cfg.stateFile;
 
-  syncScript = pkgs.writers.writePython3Bin "remarkable-sync" {
-    flakeIgnore = [
-      "E"
-      "W"
-    ];
-  } (builtins.readFile ./remarkable-sync.py);
+  syncScript = pkgs.writers.writePython3Bin "remarkable-sync"
+    { flakeIgnore = [ "E" "W" ]; }
+    (builtins.readFile ./remarkable-sync.py);
 
-in
-{
+in {
 
   options.services.remarkable-sync = {
 
     enable = lib.mkEnableOption "reMarkable two-way cloud sync";
 
     user = lib.mkOption {
-      type = lib.types.str;
-      example = "progressio";
+      type        = lib.types.str;
+      example     = "progressio";
       description = "Username that owns the sync folder and rmapi credentials.";
     };
 
     syncDir = lib.mkOption {
-      type = lib.types.str;
+      type        = lib.types.str;
       description = "Local directory synced with the reMarkable cloud.";
-      default = "/home/${cfg.user}/remarkable";
+      default     = "/home/${cfg.user}/remarkable";
     };
 
     stateFile = lib.mkOption {
-      type = lib.types.str;
+      type        = lib.types.str;
       description = "JSON file used to track sync state between runs.";
-      default = "/home/${cfg.user}/.local/share/remarkable-sync/state.json";
+      default     = "/home/${cfg.user}/.local/share/remarkable-sync/state.json";
     };
 
     remoteRoot = lib.mkOption {
-      type = lib.types.str;
-      default = "/";
+      type        = lib.types.str;
+      default     = "/";
       description = "Root folder on the reMarkable cloud to sync against.";
     };
 
     interval = lib.mkOption {
-      type = lib.types.str;
-      default = "5min";
-      example = "15min";
+      type        = lib.types.str;
+      default     = "5min";
+      example     = "15min";
       description = "How often to run the sync (systemd OnUnitActiveSec value).";
     };
 
     extraArgs = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ ];
-      example = [ "--verbose" ];
+      type        = lib.types.listOf lib.types.str;
+      default     = [];
+      example     = [ "--verbose" ];
       description = "Extra arguments forwarded to the remarkable-sync script.";
     };
   };
@@ -84,50 +75,48 @@ in
 
     environment.systemPackages = [ pkgs.rmapi ];
 
-    systemd = {
-      tmpfiles.rules = [
-        "d '${cfg.syncDir}'  0755 ${cfg.user} users - -"
-        "d '${stateDir}'     0755 ${cfg.user} users - -"
-      ];
+    systemd.tmpfiles.rules = [
+      "d '${cfg.syncDir}'  0755 ${cfg.user} users - -"
+      "d '${stateDir}'     0755 ${cfg.user} users - -"
+    ];
 
-      services.remarkable-sync = {
-        description = "reMarkable two-way cloud sync";
-        wants = [ "network-online.target" ];
-        after = [
-          "network-online.target"
-          "systemd-tmpfiles-setup.service"
+    systemd.services.remarkable-sync = {
+      description = "reMarkable two-way cloud sync";
+      wants       = [ "network-online.target" ];
+      after       = [ "network-online.target" "systemd-tmpfiles-setup.service" ];
+      # Start notebook converter after successful sync
+      onSuccess   = [ "rmdoc-to-pdf.service" ];
+
+      serviceConfig = {
+        Type    = "oneshot";
+        User    = cfg.user;
+        Nice    = 10;
+
+        Environment = [
+          "HOME=/home/${cfg.user}"
+          "REMARKABLE_SYNC_DIR=${cfg.syncDir}"
+          "REMARKABLE_STATE_FILE=${cfg.stateFile}"
+          "REMARKABLE_REMOTE_ROOT=${cfg.remoteRoot}"
+          "RMAPI_BIN=${pkgs.rmapi}/bin/rmapi"
         ];
 
-        serviceConfig = {
-          Type = "oneshot";
-          User = cfg.user;
-          Nice = 10;
+        ExecStart =
+          "${syncScript}/bin/remarkable-sync"
+          + lib.optionalString (cfg.extraArgs != [])
+              (" " + lib.escapeShellArgs cfg.extraArgs);
 
-          Environment = [
-            "HOME=/home/${cfg.user}"
-            "REMARKABLE_SYNC_DIR=${cfg.syncDir}"
-            "REMARKABLE_STATE_FILE=${cfg.stateFile}"
-            "REMARKABLE_REMOTE_ROOT=${cfg.remoteRoot}"
-            "RMAPI_BIN=${pkgs.rmapi}/bin/rmapi"
-          ];
-
-          ExecStart =
-            "${syncScript}/bin/remarkable-sync"
-            + lib.optionalString (cfg.extraArgs != [ ]) (" " + lib.escapeShellArgs cfg.extraArgs);
-
-          SuccessExitStatus = "0 1";
-        };
+        SuccessExitStatus = "0 1";
       };
+    };
 
-      timers.remarkable-sync = {
-        description = "Trigger reMarkable sync every ${cfg.interval}";
-        wantedBy = [ "timers.target" ];
+    systemd.timers.remarkable-sync = {
+      description = "Trigger reMarkable sync every ${cfg.interval}";
+      wantedBy    = [ "timers.target" ];
 
-        timerConfig = {
-          OnBootSec = "2min";
-          OnUnitActiveSec = cfg.interval;
-          Persistent = true;
-        };
+      timerConfig = {
+        OnBootSec       = "2min";
+        OnUnitActiveSec = cfg.interval;
+        Persistent      = true;
       };
     };
   };

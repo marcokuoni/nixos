@@ -1,24 +1,30 @@
 # remarkable-sync
 
-A NixOS setup for two-way sync between a local Linux folder and your reMarkable 2 tablet, plus automatic conversion of handwritten notebooks to PDF.
-
-## Overview
+A NixOS setup for two-way sync between a local Linux folder and your reMarkable 2 tablet, plus automatic conversion of handwritten notebooks and annotated PDFs to readable PDFs.
 
 Two services work together:
 
-- **`remarkable-sync`** — syncs files between `~/remarkable/` and the reMarkable cloud every 5 minutes
-- **`rmdoc-to-pdf`** — converts handwritten notebooks (`.rmdoc`) to PDFs in `~/remarkable-pdf/`
+- **`remarkable-sync`** — syncs files between `~/remarkable/` and the reMarkable cloud every 5 minutes, automatically detecting when you've added annotations on the tablet and re-downloading updated files
+- **`rmdoc-to-pdf`** — converts all `.rmdoc` files (notebooks and annotated PDFs) to readable PDFs in `~/remarkable-pdf/`, starts automatically after each sync
 
 ```
 reMarkable cloud
       ↕  (rmapi)
-~/remarkable/          ← uploaded PDFs/EPUBs extracted as .pdf
-                          native notebooks kept as .rmdoc
+~/remarkable/          ← all documents kept as .rmdoc
+                          (contains original + any annotations)
       ↓  (rmc + cairosvg)
-~/remarkable-pdf/      ← all notebooks converted to readable PDFs
+~/remarkable-pdf/      ← PDFs rendered with annotations overlaid
 ```
 
-When your tablet is connected via **USB**, the sync automatically downloads perfect PDFs directly from the tablet for everything — no conversion needed.
+When connected via USB, `~/remarkable/` receives proper PDFs directly from the tablet (perfect quality, bypasses rmc entirely).
+
+---
+
+## Requirements
+
+- A **reMarkable Connect subscription** (or free cloud account) — rmapi uses the reMarkable cloud API
+- Run `rmapi` **once manually** after first install to authenticate (see step 4)
+- For USB mode: tablet connected via USB cable, USB web interface enabled on device
 
 ---
 
@@ -30,14 +36,6 @@ When your tablet is connected via **USB**, the sync automatically downloads perf
 | `remarkable-sync.py` | Sync script (rmapi cloud ↔ local folder) |
 | `rmdoc-to-pdf.nix` | NixOS module for the notebook converter |
 | `rmdoc-to-pdf.py` | Converter script (rmdoc → SVG via rmc → PDF via cairosvg) |
-
----
-
-## Requirements
-
-- A **reMarkable Connect subscription** (or free cloud account) — rmapi uses the reMarkable cloud API
-- Run `rmapi` **once manually** after first install to authenticate (see step 4)
-- For USB mode: tablet connected via USB cable, USB web interface enabled on device
 
 ---
 
@@ -96,10 +94,7 @@ The token is stored in `~/.config/rmapi/` and never expires unless revoked.
 
 ```bash
 sudo systemctl start remarkable-sync.service
-journalctl -u remarkable-sync.service -f
-
-sudo systemctl start rmdoc-to-pdf.service
-journalctl -u rmdoc-to-pdf.service -f
+journalctl -u remarkable-sync.service -u rmdoc-to-pdf.service -f
 ```
 
 ---
@@ -108,10 +103,13 @@ journalctl -u rmdoc-to-pdf.service -f
 
 ### Cloud mode (WiFi, no USB)
 
-- **Uploaded PDFs/EPUBs** → extracted from `.rmdoc` and saved as `.pdf`
-- **Native notebooks** → kept as `.rmdoc` archive files
+- **All documents** → kept as `.rmdoc` (lossless archive containing original + annotations)
+- **Annotations added on tablet** → re-downloaded automatically on next sync (remote mtime checked via `rmapi stat`, stored in state to avoid redundant re-downloads)
+- **New pages added to a notebook** → `.rmdoc` updated on next sync
 - **Local PDF/EPUB dropped in `~/remarkable/`** → uploaded to reMarkable cloud
 - **Local file deleted** → deleted from cloud (only files you uploaded)
+
+Readable PDFs with annotations are produced by `rmdoc-to-pdf` in `~/remarkable-pdf/`.
 
 ### USB mode (tablet plugged in)
 
@@ -133,17 +131,28 @@ Step by step when USB is connected:
 
 ## How notebook conversion works
 
-The `rmdoc-to-pdf` service processes every `.rmdoc` file in `~/remarkable/` and converts it to a PDF in `~/remarkable-pdf/`, preserving folder structure.
+The `rmdoc-to-pdf` service processes every `.rmdoc` file in `~/remarkable/` and converts it to a PDF in `~/remarkable-pdf/`, preserving folder structure. This works for both native notebooks and annotated PDFs.
 
-Pipeline per notebook:
-1. **Unzip** the `.rmdoc` archive
-2. **Convert each `.rm` page to SVG** using `rmc` (supports reMarkable v6 format)
-3. **Convert each SVG to PDF** using `cairosvg` (pure Python, no binary deps)
-4. **Merge all pages** into a single PDF using `pypdf`
+### Native notebooks (no original PDF inside)
 
-Pages that `rmc` cannot parse (some newer firmware 3.26 format blocks) are skipped — the PDF will have gaps for those pages. Quality is good for most content.
+1. Read page order from `.content` file (`cPages.pages[].id`)
+2. Convert each `.rm` page to SVG using `rmc`
+3. Convert each SVG to PDF using `cairosvg`
+4. Merge all pages into a single PDF using `pypdf`
 
-State is tracked in `~/remarkable-pdf/.rmdoc-to-pdf-state.json` — only modified notebooks are reconverted on subsequent runs.
+Pages that `rmc` cannot parse (some newer firmware 3.26 format blocks) are skipped — the PDF will have gaps for those pages.
+
+### Annotated PDFs (original PDF inside rmdoc)
+
+1. Extract the original PDF from the rmdoc archive
+2. Read page mapping from `.content` (`cPages.pages[].redir.value` = original PDF page index)
+3. For each annotated page, convert the `.rm` strokes to SVG using `rmc`
+4. Rewrite the SVG to use the full reMarkable canvas coordinate space
+5. Overlay the annotation onto the correct original PDF page using `pypdf`
+
+> **Note on annotation positioning:** The annotation overlay uses empirically calibrated constants (`scale=0.75, tx=pw/2, ty=ph*0.285`) derived for the reMarkable 2 on A4 PDFs. The offset is caused by how `rmc` and `cairosvg` handle the reMarkable's internal coordinate system — `rmc` outputs SVG with a negative x viewBox offset, and `cairosvg` renders at 75% of the input size regardless of specified dimensions. These constants correct for both effects. Positioning may be slightly off on non-A4 PDFs or different reMarkable models. For perfect annotation rendering, use USB mode — the tablet renders its own files flawlessly.
+
+State is tracked in `~/remarkable-pdf/.rmdoc-to-pdf-state.json` — only modified files are reconverted on subsequent runs.
 
 ---
 
@@ -181,14 +190,13 @@ State is tracked in `~/remarkable-pdf/.rmdoc-to-pdf-state.json` — only modifie
 systemctl status remarkable-sync.timer
 systemctl status rmdoc-to-pdf.timer
 
-# View logs
-journalctl -u remarkable-sync.service
-journalctl -u rmdoc-to-pdf.service
+# View logs (both services together)
+journalctl -u remarkable-sync.service -u rmdoc-to-pdf.service -f
 
-# Force immediate sync
+# Force immediate sync (rmdoc-to-pdf starts automatically after)
 sudo systemctl start remarkable-sync.service
 
-# Force immediate conversion
+# Force immediate conversion only (without sync)
 sudo systemctl start rmdoc-to-pdf.service
 
 # Force re-conversion of all notebooks
@@ -198,12 +206,6 @@ sudo systemctl start rmdoc-to-pdf.service
 # Re-download everything from scratch
 rm ~/.local/share/remarkable-sync/state.json
 sudo systemctl start remarkable-sync.service
-
-# Dry run (see what would happen)
-REMARKABLE_SYNC_DIR=~/remarkable \
-REMARKABLE_STATE_FILE=~/.local/share/remarkable-sync/state.json \
-RMAPI_BIN=$(which rmapi) \
-  python3 /etc/nixos/remarkable-sync.py --dry-run --verbose
 ```
 
 ---
@@ -223,11 +225,14 @@ Token may have been revoked. Re-run `rmapi` interactively to re-authenticate.
 **Notebooks produce PDFs with blank pages**
 Some pages use reMarkable firmware 3.26 format blocks that `rmscene 0.8` cannot parse. Connect via USB for perfect PDFs — the tablet renders its own files flawlessly.
 
-**"Already on disk" but folder is empty**
-Check for hidden files or subfolders:
+**Annotations are slightly misaligned on the PDF**
+See the note in "How notebook conversion works" above. The calibrated offsets work well for A4 PDFs on reMarkable 2. For perfect alignment, use USB mode.
+
+**File keeps re-downloading every sync**
+The remote mtime state may be corrupt. Reset:
 ```bash
-find ~/remarkable -maxdepth 3 2>/dev/null
-ls -la ~/remarkable/
+rm ~/.local/share/remarkable-sync/state.json
+sudo systemctl start remarkable-sync.service
 ```
 
 **Timer fires but sync missed while suspended**

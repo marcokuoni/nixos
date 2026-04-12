@@ -5,12 +5,16 @@ remarkable-sync: Two-way sync between a local folder and reMarkable Cloud.
 Download (remote -> local):
   - Uploaded PDFs/EPUBs: extracted from .rmdoc as proper .pdf files
   - Native notebooks: kept as .rmdoc (reMarkable's archive format)
+  - Re-downloads if the remote file is newer than the local copy
+    (picks up annotations and new pages added on the tablet)
   - When tablet is connected via USB: all files downloaded as PDF via
     the USB web interface (perfect quality, tablet renders everything)
+  - USB upgrades existing .rmdoc files to proper PDFs automatically
 
 Upload (local -> remote):
   - PDF/EPUB files dropped into ~/remarkable/ are uploaded with rmapi put
   - Files deleted locally that were previously uploaded are removed remotely
+  - Downloaded files are never re-uploaded back to the tablet
 """
 
 import argparse
@@ -20,6 +24,7 @@ import os
 import subprocess
 import urllib.request
 import zipfile
+from datetime import datetime
 from pathlib import Path
 
 SUPPORTED_UPLOAD_EXTENSIONS = {".pdf", ".epub"}
@@ -39,6 +44,8 @@ logging.basicConfig(
 )
 log = logging.getLogger("remarkable-sync")
 
+
+# ── USB web interface ─────────────────────────────────────────────────────────
 
 def usb_available():
     try:
@@ -92,6 +99,8 @@ def usb_download_pdf(doc_id, dest_path):
         return False
 
 
+# ── rmapi helpers ─────────────────────────────────────────────────────────────
+
 def rmapi_run(args, rmapi_bin, capture=False):
     cmd = [rmapi_bin] + args
     log.debug("$ %s", " ".join(str(c) for c in cmd))
@@ -124,6 +133,34 @@ def list_remote(rmapi_bin, remote_root):
     return docs
 
 
+def get_remote_mtime(rmapi_bin, doc_path):
+    """
+    Get the modification time of a remote document using rmapi stat.
+    Returns a float (unix timestamp) or None if unavailable.
+    rmapi stat output includes ModifiedClient in RFC3339 format.
+    """
+    result = rmapi_run(["stat", doc_path], rmapi_bin, capture=True)
+    if result.returncode != 0:
+        return None
+    for line in result.stdout.splitlines():
+        line = line.strip()
+        # stat output is JSON-like: "ModifiedClient": "2024-01-15T10:30:00Z"
+        if "ModifiedClient" in line or "modifiedClient" in line:
+            try:
+                # Extract the timestamp value
+                parts = line.split(":", 1)
+                if len(parts) == 2:
+                    ts_str = parts[1].strip().strip('",').strip()
+                    if ts_str:
+                        # Parse RFC3339
+                        ts_str = ts_str.replace("Z", "+00:00")
+                        dt = datetime.fromisoformat(ts_str)
+                        return dt.timestamp()
+            except Exception as e:
+                log.debug("Failed to parse mtime from %r: %s", line, e)
+    return None
+
+
 def extract_pdf_from_rmdoc(rmdoc_path, clean_name, dest_dir):
     """
     Try to extract an embedded PDF from a .rmdoc zip.
@@ -141,6 +178,8 @@ def extract_pdf_from_rmdoc(rmdoc_path, clean_name, dest_dir):
         log.error("Bad zip %s: %s", rmdoc_path.name, e)
         return None
 
+
+# ── State ─────────────────────────────────────────────────────────────────────
 
 def load_state(state_file):
     if state_file.exists():
@@ -164,6 +203,16 @@ def scan_local_uploads(sync_dir):
     return result
 
 
+def local_mtime(path):
+    """Return mtime of a local file, or 0 if it doesn't exist."""
+    try:
+        return path.stat().st_mtime
+    except FileNotFoundError:
+        return 0
+
+
+# ── Main sync ─────────────────────────────────────────────────────────────────
+
 def sync(sync_dir, state_file, rmapi_bin, remote_root, dry_run):
     sync_dir.mkdir(parents=True, exist_ok=True)
     state = load_state(state_file)
@@ -184,11 +233,9 @@ def sync(sync_dir, state_file, rmapi_bin, remote_root, dry_run):
     if use_usb:
         usb_docs = usb_build_paths(usb_list_docs())
 
-    for doc_path, doc_name in sorted(cloud_docs.items()):
-        if doc_path in prev_remote:
-            log.debug("Already known: %s", doc_path)
-            continue
+    remote_mtimes = {}  # track fetched mtimes to store in state
 
+    for doc_path, doc_name in sorted(cloud_docs.items()):
         rel_parts = doc_path.lstrip("/").split("/")
         local_dir = sync_dir
         if len(rel_parts) > 1:
@@ -198,21 +245,36 @@ def sync(sync_dir, state_file, rmapi_bin, remote_root, dry_run):
         pdf_path = local_dir / (clean_name + ".pdf")
         rmdoc_path = local_dir / (clean_name + ".rmdoc")
 
-        if pdf_path.exists():
-            log.debug("Already on disk as PDF: %s", clean_name)
-            continue
+        # Determine if we need to download (new or updated)
+        existing = pdf_path if pdf_path.exists() else (rmdoc_path if rmdoc_path.exists() else None)
+        is_new = doc_path not in prev_remote
 
-        # If USB is available and we only have a .rmdoc, upgrade it to PDF
-        if rmdoc_path.exists():
-            if use_usb:
-                log.info("UPGRADE  %s (.rmdoc -> PDF via USB)", clean_name)
-                rmdoc_path.unlink()
+        if existing and not is_new:
+            # Check if remote is newer than last known remote mtime
+            # Using stored remote mtime avoids re-downloading every run
+            remote_mt = get_remote_mtime(rmapi_bin, doc_path)
+            if remote_mt:
+                remote_mtimes[doc_path] = remote_mt
+            last_remote_mt = prev_remote.get(doc_path + ":mtime", 0)
+            if remote_mt and remote_mt > last_remote_mt + 60:
+                log.info("UPDATE   %s (remote newer by %ds)",
+                         doc_name, int(remote_mt - last_remote_mt) if last_remote_mt else 0)
+                existing.unlink()
+                existing = None
             else:
-                log.debug("Already on disk as rmdoc: %s", clean_name)
-                continue
+                if use_usb and existing == rmdoc_path:
+                    # Upgrade rmdoc to PDF via USB
+                    log.info("UPGRADE  %s (.rmdoc -> PDF via USB)", clean_name)
+                    rmdoc_path.unlink()
+                    existing = None
+                else:
+                    log.debug("Up to date: %s", clean_name)
+                    continue
 
-        log.info("DOWNLOAD  %s", doc_path)
-        if dry_run:
+        if existing is None:
+            log.info("DOWNLOAD %s", doc_path)
+
+        if dry_run or existing is not None:
             continue
 
         local_dir.mkdir(parents=True, exist_ok=True)
@@ -225,10 +287,9 @@ def sync(sync_dir, state_file, rmapi_bin, remote_root, dry_run):
                 None
             )
             if usb_match:
-                log.info("  via USB PDF export")
                 downloaded_as_pdf = usb_download_pdf(usb_match["ID"], pdf_path)
                 if downloaded_as_pdf:
-                    log.info("  -> %s", pdf_path.name)
+                    log.info("  -> %s (USB PDF)", pdf_path.name)
 
         if not downloaded_as_pdf:
             old_cwd = os.getcwd()
@@ -255,37 +316,36 @@ def sync(sync_dir, state_file, rmapi_bin, remote_root, dry_run):
                 log.error("No rmdoc found after downloading %s", doc_path)
                 continue
 
-            pdf = extract_pdf_from_rmdoc(dl, clean_name, local_dir)
-            if pdf:
-                dl.unlink()
-                log.info("  -> extracted PDF: %s", pdf.name)
-            else:
-                final = local_dir / (clean_name + ".rmdoc")
-                if dl != final:
-                    dl.rename(final)
-                log.info("  -> notebook: %s (plug in USB for PDF)", final.name)
+            # Always keep the .rmdoc so rmdoc-to-pdf can render annotations.
+            # For uploaded PDFs the rmdoc contains both the original PDF and
+            # any .rm annotation files added on the tablet.
+            final = local_dir / (clean_name + ".rmdoc")
+            if dl != final:
+                dl.rename(final)
+            log.info("  -> %s", final.name)
 
+    # ── Upload new local files ────────────────────────────────────────────────
     log.info("Scanning local folder: %s", sync_dir)
     current_uploaded = scan_local_uploads(sync_dir)
     remote_stems = {p.rsplit("/", 1)[-1] for p in cloud_docs}
 
-    # Treat all downloaded files (anything whose stem matches a remote doc)
-    # as already-remote so we never upload them back to the tablet.
-    # Only files whose stem does NOT match any remote doc are user-created uploads.
+    # Files whose stem matches a remote doc are downloads, not user uploads
+    # Also skip if a .rmdoc exists for the same name (would create duplicate)
+    existing_rmdoc_stems = {
+        p.stem for p in sync_dir.rglob("*.rmdoc")
+    }
     new_local = {
         rel for rel in set(current_uploaded) - set(prev_uploaded)
         if Path(rel).stem not in remote_stems
+        and Path(rel).stem not in existing_rmdoc_stems
     }
     for rel in sorted(new_local):
         local_path = sync_dir / rel
-        if local_path.stem in remote_stems:
-            log.debug("Skipping upload (already remote): %s", rel)
-            continue
         parts = Path(rel).parts
         remote_dir = remote_root
         if len(parts) > 1:
             remote_dir = remote_root.rstrip("/") + "/" + "/".join(parts[:-1])
-        log.info("UPLOAD  %s  ->  %s", rel, remote_dir)
+        log.info("UPLOAD   %s  ->  %s", rel, remote_dir)
         if not dry_run:
             result = rmapi_run(
                 ["put", str(local_path), remote_dir], rmapi_bin, capture=True
@@ -293,19 +353,28 @@ def sync(sync_dir, state_file, rmapi_bin, remote_root, dry_run):
             if result.returncode != 0:
                 log.error("Upload failed for %s: %s", rel, result.stderr.strip())
 
+    # ── Delete remote docs removed locally ───────────────────────────────────
     deleted_local = set(prev_uploaded) - set(current_uploaded)
     for rel in sorted(deleted_local):
         stem = Path(rel).stem
         for doc_path in [p for p in cloud_docs if p.rsplit("/", 1)[-1] == stem]:
-            log.info("DELETE remote  %s", doc_path)
+            log.info("DELETE   %s", doc_path)
             if not dry_run:
                 result = rmapi_run(["rm", doc_path], rmapi_bin, capture=True)
                 if result.returncode != 0:
                     log.warning("Delete failed %s: %s", doc_path, result.stderr.strip())
 
+    # ── Save state ────────────────────────────────────────────────────────────
     if not dry_run:
         state["local_uploaded"] = scan_local_uploads(sync_dir)
-        state["remote_seen"] = cloud_docs
+        # Merge cloud docs with fetched mtimes so next run won't re-download
+        new_remote = dict(cloud_docs)
+        for k, v in prev_remote.items():
+            if k.endswith(":mtime"):
+                new_remote[k] = v
+        for doc_path, mt in remote_mtimes.items():
+            new_remote[doc_path + ":mtime"] = mt
+        state["remote_seen"] = new_remote
         save_state(state, state_file)
         log.info("State saved -> %s", state_file)
     else:
