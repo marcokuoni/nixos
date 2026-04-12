@@ -110,7 +110,16 @@ journalctl -u rmdoc-to-pdf.service -f
 When the tablet is connected via USB and the USB web interface is enabled:
 
 - **All documents** (including notebooks) → downloaded as perfect PDFs rendered by the tablet itself
+- **Existing `.rmdoc` files are automatically upgraded** to proper PDFs on the next sync
+- **Downloaded PDFs are never uploaded back** to the tablet — only files you explicitly drop into the folder get uploaded
 - Enable in tablet: **Settings → Storage → USB web interface**
+
+Step by step when USB is connected:
+1. Script detects `http://10.11.99.1` is reachable
+2. Calls `GET http://10.11.99.1/documents/` to get all documents with their UUIDs
+3. For each new or previously `.rmdoc` document, calls `GET http://10.11.99.1/download/<uuid>/pdf`
+4. The **tablet itself renders the PDF** — perfect quality, no format issues
+5. Saves as `DocName.pdf` in `~/remarkable/`
 
 ---
 

@@ -198,9 +198,18 @@ def sync(sync_dir, state_file, rmapi_bin, remote_root, dry_run):
         pdf_path = local_dir / (clean_name + ".pdf")
         rmdoc_path = local_dir / (clean_name + ".rmdoc")
 
-        if pdf_path.exists() or rmdoc_path.exists():
-            log.debug("Already on disk: %s", clean_name)
+        if pdf_path.exists():
+            log.debug("Already on disk as PDF: %s", clean_name)
             continue
+
+        # If USB is available and we only have a .rmdoc, upgrade it to PDF
+        if rmdoc_path.exists():
+            if use_usb:
+                log.info("UPGRADE  %s (.rmdoc -> PDF via USB)", clean_name)
+                rmdoc_path.unlink()
+            else:
+                log.debug("Already on disk as rmdoc: %s", clean_name)
+                continue
 
         log.info("DOWNLOAD  %s", doc_path)
         if dry_run:
@@ -260,7 +269,13 @@ def sync(sync_dir, state_file, rmapi_bin, remote_root, dry_run):
     current_uploaded = scan_local_uploads(sync_dir)
     remote_stems = {p.rsplit("/", 1)[-1] for p in cloud_docs}
 
-    new_local = set(current_uploaded) - set(prev_uploaded)
+    # Treat all downloaded files (anything whose stem matches a remote doc)
+    # as already-remote so we never upload them back to the tablet.
+    # Only files whose stem does NOT match any remote doc are user-created uploads.
+    new_local = {
+        rel for rel in set(current_uploaded) - set(prev_uploaded)
+        if Path(rel).stem not in remote_stems
+    }
     for rel in sorted(new_local):
         local_path = sync_dir / rel
         if local_path.stem in remote_stems:
