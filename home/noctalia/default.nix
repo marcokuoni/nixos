@@ -20,10 +20,7 @@
             }
             { id = "Network"; }
             { id = "Bluetooth"; }
-            # KDE Connect — phone integration
-            { id = "plugin:kde-connect"; }
-            # shows mic/camera indicator when in use
-            { id = "plugin:privacy-indicator"; }
+            { id = "VPN"; }
           ];
           center = [
             {
