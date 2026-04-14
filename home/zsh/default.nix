@@ -19,6 +19,7 @@ let
 
     # safer mv — prompt before overwriting
     mv = "mv -i";
+    nvim = "NVIM_FULL_TERMINAL=0 nvim";
 
     # use bsdtar instead of unzip for better encoding handling
     # unzip = "bsdtar -xf";

@@ -10,7 +10,8 @@
     # niri-unstable for latest features — change to niri-stable if breakage occurs
     package = pkgs.niri-unstable;
     settings = {
-      outputs."DP-8" = {
+      # niri msg outputs, hier auf den anderen Screen wechseln
+      outputs."DP-9" = {
         # rotated monitor (portrait mode)
         transform.rotation = 270;
       };
