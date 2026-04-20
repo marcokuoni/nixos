@@ -7,6 +7,7 @@
   imports = [
     ./remarkable-sync
     ./remarkable-sync/rmdoc-to-pdf.nix
+    ./microvms
   ];
 
   networking = {
