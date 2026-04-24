@@ -7,7 +7,6 @@
   imports = [
     ./remarkable-sync
     ./remarkable-sync/rmdoc-to-pdf.nix
-    ./microvms
   ];
 
   networking = {
@@ -138,7 +137,7 @@
       127.0.0.1 backoffice.local
       127.0.0.1 formidable.local
       127.0.0.1 kulturkarussell.local
-      127.0.0.1 innovationsbox.local
+      127.0.0.1 innovationsbox.internal
       152.96.10.67 ins-lab
     '';
 
