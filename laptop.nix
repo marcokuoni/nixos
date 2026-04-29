@@ -290,6 +290,7 @@
 
   fonts = {
     packages = with pkgs; [
+      corefonts
       nerd-fonts.ubuntu
       nerd-fonts.fira-code
       nerd-fonts._0xproto
@@ -347,10 +348,19 @@
 
   xdg.portal = {
     enable = true;
-    # GTK file chooser dialog for browser uploads etc.
-    # lighter than xdg-desktop-portal-gnome, no full GNOME deps needed
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-    config.common.default = "*";
+    extraPortals = [
+      pkgs.xdg-desktop-portal-gtk
+      # gnome is added by programs.niri.enable, but listing it explicitly
+      # is harmless and makes intent obvious
+      pkgs.xdg-desktop-portal-gnome
+    ];
+    config.niri = {
+      default = [ "gnome" ];
+      "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+      "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+      "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
+      "org.freedesktop.impl.portal.Screenshot" = [ "gnome" ];
+    };
   };
 
   environment = {

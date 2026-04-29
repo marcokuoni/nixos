@@ -63,7 +63,7 @@
 
       location = {
         monthBeforeDay = false; # Swiss date format: day before month
-        name = "Zurich, Switzerland";
+        name = "Glarus, Switzerland";
       };
 
       plugins = {

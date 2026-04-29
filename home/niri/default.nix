@@ -16,6 +16,11 @@
         transform.rotation = 270;
       };
 
+      outputs."DP-11" = {
+        # rotated monitor (portrait mode)
+        transform.rotation = 270;
+      };
+
       input.keyboard.xkb = {
         layout = "ch";
         variant = "de_nodeadkeys";

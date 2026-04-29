@@ -16,6 +16,10 @@
   };
 
   programs = {
+    jujutsu = {
+      enable = true;
+    };
+
     vscode.enable = true;
 
     zen-browser = {
