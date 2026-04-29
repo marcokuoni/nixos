@@ -50,6 +50,7 @@
     username = "progressio";
     homeDirectory = "/home/progressio";
     packages = with pkgs; [
+      nautilus
       curl
       ripgrep
       openfortivpn
