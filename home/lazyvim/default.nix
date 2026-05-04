@@ -52,6 +52,11 @@
       vtsls # TypeScript/JS LSP
       vscode-json-languageserver
 
+      # Typst writing stack
+      typst # compiler
+      tinymist # LSP: preview, completion, hover, format
+      typstyle # formatter
+
       # DAP adapters (pulled from nixpkgs instead of Mason)
       vscode-extensions.xdebug.php-debug
       vscode-js-debug
@@ -94,6 +99,11 @@
       "parser/javascript.so".source =
         "${pkgs.vimPlugins.nvim-treesitter-parsers.javascript}/parser/javascript.so";
       "parser/c_sharp.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.c_sharp}/parser/c_sharp.so";
+      "parser/typst.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.typst}/parser/typst.so";
+      "parser/markdown.so".source =
+        "${pkgs.vimPlugins.nvim-treesitter-parsers.markdown}/parser/markdown.so";
+      "parser/markdown_inline.so".source =
+        "${pkgs.vimPlugins.nvim-treesitter-parsers.markdown_inline}/parser/markdown_inline.so";
 
       # matugen-template.lua is the source template — Noctalia reads this and
       # writes matugen.lua with actual color values at runtime
@@ -207,6 +217,19 @@
           markdown-preview-nvim
           render-markdown-nvim
           phpactor
+
+          # ── Research stack plugins ─────────────────────────────────────────
+          # typst-preview wraps tinymist for live browser preview with cursor sync
+          {
+            name = "typst-preview.nvim";
+            path = typst-preview-nvim;
+          }
+          # obsidian.nvim — edit your vault with wiki-link completion / backlinks
+          {
+            name = "obsidian.nvim";
+            path = obsidian-nvim;
+          }
+
           {
             name = "catppuccin";
             path = catppuccin-nvim;
@@ -244,6 +267,15 @@
         require("lazy").setup({
           defaults = { lazy = true },
           rocks = { enabled = false },
+          install = { missing = false },
+          change_detection = { enabled = false },
+          performance = {
+            reset_packpath = true,
+            rtp = {
+              reset = true,
+            },
+          },
+          readme = { enabled = false },
           dev = {
             -- point lazy at the nix-built plugin farm
             path = "${lazyPath}",
@@ -307,59 +339,71 @@
                     organize_imports_on_format = true,
                     enable_import_completion = true,
                   },
+                  -- Tinymist: Typst LSP. Writes a PDF on every :w and gives
+                  -- you completion, hover docs, goto-def, formatting, etc.
+                  tinymist = {
+                    settings = {
+                      formatterMode = "typstyle",
+                      exportPdf = "onSave",
+                      semanticTokens = "enable",
+                    },
+                  },
                 },
               },
             },
 
-            -- ── PHP / Xdebug DAP ───────────────────────────────────────────
+            -- ── Typst live preview (browser, cursor-synced) ─────────────────
+            -- <leader>tp opens the preview in your default browser. As you
+            -- type, the preview updates and the source/PDF positions sync
+            -- both ways. Uses the tinymist binary from extraPackages.
             {
-              "mfussenegger/nvim-dap",
-              dependencies = {
-                "rcarriga/nvim-dap-ui",
-                "nvim-neotest/nvim-nio",
-                "theHamsta/nvim-dap-virtual-text",
+              "chomosuke/typst-preview.nvim",
+              ft = "typst",
+              opts = {
+                dependencies_bin = {
+                  ["tinymist"] = "tinymist",
+                },
+                open_cmd = "xdg-open %s",
               },
-              ft = { "php" },
-              config = function()
-                local dap    = require("dap")
-                local dapui  = require("dapui")
-
-                local php_debug_js = "${pkgs.vscode-extensions.xdebug.php-debug}/share/vscode/extensions/xdebug.php-debug/out/phpDebug.js"
-
-                dap.adapters.php = {
-                  type    = "executable",
-                  command = "node",
-                  args    = { php_debug_js },
-                  options = { detached = false },
-                }
-                dap.adapters["php-debug-adapter"] = dap.adapters.php
-
-                dapui.setup()
-                dap.listeners.after.event_initialized["dapui_open"]  = function() dapui.open()  end
-                dap.listeners.before.event_terminated["dapui_close"] = function() dapui.close() end
-                dap.listeners.before.event_exited["dapui_close"]     = function() dapui.close() end
-
-                vim.keymap.set("n", "<F5>",  function() dap.continue()          end)
-                vim.keymap.set("n", "<F9>",  function() dap.toggle_breakpoint()  end)
-                vim.keymap.set("n", "<F10>", function() dap.step_over()          end)
-                vim.keymap.set("n", "<F11>", function() dap.step_into()          end)
-                vim.keymap.set("n", "<F12>", function() dap.step_out()           end)
-              end,
+              keys = {
+                { "<leader>tp", "<cmd>TypstPreview<cr>",       desc = "Typst preview (browser)" },
+                { "<leader>tt", "<cmd>TypstPreviewToggle<cr>", desc = "Toggle Typst preview" },
+                { "<leader>ts", "<cmd>TypstPreviewSyncCursor<cr>", desc = "Sync preview to cursor" },
+              },
             },
 
-            -- ── JS / Node / Chrome DAP ─────────────────────────────────────
+            -- ── Obsidian vault integration ─────────────────────────────────
+            -- Edit ~/research/vault directly from nvim. Wiki-link completion
+            -- with [[ , :ObsidianBacklinks for backlink panel, etc. The
+            -- Obsidian app stays useful for the graph view & community
+            -- plugins; both edit the same files so there's no sync issue.
             {
-              "mxsdev/nvim-dap-vscode-js",
-              dependencies = { "mfussenegger/nvim-dap" },
-              ft = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
-              config = function()
-                local debugger_path = "${pkgs.vscode-js-debug}/share/vscode/extensions/ms-vscode.js-debug"
-
-                require("dap-vscode-js").setup({
-                  debugger_path = debugger_path,
-                  adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "pwa-extensionHost" },
-                })
-              end,
+              "obsidian-nvim/obsidian.nvim",
+              version = "*",
+              ft = "markdown",
+              -- Or trigger only inside the vault:
+              -- event = { "BufReadPre " .. vim.fn.expand("~") .. "/research/vault/**.md" },
+              dependencies = { "nvim-lua/plenary.nvim" },
+              opts = {
+                workspaces = {
+                  { name = "research", path = "~/research/vault" },
+                },
+                completion = {
+                  nvim_cmp = true, -- you're using nvim-cmp, not blink
+                  min_chars = 2,
+                },
+                daily_notes = { folder = "daily" },
+                -- Where new literature notes go when created from a citation
+                notes_subdir = "literature",
+                new_notes_location = "notes_subdir",
+              },
+              keys = {
+                { "<leader>oo", "<cmd>ObsidianQuickSwitch<cr>",  desc = "Obsidian quick switch" },
+                { "<leader>os", "<cmd>ObsidianSearch<cr>",       desc = "Obsidian search" },
+                { "<leader>ob", "<cmd>ObsidianBacklinks<cr>",    desc = "Obsidian backlinks" },
+                { "<leader>on", "<cmd>ObsidianNew<cr>",          desc = "Obsidian new note" },
+                { "<leader>ot", "<cmd>ObsidianTags<cr>",         desc = "Obsidian tags" },
+              },
             },
 
             -- snacks: notifier replaces vim.notify, picker for file explorer
@@ -411,6 +455,7 @@
                   json       = { "prettierd", "prettier", "jq", stop_after_first = true },
                   jsonc      = { "biome", "fixjson", "prettierd", "prettier", stop_after_first = true },
                   cs         = { "csharpier" },
+                  -- typst formatting goes through tinymist's LSP, not conform
                 },
               },
             },
@@ -438,6 +483,57 @@
               "hrsh7th/nvim-cmp",
               opts = function(_, opts)
                 opts.completion = { autocomplete = false }
+              end,
+            },
+
+            -- ── PHP / Xdebug DAP ───────────────────────────────────────────
+            {
+              "mfussenegger/nvim-dap",
+              dependencies = {
+                "rcarriga/nvim-dap-ui",
+                "nvim-neotest/nvim-nio",
+                "theHamsta/nvim-dap-virtual-text",
+              },
+              ft = { "php" },
+              config = function()
+                local dap    = require("dap")
+                local dapui  = require("dapui")
+
+                local php_debug_js = "${pkgs.vscode-extensions.xdebug.php-debug}/share/vscode/extensions/xdebug.php-debug/out/phpDebug.js"
+
+                dap.adapters.php = {
+                  type    = "executable",
+                  command = "node",
+                  args    = { php_debug_js },
+                  options = { detached = false },
+                }
+                dap.adapters["php-debug-adapter"] = dap.adapters.php
+
+                dapui.setup()
+                dap.listeners.after.event_initialized["dapui_open"]  = function() dapui.open()  end
+                dap.listeners.before.event_terminated["dapui_close"] = function() dapui.close() end
+                dap.listeners.before.event_exited["dapui_close"]     = function() dapui.close() end
+
+                vim.keymap.set("n", "<F5>",  function() dap.continue()          end)
+                vim.keymap.set("n", "<F9>",  function() dap.toggle_breakpoint()  end)
+                vim.keymap.set("n", "<F10>", function() dap.step_over()          end)
+                vim.keymap.set("n", "<F11>", function() dap.step_into()          end)
+                vim.keymap.set("n", "<F12>", function() dap.step_out()           end)
+              end,
+            },
+
+            -- ── JS / Node / Chrome DAP ─────────────────────────────────────
+            {
+              "mxsdev/nvim-dap-vscode-js",
+              dependencies = { "mfussenegger/nvim-dap" },
+              ft = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
+              config = function()
+                local debugger_path = "${pkgs.vscode-js-debug}/share/vscode/extensions/ms-vscode.js-debug"
+
+                require("dap-vscode-js").setup({
+                  debugger_path = debugger_path,
+                  adapters = { "pwa-node", "pwa-chrome", "pwa-msedge", "pwa-extensionHost" },
+                })
               end,
             },
           },

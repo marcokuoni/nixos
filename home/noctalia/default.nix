@@ -38,8 +38,8 @@
             }
             {
               id = "Clock";
-              formatHorizontal = "HH:mm";
-              formatVertical = "HH mm";
+              formatHorizontal = "dd HH:mm:ss";
+              formatVertical = "dd HH mm ss";
               useMonospacedFont = true;
               usePrimaryColor = true;
             }

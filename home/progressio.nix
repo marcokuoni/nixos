@@ -50,6 +50,13 @@
     username = "progressio";
     homeDirectory = "/home/progressio";
     packages = with pkgs; [
+      # Research
+      pandoc
+      obsidian
+      zotero
+      pdfannots2json # for zotero integration in obsidium
+      zathura # pdf viewer
+
       nautilus
       curl
       ripgrep
