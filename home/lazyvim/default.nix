@@ -478,11 +478,26 @@
               end,
             },
 
-            -- disable autocomplete popup — trigger manually with C-n/C-p
+            -- calmer completion behaviour for writing:
+            -- no auto-selection and Enter inserts a newline unless a completion
+            -- item was explicitly selected by the user
             {
               "hrsh7th/nvim-cmp",
               opts = function(_, opts)
-                opts.completion = { autocomplete = false }
+                local cmp = require("cmp")
+
+                opts.completion = {
+                  autocomplete = false,
+                  completeopt = "menu,menuone,noselect",
+                }
+
+                opts.preselect = cmp.PreselectMode.None
+
+                opts.mapping["<CR>"] = cmp.mapping.confirm({
+                  select = false,
+                })
+
+                return opts
               end,
             },
 
