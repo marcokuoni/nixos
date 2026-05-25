@@ -10,13 +10,7 @@
     # niri-unstable for latest features — change to niri-stable if breakage occurs
     package = pkgs.niri-unstable;
     settings = {
-      # niri msg outputs, hier auf den anderen Screen wechseln
-      outputs."DP-9" = {
-        # rotated monitor (portrait mode)
-        transform.rotation = 270;
-      };
-
-      outputs."DP-11" = {
+      outputs."LG Electronics LG HDR 4K 0x0003EE38" = {
         # rotated monitor (portrait mode)
         transform.rotation = 270;
       };
