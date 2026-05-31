@@ -123,6 +123,9 @@
               username = "marco.kuoni@ost.ch";
               authtype = "password";
             };
+            ipv6 = {
+              method = "disabled";
+            };
             vpn-secrets = { };
           };
         };
