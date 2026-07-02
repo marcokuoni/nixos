@@ -21,6 +21,7 @@
     # All LSPs, formatters, linters and DAP adapters come from Nix — no Mason
     extraPackages = with pkgs; [
       # LazyVim core tools
+      hlint
       lua-language-server
       stylua # Lua formatter
       fd # faster find (telescope)
