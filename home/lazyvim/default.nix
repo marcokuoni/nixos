@@ -225,11 +225,6 @@
             name = "typst-preview.nvim";
             path = typst-preview-nvim;
           }
-          # obsidian.nvim — edit your vault with wiki-link completion / backlinks
-          {
-            name = "obsidian.nvim";
-            path = obsidian-nvim;
-          }
 
           {
             name = "catppuccin";
@@ -370,40 +365,6 @@
                 { "<leader>tp", "<cmd>TypstPreview<cr>",       desc = "Typst preview (browser)" },
                 { "<leader>tt", "<cmd>TypstPreviewToggle<cr>", desc = "Toggle Typst preview" },
                 { "<leader>ts", "<cmd>TypstPreviewSyncCursor<cr>", desc = "Sync preview to cursor" },
-              },
-            },
-
-            -- ── Obsidian vault integration ─────────────────────────────────
-            -- Edit ~/research/vault directly from nvim. Wiki-link completion
-            -- with [[ , :ObsidianBacklinks for backlink panel, etc. The
-            -- Obsidian app stays useful for the graph view & community
-            -- plugins; both edit the same files so there's no sync issue.
-            {
-              "obsidian-nvim/obsidian.nvim",
-              version = "*",
-              ft = "markdown",
-              -- Or trigger only inside the vault:
-              -- event = { "BufReadPre " .. vim.fn.expand("~") .. "/research/vault/**.md" },
-              dependencies = { "nvim-lua/plenary.nvim" },
-              opts = {
-                workspaces = {
-                  { name = "research", path = "~/research/vault" },
-                },
-                completion = {
-                  nvim_cmp = true, -- you're using nvim-cmp, not blink
-                  min_chars = 2,
-                },
-                daily_notes = { folder = "daily" },
-                -- Where new literature notes go when created from a citation
-                notes_subdir = "literature",
-                new_notes_location = "notes_subdir",
-              },
-              keys = {
-                { "<leader>oo", "<cmd>ObsidianQuickSwitch<cr>",  desc = "Obsidian quick switch" },
-                { "<leader>os", "<cmd>ObsidianSearch<cr>",       desc = "Obsidian search" },
-                { "<leader>ob", "<cmd>ObsidianBacklinks<cr>",    desc = "Obsidian backlinks" },
-                { "<leader>on", "<cmd>ObsidianNew<cr>",          desc = "Obsidian new note" },
-                { "<leader>ot", "<cmd>ObsidianTags<cr>",         desc = "Obsidian tags" },
               },
             },
 
