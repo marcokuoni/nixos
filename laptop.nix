@@ -262,6 +262,18 @@
       alsa.support32Bit = true;
       # PulseAudio compatibility layer
       pulse.enable = true;
+      # extraConfig.pipewire."10-airplay" = {
+      #   "context.modules" = [
+      #     {
+      #       name = "libpipewire-module-raop-discover";
+      #       args = {
+      #         "stream.props" = {
+      #           "sess.latency.msec" = 2000;
+      #         };
+      #       };
+      #     }
+      #   ];
+      # };
     };
 
     # Allow users to configure Bastard Keyboard via browser (WebHID)

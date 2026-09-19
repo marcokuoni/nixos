@@ -85,6 +85,12 @@
       omnisharp-roslyn
       csharpier
       dotnet-sdk_10
+      netcoredbg # C# debug adapter
+
+      # Rust
+      cargo
+      rustc
+      vscode-extensions.vadimcn.vscode-lldb # codelldb
     ];
 
     # ── Pre-compiled tree-sitter parsers ──────────────────────────────────────
@@ -105,6 +111,7 @@
         "${pkgs.vimPlugins.nvim-treesitter-parsers.markdown}/parser/markdown.so";
       "parser/markdown_inline.so".source =
         "${pkgs.vimPlugins.nvim-treesitter-parsers.markdown_inline}/parser/markdown_inline.so";
+      "parser/rust.so".source = "${pkgs.vimPlugins.nvim-treesitter-parsers.rust}/parser/rust.so";
 
       # matugen-template.lua is the source template — Noctalia reads this and
       # writes matugen.lua with actual color values at runtime
@@ -218,6 +225,7 @@
           markdown-preview-nvim
           render-markdown-nvim
           phpactor
+          nvim-treesitter-parsers.rust
 
           # ── Research stack plugins ─────────────────────────────────────────
           # typst-preview wraps tinymist for live browser preview with cursor sync
@@ -463,7 +471,10 @@
               end,
             },
 
-            -- ── PHP / Xdebug DAP ───────────────────────────────────────────
+            -- ── DAP: PHP / Rust / C# in ONE spec ───────────────────────────
+            -- lazy.nvim merges specs for the same plugin and only the LAST
+            -- `config` wins — separate blocks per language silently dropped
+            -- the earlier ones (your PHP setup was being overridden by Rust).
             {
               "mfussenegger/nvim-dap",
               dependencies = {
@@ -471,13 +482,13 @@
                 "nvim-neotest/nvim-nio",
                 "theHamsta/nvim-dap-virtual-text",
               },
-              ft = { "php" },
+              ft = { "php", "rust", "cs" },
               config = function()
-                local dap    = require("dap")
-                local dapui  = require("dapui")
+                local dap   = require("dap")
+                local dapui = require("dapui")
 
+                -- PHP / Xdebug
                 local php_debug_js = "${pkgs.vscode-extensions.xdebug.php-debug}/share/vscode/extensions/xdebug.php-debug/out/phpDebug.js"
-
                 dap.adapters.php = {
                   type    = "executable",
                   command = "node",
@@ -486,16 +497,73 @@
                 }
                 dap.adapters["php-debug-adapter"] = dap.adapters.php
 
+                -- Rust / codelldb
+                local lldb = "${pkgs.vscode-extensions.vadimcn.vscode-lldb}/share/vscode/extensions/vadimcn.vscode-lldb"
+                dap.adapters.codelldb = {
+                  type = "server",
+                  port = "''${port}",
+                  executable = {
+                    command = lldb .. "/adapter/codelldb",
+                    args = { "--port", "''${port}" },
+                  },
+                }
+                dap.configurations.rust = {
+                  {
+                    name = "Launch",
+                    type = "codelldb",
+                    request = "launch",
+                    program = function()
+                      vim.fn.system("cargo build")
+                      return vim.fn.input("Executable: ", vim.fn.getcwd() .. "/target/debug/", "file")
+                    end,
+                    cwd = "''${workspaceFolder}",
+                    stopOnEntry = false,
+                  },
+                }
+
+                -- C# / netcoredbg
+                dap.adapters.coreclr = {
+                  type    = "executable",
+                  command = "netcoredbg",
+                  args    = { "--interpreter=vscode" },
+                }
+                dap.adapters.netcoredbg = dap.adapters.coreclr
+                dap.configurations.cs = {
+                  {
+                    type = "coreclr",
+                    name = "Launch (build first)",
+                    request = "launch",
+                    program = function()
+                      vim.notify("dotnet build …")
+                      local out = vim.fn.system("dotnet build")
+                      if vim.v.shell_error ~= 0 then
+                        vim.notify(out, vim.log.levels.ERROR)
+                        return dap.ABORT
+                      end
+                      return vim.fn.input("DLL: ", vim.fn.getcwd() .. "/bin/Debug/", "file")
+                    end,
+                    cwd = "''${workspaceFolder}",
+                    stopAtEntry = false,
+                  },
+                  {
+                    type = "coreclr",
+                    name = "Attach to process",
+                    request = "attach",
+                    processId = require("dap.utils").pick_process,
+                  },
+                }
+
+                -- UI + keys
                 dapui.setup()
                 dap.listeners.after.event_initialized["dapui_open"]  = function() dapui.open()  end
                 dap.listeners.before.event_terminated["dapui_close"] = function() dapui.close() end
                 dap.listeners.before.event_exited["dapui_close"]     = function() dapui.close() end
 
-                vim.keymap.set("n", "<F5>",  function() dap.continue()          end)
-                vim.keymap.set("n", "<F9>",  function() dap.toggle_breakpoint()  end)
-                vim.keymap.set("n", "<F10>", function() dap.step_over()          end)
-                vim.keymap.set("n", "<F11>", function() dap.step_into()          end)
-                vim.keymap.set("n", "<F12>", function() dap.step_out()           end)
+                vim.keymap.set("n", "<F5>",  function() dap.continue()          end, { desc = "DAP continue" })
+                vim.keymap.set("n", "<F9>",  function() dap.toggle_breakpoint()  end, { desc = "DAP breakpoint" })
+                vim.keymap.set("n", "<F10>", function() dap.step_over()          end, { desc = "DAP step over" })
+                vim.keymap.set("n", "<F11>", function() dap.step_into()          end, { desc = "DAP step into" })
+                vim.keymap.set("n", "<F12>", function() dap.step_out()           end, { desc = "DAP step out" })
               end,
             },
 
