@@ -30,6 +30,16 @@
         tab-indicator = {
           # show tab indicator inside the column rather than above it
           place-within-column = true;
+          position = "left"; # "top" can suit the portrait monitor
+          width = 6;
+          gap = 4; # space between indicator and window
+          gaps-between-tabs = 4; # separates the individual tab segments
+          corner-radius = 3;
+          length.total-proportion = 1.0; # use the full column height
+          hide-when-single-tab = false; # still show it on a tabbed column with 1 window
+          active.color = "#c4a7e7"; # iris: the tab you're on
+          inactive.color = "#524f67"; # the other tabs
+          urgent.color = "#eb6f92"; # a tab asking for attention
         };
       };
 

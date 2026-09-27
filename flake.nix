@@ -39,6 +39,8 @@
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    go2hs.url = "path:/home/progressio/ost/git/go2/nix_solution/go2hs"; # or a git URL
   };
 
   outputs =
@@ -49,6 +51,7 @@
       niri,
       noctalia,
       zen-browser,
+      go2hs,
       ...
     }@inputs:
     {
@@ -83,6 +86,13 @@
                   ./home/progressio.nix
                 ];
               };
+            }
+
+            go2hs.nixosModules.default
+            {
+              go2.enable = true;
+              go2.interface = "enp1s0f0";
+              go2.address = "192.168.123.99"; # default
             }
           ];
         };

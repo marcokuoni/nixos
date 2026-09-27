@@ -21,6 +21,22 @@
         "type": "github"
       }
     },
+    "go2hs": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "unitree-sdk2-src": "unitree-sdk2-src"
+      },
+      "locked": {
+        "lastModified": 1790261844,
+        "narHash": "sha256-WLRBi8goF1IqJyWag3q+GrM2FrQZaBB/ZLDUL+T3Khc=",
+        "path": "/home/progressio/ost/git/go2/nix_solution/go2hs",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/progressio/ost/git/go2/nix_solution/go2hs",
+        "type": "path"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -143,15 +159,15 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1775423009,
-        "narHash": "sha256-vPKLpjhIVWdDrfiUM8atW6YkIggCEKdSAlJPzzhkQlw=",
-        "owner": "NixOs",
+        "lastModified": 1790463110,
+        "narHash": "sha256-hKlVl12B1dF0Q5vd9dY3lIJM5mFGWYSlXwSLAqHZ1+s=",
+        "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+        "rev": "e158d9ed9b51c98974c5e66e1ba1c9e0255fecaa",
         "type": "github"
       },
       "original": {
-        "owner": "NixOs",
+        "owner": "NixOS",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
@@ -169,6 +185,22 @@
       "original": {
         "owner": "NixOS",
         "ref": "nixos-25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1775423009,
+        "narHash": "sha256-vPKLpjhIVWdDrfiUM8atW6YkIggCEKdSAlJPzzhkQlw=",
+        "owner": "NixOs",
+        "repo": "nixpkgs",
+        "rev": "68d8aa3d661f0e6bd5862291b5bb263b2a6595c9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOs",
+        "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -242,10 +274,11 @@
     },
     "root": {
       "inputs": {
+        "go2hs": "go2hs",
         "home-manager": "home-manager",
         "microvm": "microvm",
         "niri": "niri",
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": "nixpkgs_2",
         "nixvim": "nixvim",
         "noctalia": "noctalia",
         "noctalia-qs": "noctalia-qs",
@@ -316,6 +349,22 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "unitree-sdk2-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1789992172,
+        "narHash": "sha256-oJy3GCVYzPeWBX61dJtNz1um3S0PJe11yP9p/S1AwNQ=",
+        "owner": "unitreerobotics",
+        "repo": "unitree_sdk2",
+        "rev": "63096d0ac0c5d2dec9d6e0c22cd5233410ca2f36",
+        "type": "github"
+      },
+      "original": {
+        "owner": "unitreerobotics",
+        "repo": "unitree_sdk2",
         "type": "github"
       }
     },
