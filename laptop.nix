@@ -231,7 +231,7 @@
       enable = true;
       settings = {
         default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${pkgs.niri-unstable}/bin/niri-session";
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd ${pkgs.niri}/bin/niri-session";
           user = "greeter";
         };
       };
@@ -280,6 +280,7 @@
     udev.extraRules = ''
       KERNEL=="hidraw*", SUBSYSTEM=="hidraw", MODE="0660", GROUP="users", TAG+="uaccess", TAG+="udev-acl"
     '';
+    udev.packages = [ pkgs.projecteur ];
   };
 
   users = {
@@ -302,6 +303,7 @@
   };
 
   virtualisation.docker.enable = true;
+  hardware.uinput.enable = true;
 
   fonts = {
     packages = with pkgs; [

@@ -8,7 +8,7 @@
   programs.niri = {
     enable = true;
     # niri-unstable for latest features — change to niri-stable if breakage occurs
-    package = pkgs.niri-unstable;
+    package = pkgs.niri;
     settings = {
       outputs."LG Electronics LG HDR 4K 0x0003EE38" = {
         # rotated monitor (portrait mode)
@@ -118,6 +118,12 @@
             "Mod+P" = {
               repeat = false;
               action.spawn-sh = "wl-mirror $(niri msg --json focused-output | jq -r .name)";
+            };
+
+            # toggle Projecteur spotlight; starts Projecteur first if it isn't running
+            "Mod+Alt+P" = {
+              repeat = false;
+              action.spawn-sh = "projecteur -c spot=toggle 2>/dev/null || projecteur &";
             };
 
             # lock screen

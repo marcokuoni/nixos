@@ -12,12 +12,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.noctalia-qs.follows = "noctalia-qs";
-    };
-
     noctalia-qs = {
       url = "github:noctalia-dev/noctalia-qs";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -41,6 +35,17 @@
     };
 
     go2hs.url = "path:/home/progressio/ost/git/go2/nix_solution/go2hs"; # or a git URL
+
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell/legacy-v4"; # stay on v4 for now
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.noctalia-qs.follows = "noctalia-qs";
+    };
+
+    projecteur-src = {
+      url = "github:gbin/Projecteur/develop";
+      flake = false;
+    };
   };
 
   outputs =
@@ -62,8 +67,17 @@
             ./hardware/laptop.nix
             ./laptop.nix
 
-            # niri overlay provides pkgs.niri-stable and pkgs.niri-unstable
-            { nixpkgs.overlays = [ niri.overlays.niri ]; }
+            {
+              nixpkgs.overlays = [
+                # Projecteur from GitHub instead of the old Qt5 version in nixpkgs
+                (final: prev: {
+                  projecteur = final.callPackage ./pkgs/projecteur.nix {
+                    src = inputs.projecteur-src;
+                    version = "1.0.0-${inputs.projecteur-src.shortRev or "dev"}";
+                  };
+                })
+              ];
+            }
 
             home-manager.nixosModules.home-manager
             {
