@@ -16,6 +16,9 @@
   programs.nixvim = {
     enable = true;
     withRuby = false;
+    # nvim runs :!cmd, system() etc. through 'shell' and expects POSIX syntax;
+    # the login shell is nushell now, so keep bash for that (terminal still opens nu)
+    opts.shell = lib.getExe pkgs.bash;
 
     # ── External tools ────────────────────────────────────────────────────────
     # All LSPs, formatters, linters and DAP adapters come from Nix — no Mason
@@ -63,7 +66,7 @@
       vscode-js-debug
 
       # Haskell
-      haskell-language-server
+      # haskell-language-server bring inside with flake
       haskellPackages.fourmolu # Haskell formatter
       haskellPackages.cabal-fmt
       haskellPackages.fast-tags
@@ -388,28 +391,8 @@
                   },
                 },
               },
-              init = function()
-                -- if launched from ghostty as a terminal replacement, open fullscreen
-                if vim.env.NVIM_FULL_TERMINAL == "1" then
-                  vim.api.nvim_create_autocmd("UIEnter", {
-                    once = true,
-                    callback = function()
-                      vim.schedule(function()
-                        Snacks.terminal(nil, {
-                          win = {
-                            position = "float",
-                            width = 0,
-                            height = 0,
-                            border = "none",
-                          }
-                        })
-                      end)
-                    end,
-                  })
-                end
-              end,
               keys = {
-                { "<leader>t", function() Snacks.terminal() end, desc = "Toggle Terminal" },
+                { "<leader>t", function() Snacks.terminal("nu") end, desc = "Toggle Terminal (nushell)" },
               },
             },
 

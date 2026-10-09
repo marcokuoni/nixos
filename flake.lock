@@ -27,13 +27,13 @@
         "unitree-sdk2-src": "unitree-sdk2-src"
       },
       "locked": {
-        "lastModified": 1790506737,
-        "narHash": "sha256-vLuocla+JEDyEigdi7fCiYwetsfj50iJa+vbKFhTjBc=",
-        "path": "/home/progressio/ost/git/go2/nix_solution/go2hs",
+        "lastModified": 1791469003,
+        "narHash": "sha256-C4IAYwGcUFgNR5/Fql06MIMDU78t0Q0+Aw0ur6+H6i0=",
+        "path": "/home/progressio/ost/git/go2/devvm/data/go2hs",
         "type": "path"
       },
       "original": {
-        "path": "/home/progressio/ost/git/go2/nix_solution/go2hs",
+        "path": "/home/progressio/ost/git/go2/devvm/data/go2hs",
         "type": "path"
       }
     },
@@ -159,11 +159,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1790578696,
-        "narHash": "sha256-ZoxIApko70jCdbH3l20HWXOBaT2HZd87orzd2yJ9dVE=",
+        "lastModified": 1791260994,
+        "narHash": "sha256-Miqqk/ammqnTUxaoCyvtwoPeLbI1ksFyLxi/CazZpWY=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "7a0f122f5090cf4c2ade2a13a0e229d4e19ba71f",
+        "rev": "151fa4e8ddfdd8dd25d945ad94ed54a13de9f6e4",
         "type": "github"
       },
       "original": {

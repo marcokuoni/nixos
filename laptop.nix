@@ -297,9 +297,8 @@
         "lpadmin" # manage printers
         "dialout" # serial ports
       ];
-      shell = pkgs.zsh;
+      shell = pkgs.nushell;
     };
-    defaultUserShell = pkgs.zsh;
   };
 
   virtualisation.docker.enable = true;
@@ -360,7 +359,6 @@
     firefox.enable = true;
     # nix-ld allows running unpatched binaries (e.g. downloaded scripts)
     nix-ld.enable = true;
-    zsh.enable = true;
   };
 
   xdg.portal = {
@@ -381,7 +379,7 @@
   };
 
   environment = {
-    shells = [ pkgs.zsh ];
+    shells = [ pkgs.nushell ];
     # Required for xdg-desktop-portal to work with home-manager useUserPackages
     pathsToLink = [
       "/share/applications"

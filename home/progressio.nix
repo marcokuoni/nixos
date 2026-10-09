@@ -4,7 +4,7 @@
     ./niri
     ./noctalia
     ./ghostty
-    ./zsh
+    ./nushell
     ./lazyvim
     ./scripts/LazyvimDiffPlugins.nix
     ./scripts/BeamerMirror.nix

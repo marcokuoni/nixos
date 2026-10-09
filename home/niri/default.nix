@@ -102,10 +102,10 @@
             "Mod+Shift+Slash".action.show-hotkey-overlay = { };
 
             # ── App launchers ───────────────────────────────────────────────
-            "Mod+Alt+T".action.spawn = "ghostty";
+            # ghostty starts the login shell (nushell)
             "Mod+T" = {
               repeat = false;
-              action.spawn-sh = "NVIM_FULL_TERMINAL=1 ghostty --command='nvim'";
+              action.spawn = "ghostty";
             };
             "Mod+N" = {
               repeat = false;
