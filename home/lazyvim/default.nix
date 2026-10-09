@@ -383,7 +383,9 @@
             {
               "folke/snacks.nvim",
               opts = {
-                terminal = { enabled = true },
+                -- every snacks terminal (<C-/>, <leader>ft, <leader>t) opens nushell;
+                -- vim.o.shell stays bash for :!cmd and plugins
+                terminal = { enabled = true, shell = "nu" },
                 notifier = { enabled = true },
                 picker = {
                   sources = {
@@ -392,7 +394,7 @@
                 },
               },
               keys = {
-                { "<leader>t", function() Snacks.terminal("nu") end, desc = "Toggle Terminal (nushell)" },
+                { "<leader>t", function() Snacks.terminal() end, desc = "Toggle Terminal" },
               },
             },
 

@@ -58,6 +58,14 @@
           mkdir $name
           ^bsdtar -xf $archive -C $name
         }
+        # p in vi normal mode pastes the system clipboard (what nvim/tmux yanked)
+        $env.config.keybindings = ($env.config.keybindings | append {
+          name: paste_clipboard
+          modifier: none
+          keycode: char_p
+          mode: vi_normal
+          event: { send: executehostcommand, cmd: "commandline edit --insert (^wl-paste --no-newline)" }
+        })
       '';
     };
 
