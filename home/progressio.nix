@@ -6,7 +6,7 @@
     ./tmux
     ./ghostty
     ./nushell
-    ./lazyvim
+    ./nvim
     ./scripts/LazyvimDiffPlugins.nix
     ./scripts/BeamerMirror.nix
   ];

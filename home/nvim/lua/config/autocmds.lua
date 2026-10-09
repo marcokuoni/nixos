@@ -1,0 +1,1 @@
+-- Extra autocommands, loaded by LazyVim on VeryLazy.

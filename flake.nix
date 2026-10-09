@@ -7,11 +7,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixvim = {
-      url = "github:nix-community/nixvim";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     noctalia-qs = {
       url = "github:noctalia-dev/noctalia-qs";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -52,7 +47,6 @@
     {
       nixpkgs,
       home-manager,
-      nixvim,
       niri,
       noctalia,
       zen-browser,
@@ -93,7 +87,6 @@
                   niri.homeModules.niri
                   noctalia.homeModules.default
                   zen-browser.homeModules.beta
-                  nixvim.homeModules.nixvim
                 ];
 
                 users.progressio.imports = [

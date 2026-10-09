@@ -1,4 +1,4 @@
-{pkgs, ...}: {
+{ pkgs, ... }: {
   # lazyvim-diff-plugins: compare plugins known to Nix vs plugins loaded by lazy
   # useful for finding plugins lazy downloaded that should be added to the Nix config
   home.packages = [

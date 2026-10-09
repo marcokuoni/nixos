@@ -1,3 +1,37 @@
+# Neovim (LazyVim)
+
+## Aufbau
+
+```
+home/nvim/
+├── default.nix          # nur Nix: nvim, LSPs/Formatter/Debugger, Plugins, Parser
+└── lua/
+    ├── config/
+    │   ├── lazy.lua     # lazy.nvim-Setup (Plugins aus Nix, keine Downloads)
+    │   ├── options.lua  # vim-Optionen
+    │   ├── keymaps.lua  # eigene Keymaps
+    │   └── autocmds.lua
+    ├── plugins/         # ein File pro Thema, normale LazyVim-Specs
+    │   ├── colorscheme.lua
+    │   ├── dap.lua      # Debugging PHP / Rust / C# / JS
+    │   ├── editor.lua   # snacks (Terminal = nushell), cmp
+    │   ├── format.lua   # conform + nvim-lint
+    │   ├── lsp.lua      # phpactor, omnisharp, tinymist
+    │   ├── nix.lua      # Mason aus, Treesitter-Install aus
+    │   └── typst.lua
+    └── matugen-template.lua  # Farben aus dem Wallpaper (Noctalia)
+```
+
+- **Verhalten ändern** → das passende File in `lua/` editieren, rebuild.
+- **Neues Plugin** → Spec in `lua/plugins/` + Paket in `plugins` in `default.nix`.
+  `lazyvim-diff-plugins` zeigt, ob lazy ein Plugin sucht, das in Nix fehlt.
+- **Neues Tool (LSP, Formatter)** → `extraPackages` in `default.nix`.
+- **Neuer Treesitter-Parser** → `parsers` in `default.nix`.
+- Store-Pfade, die Lua braucht (Debug-Adapter, Plugin-Ordner), stehen in
+  `require("nix")`, gesetzt in `initLua` in `default.nix`.
+
+---
+
 # Research Stack — Obsidian + Zotero + Typst auf NixOS
 
 Eine zusammenhängende Forschungs- und Schreib-Umgebung. Alles deklarativ in Nix,
@@ -48,7 +82,7 @@ mkdir -p ~/research/{pdfs,vault/{daily,weekly,monthly,literature,projects,calend
 
 ### 1. NixOS-Config aktivieren
 
-Diese Datei (`nixvim.nix`) in dein Home-Manager-Modul einbinden, dann:
+Das Modul `home/nvim` ist in `home/progressio.nix` eingebunden, dann:
 
 ```bash
 sudo nixos-rebuild switch --flake '.#laptop' --impure
@@ -72,9 +106,10 @@ gelegt (read-only, im Nix-Store).
 
 ### 3. Tinymist Project Root
 
-Wichtig damit Bibliographie-Symlinks funktionieren: Die nixvim-Config setzt
-`--root /home/progressio/research`. Falls dein Username/Pfad anders ist,
-in `nixvim.nix` unter `tinymist.settings.typstExtraArgs` anpassen.
+Wichtig damit Bibliographie-Symlinks funktionieren: tinymist braucht einen
+Project Root, der die `.bib` enthält. Dafür in `lua/plugins/lsp.lua` bei
+`tinymist.settings` ergänzen:
+`typstExtraArgs = { "--root", "/home/progressio/research" }`.
 
 ### 4. Obsidian-Plugins installieren
 
@@ -120,9 +155,9 @@ Den eingebauten Daily-Notes-Core-Plugin **deaktivieren**, sonst doppelte Trigger
 
 | Keybind        | Aktion                              |
 | -------------- | ----------------------------------- |
-| `<leader>yp`   | Live-Preview im Browser öffnen      |
-| `<leader>yt`   | Preview an/aus                      |
-| `<leader>ys`   | Preview zur Cursorposition scrollen |
+| `<leader>tp`   | Live-Preview im Browser öffnen      |
+| `<leader>tt`   | Preview an/aus                      |
+| `<leader>ts`   | Preview zur Cursorposition scrollen |
 
 ### Obsidian (`.md`-Files)
 
@@ -152,9 +187,8 @@ Den eingebauten Daily-Notes-Core-Plugin **deaktivieren**, sonst doppelte Trigger
 
 | Keybind      | Aktion           |
 | ------------ | ---------------- |
-| `<leader>T`  | Terminal toggle  |
-
-(Bewusst auf großem `T`, weil `<leader>t` von der Typst-Familie genutzt wird.)
+| `<leader>t`  | Terminal toggle (nushell) |
+| `<C-/>`      | Terminal toggle (LazyVim-Default) |
 
 ### DAP Debugging
 
@@ -209,7 +243,7 @@ deklarativ in Nix). Trigger: Kürzel im Insert-Modus tippen, dann `<Tab>`.
 
 **Schreiben:**
 - `nvim ~/research/papers/foo/paper.typ`
-- `<leader>yp` → Browser-Preview, Cursor-Sync läuft
+- `<leader>tp` → Browser-Preview, Cursor-Sync läuft
 - `:w` → tinymist exportiert PDF
 - Citation Keys per `cite<Tab>` → `@smith2024` (gleiche Keys wie in Obsidian)
 
@@ -226,7 +260,7 @@ deklarativ in Nix). Trigger: Kürzel im Insert-Modus tippen, dann `<Tab>`.
 
 **`failed to load file (access denied)`:**
 - Tinymist Sandbox-Problem
-- `--root`-Pfad in `nixvim.nix` muss deinen Pfad enthalten
+- `--root`-Pfad in `lua/plugins/lsp.lua` muss deinen Pfad enthalten
 - Symlinks resolven werden — Target muss innerhalb des Roots liegen
 
 **Obsidian: "module 'cmp' not found":**
@@ -240,13 +274,13 @@ deklarativ in Nix). Trigger: Kürzel im Insert-Modus tippen, dann `<Tab>`.
 
 ## Snippets ändern
 
-Da Snippets in `extraFiles` liegen, ist Editing = `nixos-rebuild`. Workflow:
+Snippets aus dem Nix-Store sind read-only, Editing = `nixos-rebuild`. Workflow:
 
-1. `nixvim.nix` editieren, im `extraFiles`-Block den Snippet-Inhalt ändern
+1. Snippet-File editieren
 2. `sudo nixos-rebuild switch --flake '.#laptop' --impure`
 3. nvim neu starten oder `:Lazy reload LuaSnip`
 
-Wer das öfter machen will: `extraFiles`-Block für Snippets weglassen und in
+Wer das öfter machen will: in
 LuaSnip's Loader einen writable Pfad eintragen, z.B.
 `~/.config/luasnip-snippets-user`. Dann werden Änderungen ohne rebuild aktiv.
 
