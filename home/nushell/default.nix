@@ -66,6 +66,11 @@
           mode: vi_normal
           event: { send: executehostcommand, cmd: "commandline edit --insert (^wl-paste --no-newline)" }
         })
+        # reset the cursor to the terminal default (block) before every command,
+        # so ssh, a remote vi, less etc. don't inherit nushell's insert-mode line
+        $env.config.hooks.pre_execution = (
+          $env.config.hooks.pre_execution? | default [] | append {|| print -n (ansi -e '0 q') }
+        )
       '';
     };
 
