@@ -7,7 +7,7 @@
 {
   programs.niri = {
     enable = true;
-    # niri-unstable for latest features — change to niri-stable if breakage occurs
+    # niri from nixpkgs (the same one greetd starts in modules/nixos/desktop.nix)
     package = pkgs.niri;
     settings = {
       outputs."LG Electronics LG HDR 4K 0x0003EE38" = {

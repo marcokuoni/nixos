@@ -7,8 +7,5 @@
     # firmware updates (BIOS, Thunderbolt, SSD, …) from LVFS:
     # fwupdmgr refresh && fwupdmgr update
     fwupd.enable = true;
-
-    # D-Bus is needed by almost everything (keyring, NetworkManager, PipeWire, …)
-    dbus.enable = true;
   };
 }

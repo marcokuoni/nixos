@@ -1,6 +1,6 @@
 # Network: NetworkManager, firewall, local host names.
 # VPN profiles are in vpn.nix.
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 {
   networking = {
     networkmanager = {
@@ -31,8 +31,6 @@
       docker0.allowedTCPPorts = [ 9003 ];
       "br-+".allowedTCPPorts = [ 9003 ];
     };
-
-    useDHCP = lib.mkDefault true;
 
     # needed for VPN DNS to work correctly with NetworkManager
     resolvconf.enable = true;
