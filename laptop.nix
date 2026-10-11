@@ -168,9 +168,13 @@
       # Trigger GC when less than 50GB free
       min-free = "50G";
       # Binary cache for niri compositor
-      substituters = [ "https://niri.cachix.org" ];
+      substituters = [
+        "https://niri.cachix.org"
+        "https://noctalia.cachix.org"
+      ];
       trusted-public-keys = [
         "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
+        "noctalia.cachix.org-1:pCOR47nnMEo5thcxNDtzWpOxNFQsBRglJzxWPp3dkU4="
       ];
     };
     # Auto garbage collect weekly, keep last 7 days

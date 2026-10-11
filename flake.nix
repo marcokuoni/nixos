@@ -7,11 +7,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    noctalia-qs = {
-      url = "github:noctalia-dev/noctalia-qs";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     # niri Wayland compositor flake — provides stable + unstable packages
     # and home-manager/nixos modules
     niri = {
@@ -31,11 +26,7 @@
 
     go2hs.url = "path:/home/progressio/ost/git/go2/devvm/data/go2hs"; # or a git URL
 
-    noctalia = {
-      url = "github:noctalia-dev/noctalia-shell/legacy-v4"; # stay on v4 for now
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.noctalia-qs.follows = "noctalia-qs";
-    };
+    noctalia.url = "github:noctalia-dev/noctalia/cachix";
 
     projecteur-src = {
       url = "github:gbin/Projecteur/develop";

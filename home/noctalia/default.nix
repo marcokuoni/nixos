@@ -1,91 +1,73 @@
+# Noctalia v5 — bar, launcher, notifications, lock screen, wallpaper.
+# Settings are written to ~/.config/noctalia/config.toml.
+# Docs: https://docs.noctalia.dev/noctalia/configuration/
+# Changes made in the Settings GUI land in ~/.local/state/noctalia/settings.toml
+# and win over this file — delete that file to go back to what is declared here.
 {
-  programs.noctalia-shell = {
+  programs.noctalia = {
     enable = true;
+
     settings = {
-      wallpaper = {
-        automationEnabled = true;
-        randomIntervalSec = 600;
-      };
-      bar = {
-        density = "normal";
-        position = "left"; # vertical bar on the left, suits niri's column layout
-        showCapsule = false;
-        widgets = {
-          left = [
-            {
-              # system menu / distro logo area
-              id = "ControlCenter";
-              useDistroLogo = false;
-              icon = "home";
-            }
-            { id = "Network"; }
-            { id = "Bluetooth"; }
-            { id = "VPN"; }
-          ];
-          center = [
-            {
-              id = "Workspace";
-              hideUnoccupied = false;
-              labelMode = "none"; # show dots only, no workspace numbers
-            }
-          ];
-          right = [
-            { id = "Tray"; } # system tray — shows nextcloud, nm-applet etc.
-            {
-              id = "Battery";
-              alwaysShowPercentage = false;
-              warningThreshold = 30;
-            }
-            {
-              id = "Clock";
-              formatHorizontal = "dd HH:mm:ss";
-              formatVertical = "dd HH mm ss";
-              useMonospacedFont = true;
-              usePrimaryColor = true;
-            }
-          ];
-        };
+      shell = {
+        corner_radius_scale = 0.2; # mostly square corners
       };
 
-      appLauncher = {
-        enableClipboardHistory = true;
-        # use ghostty as terminal for launching terminal apps
-        terminalCommand = "ghostty -e";
-        showCategories = false;
+      theme = {
+        mode = "dark";
+        source = "builtin";
+        builtin = "Ayu";
       };
 
-      colorSchemes.predefinedScheme = "Ayu";
-
-      general = {
-        avatarImage = "";
-        radiusRatio = 0.2;
+      wallpaper.automation = {
+        enabled = true;
+        interval_seconds = 600; # new random wallpaper every 10 minutes
+        order = "random";
       };
 
-      location = {
-        monthBeforeDay = false; # Swiss date format: day before month
-        name = "Glarus, Switzerland";
-      };
+      # weather, night light and auto theme use this
+      location.address = "Glarus, Switzerland";
 
-      plugins = {
-        sources = [
-          {
-            enabled = true;
-            name = "Official Noctalia Plugins";
-            url = "https://github.com/noctalia-dev/noctalia-plugins";
-          }
+      battery.warning_threshold = 30;
+
+      # vertical bar on the left, suits niri's column layout
+      bar.main = {
+        position = "left";
+        capsule = false;
+        start = [
+          "control-center"
+          "network" # Wi-Fi / wired, with the VPN state built in
+          "bluetooth"
         ];
-        states = {
-          kde-connect = {
-            enabled = true;
-            sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-          };
-          privacy-indicator = {
-            enabled = true;
-            sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
-          };
-        };
-        version = 2;
+        center = [ "workspaces" ];
+        end = [
+          "privacy" # mic / camera / screen-share indicator
+          "phone" # KDE Connect (plugin, see below)
+          "tray" # nextcloud, nm-applet etc.
+          "battery"
+          "clock"
+        ];
       };
+
+      widget = {
+        control-center.glyph = "home";
+        network.vpn_status = "both";
+        workspaces = {
+          show_labels = false; # dots only, no workspace numbers
+          hide_when_empty = false;
+        };
+        privacy.hide_inactive = true;
+        battery.show_label = false; # percentage only in the tooltip
+        clock = {
+          format = "{:%d %H:%M:%S}";
+          vertical_format = "{:%d\n%H\n%M\n%S}";
+        };
+        phone.type = "icefish/phone-connect:bar";
+      };
+
+      plugins.enabled = [ "icefish/phone-connect" ];
     };
   };
+
+  # terminal apps started from the launcher open in ghostty
+  home.sessionVariables.TERMINAL = "ghostty";
 }

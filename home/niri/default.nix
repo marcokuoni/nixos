@@ -53,6 +53,13 @@
 
       window-rules = [
         {
+          # Noctalia's settings window floats instead of taking a column
+          matches = [ { app-id = "dev.noctalia.Noctalia"; } ];
+          open-floating = true;
+          default-column-width.fixed = 1080;
+          default-window-height.fixed = 920;
+        }
+        {
           # wl-mirror (beamer mirroring) always opens fullscreen on HDMI output
           matches = [ { app-id = "wl-mirror"; } ];
           open-fullscreen = true;
@@ -91,7 +98,7 @@
 
       # noctalia-shell is the bar + launcher — start it with niri
       spawn-at-startup = [
-        { command = [ "noctalia-shell" ]; }
+        { command = [ "noctalia" ]; }
       ];
 
       binds =
@@ -112,7 +119,7 @@
               action.spawn-sh = "ghostty --command=nvim";
             };
             "Mod+B".action.spawn = "zen-beta";
-            "Mod+D".action.spawn-sh = "noctalia-shell ipc call launcher toggle";
+            "Mod+D".action.spawn-sh = "noctalia msg panel-toggle launcher";
 
             # mirror current output to beamer (HDMI)
             "Mod+P" = {
@@ -127,7 +134,7 @@
             };
 
             # lock screen
-            "Ctrl+Alt+L".action.spawn-sh = "noctalia-shell ipc call lockScreen lock";
+            "Ctrl+Alt+L".action.spawn-sh = "noctalia msg session lock";
 
             # ── Audio ───────────────────────────────────────────────────────
             "XF86AudioRaiseVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
@@ -239,7 +246,7 @@
               allow-inhibiting = false;
             };
             # session menu (logout, reboot etc.) via noctalia
-            "Mod+Shift+E".action = spawn "noctalia-shell" "ipc" "call" "sessionMenu" "toggle";
+            "Mod+Shift+E".action = spawn "noctalia" "msg" "panel-toggle" "session";
             # hard quit with confirmation dialog
             "Ctrl+Alt+Delete".action = quit;
             # turn off monitors without locking
