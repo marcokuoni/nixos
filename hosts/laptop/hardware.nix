@@ -1,6 +1,9 @@
 # Hardware of this laptop as detected by nixos-generate-config:
-# kernel modules, file systems, swap, CPU. Safe to regenerate; boot loader,
-# disk unlocking and everything else live in modules/nixos.
+# kernel modules, file systems, swap, CPU. Boot loader, disk unlocking and
+# everything else live in modules/nixos.
+# When regenerating: the new file also contains a LUKS entry for the root
+# disk, which modules/nixos/boot.nix already defines (as "cryptroot"), so
+# drop that entry and keep the label-based file systems below.
 {
   config,
   lib,
