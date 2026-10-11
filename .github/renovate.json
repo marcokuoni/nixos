@@ -1,22 +1,11 @@
 {
-  "extends": ["config:base"],
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
   "nix": {
-    "enabled": true
-  },
-  "flake": {
     "enabled": true
   },
   "lockFileMaintenance": {
     "enabled": true,
-    "automerge": true,
     "schedule": ["before 6am on monday"]
-  },
-  "packageRules": [
-    {
-      "matchPackagePatterns": ["*"],
-      "matchManagers": ["nix"],
-      "automerge": true,
-      "platformAutomerge": true
-    }
-  ]
+  }
 }
