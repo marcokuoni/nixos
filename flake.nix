@@ -31,11 +31,28 @@
     };
   };
 
-  outputs = inputs: {
-    nixosConfigurations.laptop = inputs.nixpkgs.lib.nixosSystem {
-      # makes the flake inputs available to all modules (hosts/laptop uses them)
-      specialArgs = { inherit inputs; };
-      modules = [ ./hosts/laptop ];
+  outputs =
+    inputs:
+    let
+      pkgs = inputs.nixpkgs.legacyPackages.x86_64-linux;
+    in
+    {
+      nixosConfigurations.laptop = inputs.nixpkgs.lib.nixosSystem {
+        # makes the flake inputs available to all modules (hosts/laptop uses them)
+        specialArgs = { inherit inputs; };
+        modules = [ ./hosts/laptop ];
+      };
+
+      # `nix fmt` formats every .nix file git knows about
+      formatter.x86_64-linux = pkgs.nixfmt-tree;
+
+      # `nix develop -c statix check .` etc. — the same tools CI uses
+      devShells.x86_64-linux.default = pkgs.mkShell {
+        packages = [
+          pkgs.nixfmt-tree
+          pkgs.statix
+          pkgs.deadnix
+        ];
+      };
     };
-  };
 }

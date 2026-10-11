@@ -1,7 +1,7 @@
 name: CI
 
-# Static checks only. The full system can't be built or flake-checked here:
-# the go2hs input is a local path on the laptop.
+# Static checks only. The system itself can't be built or flake-checked
+# here: the go2hs input is a local path on the laptop.
 
 on:
   push:
@@ -16,21 +16,23 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Nix
-        uses: cachix/install-nix-action@v27
+        uses: cachix/install-nix-action@v31
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      # Use the tools from the nixpkgs revision in flake.lock, so CI formats
-      # and lints exactly like the laptop does.
+      # Same tool versions as `nix fmt` / `nix develop` on the laptop: the
+      # nixpkgs revision the system uses (root input "nixpkgs" in flake.lock).
       - name: Pin tools to flake.lock
-        run: echo "NIXPKGS=github:NixOS/nixpkgs/$(jq -r .nodes.nixpkgs.locked.rev flake.lock)" >> "$GITHUB_ENV"
+        run: echo "NIXPKGS=github:NixOS/nixpkgs/$(jq -r '.nodes[.nodes.root.inputs.nixpkgs].locked.rev' flake.lock)" >> "$GITHUB_ENV"
 
-      - name: Check formatting (nixfmt)
-        run: nix run "$NIXPKGS#nixfmt" -- --check .
+      # nixfmt-tree = treefmt + nixfmt over the files git tracks;
+      # --ci fails if any file would change
+      - name: Check formatting (nixfmt-tree)
+        run: nix run "$NIXPKGS#nixfmt-tree" -- --ci
 
       - name: Lint (statix)
         run: nix run "$NIXPKGS#statix" -- check .
