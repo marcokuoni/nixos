@@ -7,8 +7,24 @@ require("lazy").setup({
   spec = {
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
     { import = "lazyvim.plugins.extras.dap.core" },
-    -- PHP extra expects Mason; phpactor is set up in plugins/lsp.lua instead
-    { import = "lazyvim.plugins.extras.lang.php", enabled = false },
+    -- languages: LSP, formatter, linter, debugger and treesitter settings.
+    -- Their tools come from Nix (extraPackages in default.nix); the Mason
+    -- parts of these extras are ignored because Mason is disabled.
+    -- html, css and xml have no extra; they are set up in plugins/lsp.lua.
+    { import = "lazyvim.plugins.extras.lang.clangd" }, -- c, c++
+    { import = "lazyvim.plugins.extras.lang.dotnet" }, -- c#
+    { import = "lazyvim.plugins.extras.lang.go" },
+    { import = "lazyvim.plugins.extras.lang.haskell" },
+    { import = "lazyvim.plugins.extras.lang.json" },
+    { import = "lazyvim.plugins.extras.lang.markdown" },
+    { import = "lazyvim.plugins.extras.lang.nix" },
+    { import = "lazyvim.plugins.extras.lang.php" },
+    { import = "lazyvim.plugins.extras.lang.python" },
+    { import = "lazyvim.plugins.extras.lang.rust" },
+    { import = "lazyvim.plugins.extras.lang.sql" },
+    { import = "lazyvim.plugins.extras.lang.toml" },
+    { import = "lazyvim.plugins.extras.lang.typescript" }, -- typescript, javascript
+    { import = "lazyvim.plugins.extras.lang.yaml" },
     -- everything in lua/plugins/*.lua
     { import = "plugins" },
   },

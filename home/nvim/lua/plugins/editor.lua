@@ -17,19 +17,29 @@ return {
     },
   },
 
-  -- calmer completion for writing: no popup while typing (<C-Space> opens it),
-  -- nothing preselected, Enter only confirms an item you picked
+  -- calmer completion (blink.cmp, LazyVim's completion engine)
+  -- everywhere: nothing preselected, so Enter only confirms an item you picked;
+  --   no gray "ghost text" preview of a suggestion
+  -- in prose (markdown, text, git commits): no popup while typing
+  --   (<C-Space> opens it) and no words collected from the file
   {
-    "hrsh7th/nvim-cmp",
+    "saghen/blink.cmp",
     opts = function(_, opts)
-      local cmp = require("cmp")
-      opts.completion = {
-        autocomplete = false,
-        completeopt = "menu,menuone,noselect",
-      }
-      opts.preselect = cmp.PreselectMode.None
-      opts.mapping["<CR>"] = cmp.mapping.confirm({ select = false })
-      return opts
+      local prose = { markdown = true, ["markdown.mdx"] = true, text = true, gitcommit = true }
+
+      opts.completion = opts.completion or {}
+      opts.completion.list = { selection = { preselect = false, auto_insert = false } }
+      opts.completion.ghost_text = { enabled = false }
+      opts.completion.menu = opts.completion.menu or {}
+      opts.completion.menu.auto_show = function()
+        return not prose[vim.bo.filetype]
+      end
+
+      opts.sources = opts.sources or {}
+      opts.sources.per_filetype = opts.sources.per_filetype or {}
+      for ft in pairs(prose) do
+        opts.sources.per_filetype[ft] = { "lsp", "path" }
+      end
     end,
   },
 }

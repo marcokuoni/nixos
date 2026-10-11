@@ -7,17 +7,17 @@ home/nvim/
 ├── default.nix          # nur Nix: nvim, LSPs/Formatter/Debugger, Plugins, Parser
 └── lua/
     ├── config/
-    │   ├── lazy.lua     # lazy.nvim-Setup (Plugins aus Nix, keine Downloads)
+    │   ├── lazy.lua     # lazy.nvim-Setup (Plugins aus Nix, keine Downloads) + Sprach-Extras
     │   ├── options.lua  # vim-Optionen
     │   ├── keymaps.lua  # eigene Keymaps
     │   └── autocmds.lua
     ├── plugins/         # ein File pro Thema, normale LazyVim-Specs
     │   ├── colorscheme.lua
     │   ├── dap.lua      # Debugging PHP / Rust / C# / JS
-    │   ├── editor.lua   # snacks (Terminal = nushell), cmp
+    │   ├── editor.lua   # snacks (Terminal = nushell), Completion (blink.cmp)
     │   ├── format.lua   # conform + nvim-lint
-    │   ├── lsp.lua      # phpactor, omnisharp, tinymist
-    │   ├── nix.lua      # Mason aus, Treesitter-Install aus
+    │   ├── lsp.lua      # html, css, xml, omnisharp, tinymist
+    │   ├── nix.lua      # Mason aus, Treesitter aus dem Nix-Ordner, debugpy
     │   └── typst.lua
     └── matugen-template.lua  # Farben aus dem Wallpaper (Noctalia)
 ```
@@ -26,7 +26,11 @@ home/nvim/
 - **Neues Plugin** → Spec in `lua/plugins/` + Paket in `plugins` in `default.nix`.
   `lazyvim-diff-plugins` zeigt, ob lazy ein Plugin sucht, das in Nix fehlt.
 - **Neues Tool (LSP, Formatter)** → `extraPackages` in `default.nix`.
-- **Neuer Treesitter-Parser** → `parsers` in `default.nix`.
+- **Neue Sprache** → LazyVim-Extra in `lua/config/lazy.lua` importieren, dessen
+  Tools in `extraPackages` und Plugins in `plugins` (beides `default.nix`) ergänzen.
+- **Neuer Treesitter-Parser** → `grammars` in `default.nix`. Parser und Queries
+  landen in einem Nix-Ordner, der nvim-treesitters `install_dir` ist — nur dort
+  gelten Parser als installiert, sonst schaltet LazyVim kein Highlighting ein.
 - Store-Pfade, die Lua braucht (Debug-Adapter, Plugin-Ordner), stehen in
   `require("nix")`, gesetzt in `initLua` in `default.nix`.
 
