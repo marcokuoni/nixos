@@ -1,23 +1,28 @@
-{ pkgs, ... }: {
-  # lazyvim-diff-plugins: compare plugins known to Nix vs plugins loaded by lazy
-  # useful for finding plugins lazy downloaded that should be added to the Nix config
+# lazyvim-diff-plugins: compare the plugins Nix provides with the plugins
+# lazy.nvim loads. A plugin only in "lazy" is missing from `plugins` in
+# default.nix (lazy can't download it, so it won't work).
+{ pkgs, ... }:
+{
   home.packages = [
-    (pkgs.writeShellScriptBin "lazyvim-diff-plugins" ''
-      #!/usr/bin/env bash
-      # plugins as seen by lazy at runtime
-      lazy_plugins() {
-        nvim --headless \
-          -c ':lua for _, plugin in ipairs(require("lazy").plugins()) do print(plugin.name) end' \
-          -c 'q' 2>&1 \
-          | grep -vxF 'lazy.nvim' \
-          | sort
-      }
-      # plugins available in the nix linkFarm
-      nix_plugins() {
-        dir=$(awk -F'"' '/path = / {print $2}' ~/.config/nvim/init.lua)
-        ls -1 "$dir" | sort
-      }
-      diff -w -u --label nix <(nix_plugins) --label lazy <(lazy_plugins)
-    '')
+    (pkgs.writeShellApplication {
+      name = "lazyvim-diff-plugins";
+      # uses your configured nvim from PATH (not a plain one from nixpkgs)
+      text = ''
+        # plugins lazy.nvim knows at runtime
+        lazy_plugins() {
+          nvim --headless \
+            -c 'lua for _, p in ipairs(require("lazy").plugins()) do print(p.name) end' \
+            -c 'qa!' 2>&1 \
+            | grep -vxF 'lazy.nvim' \
+            | sort
+        }
+        # plugins in the Nix plugin folder (require("nix").plugins, see default.nix)
+        nix_plugins() {
+          dir=$(nvim --headless -c 'lua io.stdout:write(require("nix").plugins)' -c 'qa!' 2>/dev/null)
+          find "$dir" -mindepth 1 -maxdepth 1 -printf '%f\n' | sort
+        }
+        diff -w -u --label nix <(nix_plugins) --label lazy <(lazy_plugins)
+      '';
+    })
   ];
 }

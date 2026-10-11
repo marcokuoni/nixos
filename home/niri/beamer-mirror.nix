@@ -1,12 +1,19 @@
-{pkgs, ...}: {
-  # beamer-mirror: turns on HDMI output and starts mirroring eDP-1 to it
-  # usage: run manually or bind to a key in niri
+# beamer-mirror: switch on the HDMI output and mirror the laptop screen to it.
+# (Mod+P in niri mirrors the focused output instead.)
+{ pkgs, ... }:
+{
   home.packages = [
-    (pkgs.writeShellScriptBin "beamer-mirror" ''
-      #!/usr/bin/env bash
-      wlr-randr --output HDMI-A-1 --on
-      wl-mirror eDP-1 &
-      sleep 0.5
-    '')
+    (pkgs.writeShellApplication {
+      name = "beamer-mirror";
+      runtimeInputs = with pkgs; [
+        wlr-randr
+        wl-mirror
+      ];
+      text = ''
+        wlr-randr --output HDMI-A-1 --on
+        wl-mirror eDP-1 &
+        sleep 0.5
+      '';
+    })
   ];
 }
