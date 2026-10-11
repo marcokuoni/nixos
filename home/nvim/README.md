@@ -5,6 +5,7 @@
 ```
 home/nvim/
 ├── default.nix          # nur Nix: nvim, LSPs/Formatter/Debugger, Plugins, Parser
+├── diff-plugins.nix     # Befehl lazyvim-diff-plugins (Nix-Plugins vs. lazy)
 └── lua/
     ├── config/
     │   ├── lazy.lua     # lazy.nvim-Setup (Plugins aus Nix, keine Downloads) + Sprach-Extras
