@@ -35,6 +35,14 @@ in
       settings.user = me;
     };
 
+    # per-project environments: a project with `use flake` in its .envrc
+    # gets its own toolchain when you cd into it (nushell hook included);
+    # nvim started there sees the project's compilers and tools too
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true; # caches the flake env, survives garbage collection
+    };
+
     vscode.enable = true;
 
     chromium.enable = true;
