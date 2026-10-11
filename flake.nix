@@ -2,7 +2,7 @@
   description = "NixOS configuration of my laptop (progressio)";
 
   inputs = {
-    nixpkgs.url = "github:NixOs/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -18,11 +18,6 @@
 
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    microvm = {
-      url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
