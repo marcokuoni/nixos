@@ -32,7 +32,7 @@ in
       } {
         send-keys Escape
       }
-      bind -T nuesc Escape run-shell -b '${scrollbackInNvim} "#{pane_id}" "#{client_name}"'
+      bind -T nuesc Escape copy-mode
 
       # tmux's own copy mode stays on prefix + [
       set -s copy-command 'wl-copy'
