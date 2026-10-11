@@ -14,8 +14,8 @@ in
     ./ghostty
     ./nushell
     ./nvim
-    ./scripts/LazyvimDiffPlugins.nix
-    ./scripts/BeamerMirror.nix
+    ./nvim/diff-plugins.nix
+    ./niri/beamer-mirror.nix
     ./zen
   ];
 

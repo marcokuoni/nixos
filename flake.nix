@@ -1,4 +1,6 @@
 {
+  description = "NixOS configuration of my laptop (progressio)";
+
   inputs = {
     nixpkgs.url = "github:NixOs/nixpkgs/nixos-unstable";
 
@@ -34,72 +36,11 @@
     };
   };
 
-  outputs =
-    {
-      nixpkgs,
-      home-manager,
-      niri,
-      noctalia,
-      zen-browser,
-      go2hs,
-      ...
-    }@inputs:
-    {
-      nixosConfigurations = {
-        laptop = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./hardware/laptop.nix
-            ./laptop.nix
-
-            {
-              nixpkgs.overlays = [
-                # Projecteur from GitHub instead of the old Qt5 version in nixpkgs
-                (final: _prev: {
-                  projecteur = final.callPackage ./pkgs/projecteur.nix {
-                    src = inputs.projecteur-src;
-                    version = "1.0.0-${inputs.projecteur-src.shortRev or "dev"}";
-                  };
-                })
-              ];
-            }
-
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                # use system nixpkgs instead of a separate home-manager instance
-                useGlobalPkgs = true;
-                # install user packages into /etc/profiles instead of ~/.nix-profile
-                useUserPackages = true;
-                # files home-manager would overwrite (e.g. a hand-made
-                # ~/.config/jj/config.toml) are renamed to *.hm-backup
-                # instead of failing the rebuild
-                backupFileExtension = "hm-backup";
-                extraSpecialArgs = { inherit inputs; };
-
-                # shared home-manager modules available to all users
-                sharedModules = [
-                  niri.homeModules.niri
-                  noctalia.homeModules.default
-                  zen-browser.homeModules.beta
-                ];
-
-                users.progressio.imports = [
-                  ./home/progressio.nix
-                ];
-              };
-            }
-
-            go2hs.nixosModules.default
-            {
-              go2 = {
-                enable = true;
-                interface = "enp1s0f0";
-                address = "192.168.123.99"; # default
-              };
-            }
-          ];
-        };
-      };
+  outputs = inputs: {
+    nixosConfigurations.laptop = inputs.nixpkgs.lib.nixosSystem {
+      # makes the flake inputs available to all modules (hosts/laptop uses them)
+      specialArgs = { inherit inputs; };
+      modules = [ ./hosts/laptop ];
     };
+  };
 }
