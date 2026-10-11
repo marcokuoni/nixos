@@ -71,6 +71,10 @@
                 useGlobalPkgs = true;
                 # install user packages into /etc/profiles instead of ~/.nix-profile
                 useUserPackages = true;
+                # files home-manager would overwrite (e.g. a hand-made
+                # ~/.config/jj/config.toml) are renamed to *.hm-backup
+                # instead of failing the rebuild
+                backupFileExtension = "hm-backup";
                 extraSpecialArgs = { inherit inputs; };
 
                 # shared home-manager modules available to all users

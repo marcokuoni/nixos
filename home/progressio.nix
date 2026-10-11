@@ -1,4 +1,11 @@
 { pkgs, ... }:
+let
+  # who you are in Git and jj commits
+  me = {
+    name = "Marco Kuoni";
+    email = "mail@marcokuoni.ch";
+  };
+in
 {
   imports = [
     ./niri
@@ -18,8 +25,14 @@
   };
 
   programs = {
+    git = {
+      enable = true;
+      settings.user = me;
+    };
+
     jujutsu = {
       enable = true;
+      settings.user = me;
     };
 
     vscode.enable = true;
@@ -65,7 +78,6 @@
       zip
       unzip
       libarchive # provides bsdtar — same extraction backend as GNOME
-      git
       libnotify # notify-send for desktop notifications
       brightnessctl # backlight control (used in niri binds)
       jq # JSON processor
