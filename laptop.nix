@@ -327,26 +327,20 @@
 
     pam = {
       services = {
-        login = {
-          # Unlock GNOME keyring automatically on login with your password
-          enableGnomeKeyring = true;
-          # Require YubiKey (U2F) with PIN on login
-          u2fAuth = true;
-          rules.auth.u2f.args = lib.mkAfter [ "pinverification=1" ];
-        };
-        sudo = {
-          # Require YubiKey (U2F) with PIN for sudo
-          u2fAuth = true;
-          rules.auth.u2f.args = lib.mkAfter [ "pinverification=1" ];
-        };
-        # Also unlock keyring on greetd login
+        # Unlock GNOME keyring automatically on login with your password
+        # (greetd includes the login stack)
+        login.enableGnomeKeyring = true;
         greetd.enableGnomeKeyring = true;
       };
 
-      # YubiKey U2F config — generated with pamu2fcfg
+      # YubiKey (U2F) — enabled for every PAM service (login/greetd, sudo,
+      # polkit, su, run0, …): YubiKey + PIN, or your password as fallback.
+      # Mappings generated with pamu2fcfg.
       u2f = {
         enable = true;
         settings = {
+          # always ask for the YubiKey PIN, not just a touch
+          pinverification = 1;
           authfile = pkgs.writeText "u2f-mappings" (
             lib.concatStrings [
               "progressio"
