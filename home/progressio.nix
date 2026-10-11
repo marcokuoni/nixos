@@ -9,6 +9,7 @@
     ./nvim
     ./scripts/LazyvimDiffPlugins.nix
     ./scripts/BeamerMirror.nix
+    ./zen
   ];
 
   # Nextcloud desktop sync client
@@ -22,11 +23,6 @@
     };
 
     vscode.enable = true;
-
-    zen-browser = {
-      enable = true;
-      setAsDefaultBrowser = true;
-    };
 
     chromium.enable = true;
 

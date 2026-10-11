@@ -41,7 +41,6 @@
         center = [ "workspaces" ];
         end = [
           "privacy" # mic / camera / screen-share indicator
-          "phone" # KDE Connect (plugin, see below)
           "tray" # nextcloud, nm-applet etc.
           "battery"
           "clock"
@@ -61,10 +60,8 @@
           format = "{:%d %H:%M:%S}";
           vertical_format = "{:%d\n%H\n%M\n%S}";
         };
-        phone.type = "icefish/phone-connect:bar";
       };
 
-      plugins.enabled = [ "icefish/phone-connect" ];
     };
   };
 
