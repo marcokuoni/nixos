@@ -24,7 +24,4 @@ return {
       require("dap-python").setup(require("nix").debugpy)
     end,
   },
-
-  -- the native fzf part is pre-built by Nix
-  { "nvim-telescope/telescope-fzf-native.nvim", enabled = true },
 }

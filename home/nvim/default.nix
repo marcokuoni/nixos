@@ -21,20 +21,14 @@ let
     blink-cmp
     bufferline-nvim
     conform-nvim
-    dashboard-nvim
-    dressing-nvim
     flash-nvim
     friendly-snippets
     gitsigns-nvim
     grug-far-nvim
-    indent-blankline-nvim
     lazydev-nvim
     lualine-nvim
-    luvit-meta
     markdown-preview-nvim
-    neo-tree-nvim
     noice-nvim
-    none-ls-nvim
     nui-nvim
     nvim-dap
     nvim-dap-ui
@@ -47,17 +41,13 @@ let
     nvim-treesitter-textobjects
     nvim-ts-autotag
     persistence-nvim
-    phpactor
     plenary-nvim
     render-markdown-nvim
     snacks-nvim
-    telescope-fzf-native-nvim
-    telescope-nvim
     todo-comments-nvim
     tokyonight-nvim
     trouble-nvim
     ts-comments-nvim
-    vim-markdown-toc
     which-key-nvim
 
     # used by the LazyVim language extras (lazy.lua)
