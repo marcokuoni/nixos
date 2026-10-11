@@ -230,6 +230,10 @@
     power-profiles-daemon.enable = true;
     upower.enable = true;
 
+    # Firmware updates (BIOS, Thunderbolt, SSD, …) from LVFS:
+    # fwupdmgr refresh && fwupdmgr update
+    fwupd.enable = true;
+
     # DBus is required by almost everything (keyring, NM, pipewire...)
     dbus.enable = true;
 
