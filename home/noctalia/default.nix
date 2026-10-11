@@ -57,8 +57,8 @@
         privacy.hide_inactive = true;
         battery.show_label = false; # percentage only in the tooltip
         clock = {
-          format = "{:%d %H:%M:%S}";
-          vertical_format = "{:%d\n%H\n%M\n%S}";
+          format = "{:%d · %H:%M:%S}";
+          vertical_format = "{:%d\n──\n%H\n%M\n%S}";
         };
       };
 
