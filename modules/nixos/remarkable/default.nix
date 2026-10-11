@@ -1,12 +1,10 @@
-# remarkable-sync — NixOS system module
-#
-# Import in your SYSTEM configuration.nix (NOT inside home-manager):
-#
-#   imports = [ ./remarkable-sync.nix ];
+# remarkable-sync — two-way sync between a folder and the reMarkable cloud.
+# A system module (not home-manager), imported by modules/nixos and enabled
+# in hosts/laptop:
 #
 #   services.remarkable-sync = {
-#     enable  = true;
-#     user    = "progressio";
+#     enable = true;
+#     user = "progressio";
 #   };
 #
 # One-time auth after first rebuild:
@@ -21,6 +19,7 @@
 let
   cfg = config.services.remarkable-sync;
   stateDir = builtins.dirOf cfg.stateFile;
+  home = config.users.users.${cfg.user}.home;
 
   syncScript = pkgs.writers.writePython3Bin "remarkable-sync"
     { flakeIgnore = [ "E" "W" ]; }
@@ -41,13 +40,15 @@ in {
     syncDir = lib.mkOption {
       type        = lib.types.str;
       description = "Local directory synced with the reMarkable cloud.";
-      default     = "/home/${cfg.user}/remarkable";
+      default     = "${home}/remarkable";
+      defaultText = lib.literalMD "`remarkable` in the user's home folder";
     };
 
     stateFile = lib.mkOption {
       type        = lib.types.str;
       description = "JSON file used to track sync state between runs.";
-      default     = "/home/${cfg.user}/.local/share/remarkable-sync/state.json";
+      default     = "${home}/.local/share/remarkable-sync/state.json";
+      defaultText = lib.literalMD "`.local/share/remarkable-sync/state.json` in the user's home folder";
     };
 
     remoteRoot = lib.mkOption {
@@ -94,7 +95,7 @@ in {
           Nice    = 10;
 
           Environment = [
-            "HOME=/home/${cfg.user}"
+            "HOME=${home}"
             "REMARKABLE_SYNC_DIR=${cfg.syncDir}"
             "REMARKABLE_STATE_FILE=${cfg.stateFile}"
             "REMARKABLE_REMOTE_ROOT=${cfg.remoteRoot}"

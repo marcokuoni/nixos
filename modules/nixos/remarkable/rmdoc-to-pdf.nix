@@ -3,8 +3,7 @@
 # Converts .rmdoc notebooks from ~/remarkable into PDFs in ~/remarkable-pdf.
 # Uses rmc (SVG pipeline) + inkscape. Runs after the sync service.
 #
-# Import alongside remarkable-sync.nix:
-#   imports = [ ./remarkable-sync.nix ./rmdoc-to-pdf.nix ];
+# Imported by modules/nixos next to remarkable-sync, enabled in hosts/laptop:
 #
 #   services.rmdoc-to-pdf = {
 #     enable = true;
@@ -20,6 +19,7 @@
 
 let
   cfg = config.services.rmdoc-to-pdf;
+  home = config.users.users.${cfg.user}.home;
 
   rmscene-new = pkgs.python3Packages.buildPythonPackage rec {
     pname = "rmscene";
@@ -86,13 +86,15 @@ in
 
     inputDir = lib.mkOption {
       type = lib.types.str;
-      default = "/home/${cfg.user}/remarkable";
+      default = "${home}/remarkable";
+      defaultText = lib.literalMD "`remarkable` in the user's home folder";
       description = "Folder containing .rmdoc files (sync output).";
     };
 
     outputDir = lib.mkOption {
       type = lib.types.str;
-      default = "/home/${cfg.user}/remarkable-pdf";
+      default = "${home}/remarkable-pdf";
+      defaultText = lib.literalMD "`remarkable-pdf` in the user's home folder";
       description = "Folder where converted PDFs are written.";
     };
 
@@ -128,7 +130,7 @@ in
           Nice = 15;
 
           Environment = [
-            "HOME=/home/${cfg.user}"
+            "HOME=${home}"
             "RMC_PYTHON=${python}/bin/python3"
           ];
 
