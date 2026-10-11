@@ -55,7 +55,7 @@
             {
               nixpkgs.overlays = [
                 # Projecteur from GitHub instead of the old Qt5 version in nixpkgs
-                (final: prev: {
+                (final: _prev: {
                   projecteur = final.callPackage ./pkgs/projecteur.nix {
                     src = inputs.projecteur-src;
                     version = "1.0.0-${inputs.projecteur-src.shortRev or "dev"}";
@@ -88,9 +88,11 @@
 
             go2hs.nixosModules.default
             {
-              go2.enable = true;
-              go2.interface = "enp1s0f0";
-              go2.address = "192.168.123.99"; # default
+              go2 = {
+                enable = true;
+                interface = "enp1s0f0";
+                address = "192.168.123.99"; # default
+              };
             }
           ];
         };

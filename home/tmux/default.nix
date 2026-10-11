@@ -1,15 +1,4 @@
 { pkgs, ... }:
-let
-  # write the pane's whole scrollback to a file and open it in nvim (fullscreen popup)
-  scrollbackInNvim = pkgs.writeShellScript "tmux-scrollback-nvim" ''
-    pane="$1"
-    client="$2"
-    file="''${XDG_RUNTIME_DIR:-/tmp}/tmux-scrollback-''${pane#%}.txt"
-    tmux capture-pane -p -J -S - -E - -t "$pane" > "$file"
-    tmux display-popup -c "$client" -E -w 100% -h 100% \
-      "nvim -R -c 'normal! G' -c 'nnoremap q <cmd>qa!<cr>' $file"
-  '';
-in
 {
   home.packages = [ pkgs.wl-clipboard ]; # wl-copy / wl-paste
 
