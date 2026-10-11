@@ -23,6 +23,7 @@ in
     terminal = "tmux-256color";
     extraConfig = ''
       set -g destroy-unattached on
+      set -g status off # no status bar at the bottom
 
       # Esc Esc (while nushell is in front) -> scrollback in nvim.
       # The first Esc still reaches nushell (vi normal mode).
