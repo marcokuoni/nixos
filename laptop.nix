@@ -394,7 +394,7 @@
     systemPackages = with pkgs; [
       # NetworkManager tray applet (for nm-applet in niri bar)
       networkmanagerapplet
-      networkmanager-openconnect
+      # openconnect CLI (the NetworkManager plugin is in networking.networkmanager.plugins)
       openconnect
       # Polkit agent — handles privilege escalation popups in non-GNOME setups
       lxqt.lxqt-policykit

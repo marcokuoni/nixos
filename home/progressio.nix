@@ -91,7 +91,6 @@ in
       jq # JSON processor
       wl-mirror # mirror display output (beamer)
       wlr-randr # Wayland display management
-      xwayland-satellite # XWayland support for X11 apps under niri
     ];
     stateVersion = "25.05";
   };
