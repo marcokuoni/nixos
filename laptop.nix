@@ -144,10 +144,14 @@
       152.96.10.67 ins-lab
     '';
 
-    firewall.allowedTCPPorts = [
-      9003 # XDebug (PHP)
-      631 # CUPS (printing)
-    ];
+    # XDebug (PHP) connects from containers to the host. Open it only on the
+    # Docker bridges (docker0, and br-* for docker-compose networks), not on
+    # Wi-Fi. PHP on the host itself uses localhost, which is always allowed.
+    # Printing needs no open port; 631 is only for sharing printers.
+    firewall.interfaces = {
+      docker0.allowedTCPPorts = [ 9003 ];
+      "br-+".allowedTCPPorts = [ 9003 ];
+    };
 
     # Use DHCP on all interfaces by default
     useDHCP = lib.mkDefault true;
