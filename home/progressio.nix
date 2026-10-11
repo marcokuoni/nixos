@@ -50,16 +50,15 @@ in
     ssh = {
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks = {
+      # OpenSSH directive names, as in ssh_config(5)
+      settings = {
         # keep connections alive across all hosts
         "*" = {
-          serverAliveInterval = 60;
-          serverAliveCountMax = 5;
+          ServerAliveInterval = 60;
+          ServerAliveCountMax = 5;
         };
         # exigo servers need a plain TERM — their SSH daemon doesn't know screen-256color
-        "*.exigo.ch" = {
-          extraOptions.SetEnv = "TERM=xterm-256color";
-        };
+        "*.exigo.ch".SetEnv.TERM = "xterm-256color";
       };
     };
   };

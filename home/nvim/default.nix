@@ -185,6 +185,8 @@ in
   programs.neovim = {
     enable = true;
     withRuby = false;
+    # keep the Python provider (the default changes to false with stateVersion 26.05)
+    withPython3 = true;
 
     # Everything nvim calls: LSPs, formatters, linters, debuggers.
     # They are only on nvim's PATH, not in your shell.
