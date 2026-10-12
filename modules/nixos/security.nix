@@ -2,14 +2,19 @@
 { pkgs, lib, ... }:
 {
   security.pam = {
-    # unlock the GNOME keyring with your login password
-    # (greetd uses the login rules)
     services = {
-      login.enableGnomeKeyring = true;
+      # Login (greetd, text console, Noctalia's lock screen) uses your password:
+      # the keyring is encrypted with it and can only be unlocked when it is
+      # typed. A YubiKey login skips that step and leaves the keyring locked.
+      # (Login always accepted the password alone, so this isn't weaker.)
+      login = {
+        enableGnomeKeyring = true;
+        u2f.enable = false;
+      };
       greetd.enableGnomeKeyring = true;
     };
 
-    # YubiKey for every PAM service (login/greetd, sudo, polkit, su, run0, …):
+    # YubiKey for everything else (sudo, polkit, su, run0, …):
     # YubiKey + PIN, or your password as fallback.
     # Mappings generated with pamu2fcfg.
     u2f = {
