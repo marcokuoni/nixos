@@ -106,6 +106,14 @@
           gateway-flags = "2";
           gwcert-flags = "2";
           resolve-flags = "2";
+          # internal data of the login window, stored like the OpenConnect
+          # editor does. Without these, NetworkManager never checks that you
+          # may change this connection and drops the login cookie
+          # ("final secrets request failed to provide sufficient secrets").
+          autoconnect-flags = "0";
+          certsigs-flags = "0";
+          lasthost-flags = "0";
+          xmlconfig-flags = "0";
         };
         ipv6 = {
           method = "disabled";
