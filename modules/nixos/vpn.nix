@@ -1,5 +1,10 @@
 # VPN connections, created in NetworkManager on every rebuild.
 # Certificates and keys stay in ~/vpn (not in this repo).
+#
+# permissions = "user:progressio:;" makes a connection private to you. Only
+# the OpenVPN plugin supports that; NetworkManager refuses private OpenConnect
+# connections ("The 'openconnect' plugin doesn't support private
+# connections"), so exigo and school are system connections.
 {
   networking.networkmanager.ensureProfiles = {
     profiles = {
@@ -55,7 +60,6 @@
           id = "exigo";
           type = "vpn";
           autoconnect = false;
-          permissions = "user:progressio:;";
         };
         vpn = {
           authtype = "password";
@@ -90,15 +94,18 @@
           id = "school";
           type = "vpn";
           autoconnect = false;
-          permissions = "user:progressio:;";
         };
         vpn = {
           service-type = "org.freedesktop.NetworkManager.openconnect";
           gateway = "vpn.ost.ch";
           protocol = "anyconnect";
           useragent = "AnyConnect";
-          username = "marco.kuoni@ost.ch";
           authtype = "password";
+          # asked at every connect (login window), never stored
+          cookie-flags = "2";
+          gateway-flags = "2";
+          gwcert-flags = "2";
+          resolve-flags = "2";
         };
         ipv6 = {
           method = "disabled";
