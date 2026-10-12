@@ -41,7 +41,7 @@
         center = [ "workspaces" ];
         end = [
           "privacy" # mic / camera / screen-share indicator
-          "tray" # nextcloud, nm-applet etc.
+          "tray" # nextcloud etc.
           "battery"
           "clock"
         ];
@@ -55,6 +55,9 @@
           hide_when_empty = false;
         };
         privacy.hide_inactive = true;
+        # nm-applet keeps running (it asks for VPN passwords, which Noctalia's
+        # network widget can't), but the network widget above shows Wi-Fi + VPN
+        tray.hidden = [ "nm-applet" ];
         battery.show_label = false; # percentage only in the tooltip
         clock = {
           format = "{:%d · %H:%M:%S}";
