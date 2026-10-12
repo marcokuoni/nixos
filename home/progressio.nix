@@ -17,6 +17,7 @@ in
     ./nvim/diff-plugins.nix
     ./niri/beamer-mirror.nix
     ./zen
+    ./default-apps
   ];
 
   # Nextcloud desktop sync client
