@@ -15,7 +15,7 @@ home/nvim/
     ├── plugins/         # ein File pro Thema, normale LazyVim-Specs
     │   ├── colorscheme.lua
     │   ├── dap.lua      # Debugging PHP / Rust / C# / JS
-    │   ├── editor.lua   # snacks (Terminal = nushell), Completion (blink.cmp)
+    │   ├── editor.lua   # snacks (Terminal = zsh), Completion (blink.cmp)
     │   ├── format.lua   # conform + nvim-lint
     │   ├── lsp.lua      # html, css, xml, omnisharp, tinymist
     │   ├── nix.lua      # Mason aus, Treesitter aus dem Nix-Ordner, debugpy
@@ -192,7 +192,7 @@ Den eingebauten Daily-Notes-Core-Plugin **deaktivieren**, sonst doppelte Trigger
 
 | Keybind      | Aktion           |
 | ------------ | ---------------- |
-| `<leader>t`  | Terminal toggle (nushell) |
+| `<leader>t`  | Terminal toggle (zsh)     |
 | `<C-/>`      | Terminal toggle (LazyVim-Default) |
 
 ### DAP Debugging

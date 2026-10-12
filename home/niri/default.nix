@@ -109,7 +109,7 @@
             "Mod+Shift+Slash".action.show-hotkey-overlay = { };
 
             # ── App launchers ───────────────────────────────────────────────
-            # ghostty starts the login shell (nushell)
+            # ghostty opens tmux with zsh
             "Mod+T" = {
               repeat = false;
               action.spawn = "ghostty";

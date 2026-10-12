@@ -289,7 +289,6 @@ in
       package.loaded["nix"] = {
         lazy = "${pkgs.vimPlugins.lazy-nvim}",
         plugins = "${lazyPlugins}",
-        bash = "${lib.getExe pkgs.bash}",
         php_debug = "${pkgs.vscode-extensions.xdebug.php-debug}/share/vscode/extensions/xdebug.php-debug/out/phpDebug.js",
         codelldb = "${pkgs.vscode-extensions.vadimcn.vscode-lldb}/share/vscode/extensions/vadimcn.vscode-lldb/adapter/codelldb",
         js_debug = "${pkgs.vscode-js-debug}/share/vscode/extensions/ms-vscode.js-debug",

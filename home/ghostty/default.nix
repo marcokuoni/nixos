@@ -2,6 +2,9 @@
 {
   programs.ghostty = {
     enable = true;
+    # ghostty starts tmux, not the shell; its zsh integration would also fight
+    # the vi-mode cursor set in home/zsh
+    enableZshIntegration = false;
     settings = {
       # disable client-side decorations — niri handles window borders
       window-decoration = false;

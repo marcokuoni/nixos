@@ -13,7 +13,7 @@
 
   users.users.progressio = {
     isNormalUser = true;
-    shell = pkgs.nushell;
+    shell = pkgs.zsh;
     extraGroups = [
       "docker"
       "wheel" # sudo access
@@ -26,7 +26,13 @@
       "dialout" # serial ports
     ];
   };
-  environment.shells = [ pkgs.nushell ];
+  # zsh as login shell (configured in home/zsh). compinit runs in ~/.zshrc,
+  # so the system-wide one is skipped to avoid running it twice.
+  programs.zsh = {
+    enable = true;
+    enableGlobalCompInit = false;
+    promptInit = ""; # the prompt comes from starship
+  };
 
   # the user environment (niri, shell, editor, apps) via home-manager
   home-manager = {

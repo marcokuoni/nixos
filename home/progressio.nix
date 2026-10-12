@@ -12,7 +12,7 @@ in
     ./noctalia
     ./tmux
     ./ghostty
-    ./nushell
+    ./zsh
     ./nvim
     ./nvim/diff-plugins.nix
     ./niri/beamer-mirror.nix
@@ -36,7 +36,7 @@ in
     };
 
     # per-project environments: a project with `use flake` in its .envrc
-    # gets its own toolchain when you cd into it (nushell hook included);
+    # gets its own toolchain when you cd into it (zsh hook included);
     # nvim started there sees the project's compilers and tools too
     direnv = {
       enable = true;

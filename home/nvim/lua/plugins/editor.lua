@@ -4,8 +4,8 @@ return {
     "folke/snacks.nvim",
     opts = {
       notifier = { enabled = true },
-      -- every snacks terminal (<C-/>, <leader>ft, <leader>t) opens nushell
-      terminal = { enabled = true, shell = "nu" },
+      -- snacks terminals (<C-/>, <leader>ft, <leader>t) open your shell (zsh)
+      terminal = { enabled = true },
       picker = {
         sources = {
           explorer = { hidden = true, ignored = true },
