@@ -136,6 +136,12 @@
             # lock screen
             "Ctrl+Alt+L".action.spawn-sh = "noctalia msg session lock";
 
+            # hide / show the bar (presenting); also frees its space
+            "Mod+Shift+B" = {
+              repeat = false;
+              action = spawn "noctalia" "msg" "bar-toggle";
+            };
+
             # ── Audio ───────────────────────────────────────────────────────
             "XF86AudioRaiseVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1+";
             "XF86AudioLowerVolume".action = spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.1-";
