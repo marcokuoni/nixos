@@ -6,8 +6,8 @@
         "unitree-sdk2-src": "unitree-sdk2-src"
       },
       "locked": {
-        "lastModified": 1791469003,
-        "narHash": "sha256-C4IAYwGcUFgNR5/Fql06MIMDU78t0Q0+Aw0ur6+H6i0=",
+        "lastModified": 1791805968,
+        "narHash": "sha256-nWOEzvAZZZmBGHppYQWQPduY5zhKDjtwsrnnSiHowT8=",
         "path": "/home/progressio/ost/git/go2/devvm/data/go2hs",
         "type": "path"
       },
