@@ -21,7 +21,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    go2hs.url = "path:/home/progressio/ost/git/go2/devvm/data/go2hs"; # or a git URL
+    # go2hs.url = "path:/home/progressio/ost/git/go2/devvm/data/go2hs"; # or a git URL
+    go2hs.url = "path:/home/progressio/ost/git/go2/go2-voice-agent"; # or a git URL
 
     noctalia.url = "github:noctalia-dev/noctalia/cachix";
 

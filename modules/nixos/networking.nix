@@ -2,6 +2,20 @@
 # VPN profiles are in vpn.nix.
 { pkgs, ... }:
 {
+  # Local DNS-over-HTTPS proxy. lb-pub blocks normal DNS (port 53/853),
+  # but HTTPS works, so lb-pub sends its DNS here.
+  systemd.services.doh-proxy = {
+    description = "Local DNS-over-HTTPS proxy (used by lb-pub)";
+    wantedBy = [ "multi-user.target" ];
+    after = [ "network.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.dnsproxy}/bin/dnsproxy --listen=127.0.0.1 --port=53 --upstream=https://1.1.1.1/dns-query --upstream=https://9.9.9.9/dns-query --cache";
+      DynamicUser = true;
+      AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
+      CapabilityBoundingSet = [ "CAP_NET_BIND_SERVICE" ];
+      Restart = "on-failure";
+    };
+  };
   networking = {
     networkmanager = {
       enable = true;
@@ -34,5 +48,11 @@
 
     # needed for VPN DNS to work correctly with NetworkManager
     resolvconf.enable = true;
+
+    nat = {
+      enable = true;
+      internalInterfaces = [ "enp1s0f0" ]; # robot cable
+      externalInterface = "wlp2s0"; # your Wi-Fi
+    };
   };
 }
