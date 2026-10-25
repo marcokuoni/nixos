@@ -52,7 +52,11 @@
     users.progressio.imports = [ ../../home/progressio.nix ];
   };
 
-  nixpkgs.overlays = [ (import ../../pkgs/overlay.nix inputs) ];
+  nixpkgs.overlays = [
+    (import ../../pkgs/overlay.nix inputs)
+    # pkgs.waac (with waa-lsp) and pkgs.vimPlugins.waa-nvim
+    inputs.board.overlays.default
+  ];
 
   # reMarkable tablet: cloud sync + notebooks converted to PDF
   services.remarkable-sync = {

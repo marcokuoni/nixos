@@ -1,0 +1,66 @@
+diff --git a/flake.nix b/flake.nix
+index 4298a4d..cf9ee5a 100644
+--- a/flake.nix
++++ b/flake.nix
+@@ -24,6 +24,12 @@
+     # go2hs.url = "path:/home/progressio/ost/git/go2/devvm/data/go2hs"; # or a git URL
+     go2hs.url = "path:/home/progressio/ost/git/go2/go2-voice-agent"; # or a git URL
+ 
++    # the ESP32-C6 board project: waac, waa-lsp and the Neovim plugin for .waa
++    board = {
++      url = "path:/home/progressio/src/new_setup_guestInControl"; # or git+file:///… (only tracked files)
++      inputs.nixpkgs.follows = "nixpkgs";
++    };
++
+     noctalia.url = "github:noctalia-dev/noctalia/cachix";
+ 
+     projecteur-src = {
+diff --git a/home/nvim/default.nix b/home/nvim/default.nix
+index 95a3d91..b81189a 100644
+--- a/home/nvim/default.nix
++++ b/home/nvim/default.nix
+@@ -89,6 +89,12 @@ let
+       name = "mini.pairs";
+       path = mini-nvim;
+     }
++    # .waa files: filetype, syntax, waa-lsp (from the board flake's overlay;
++    # it starts waa-lsp from the Nix store, so no extraPackages entry needed)
++    {
++      name = "waa.nvim";
++      path = waa-nvim;
++    }
+   ];
+ 
+   lazyPlugins = pkgs.linkFarm "lazy-plugins" (
+diff --git a/home/nvim/lua/plugins/waa.lua b/home/nvim/lua/plugins/waa.lua
+new file mode 100644
+index 0000000..51d07ee
+--- /dev/null
++++ b/home/nvim/lua/plugins/waa.lua
+@@ -0,0 +1,9 @@
++-- .waa board descriptions: filetype, syntax highlighting and waa-lsp
++-- (diagnostics, hover with the WIT docs and datasheet notes, go to
++-- definition, completion). The plugin comes from the board flake
++-- (plugins in default.nix); it finds the project's WIT through the
++-- waac.args next to setup.waa.
++return {
++  -- tiny, and needed before the first .waa file is opened
++  { "marcokuoni/waa.nvim", lazy = false },
++}
+diff --git a/hosts/laptop/default.nix b/hosts/laptop/default.nix
+index bc0ae30..6e0dfaf 100644
+--- a/hosts/laptop/default.nix
++++ b/hosts/laptop/default.nix
+@@ -52,7 +52,11 @@
+     users.progressio.imports = [ ../../home/progressio.nix ];
+   };
+ 
+-  nixpkgs.overlays = [ (import ../../pkgs/overlay.nix inputs) ];
++  nixpkgs.overlays = [
++    (import ../../pkgs/overlay.nix inputs)
++    # pkgs.waac (with waa-lsp) and pkgs.vimPlugins.waa-nvim
++    inputs.board.overlays.default
++  ];
+ 
+   # reMarkable tablet: cloud sync + notebooks converted to PDF
+   services.remarkable-sync = {

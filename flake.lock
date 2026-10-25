@@ -1,5 +1,23 @@
 {
   "nodes": {
+    "board": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-overlay": "rust-overlay"
+      },
+      "locked": {
+        "lastModified": 1792870068,
+        "narHash": "sha256-LOpXaIrHX7tgle6DEYVoizAJG0OMjSgAD2MRWLjJGH0=",
+        "path": "/home/progressio/ost/git/gpio-wasm-project-vm/data/gpio-wasm-project/new_setup_guestInControl_v7",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/progressio/ost/git/gpio-wasm-project-vm/data/gpio-wasm-project/new_setup_guestInControl_v7",
+        "type": "path"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -258,6 +276,7 @@
     },
     "root": {
       "inputs": {
+        "board": "board",
         "go2hs": "go2hs",
         "home-manager": "home-manager",
         "niri": "niri",
@@ -280,6 +299,27 @@
       "original": {
         "owner": "ros",
         "repo": "rosdistro",
+        "type": "github"
+      }
+    },
+    "rust-overlay": {
+      "inputs": {
+        "nixpkgs": [
+          "board",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792825530,
+        "narHash": "sha256-aphXA2IFNd3q48++TKmfuuvDDjkrgGdJDnDIhij9684=",
+        "owner": "oxalica",
+        "repo": "rust-overlay",
+        "rev": "5b9f1198b59bcb31c5c3250b332e7d77590e6306",
+        "type": "github"
+      },
+      "original": {
+        "owner": "oxalica",
+        "repo": "rust-overlay",
         "type": "github"
       }
     },

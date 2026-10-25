@@ -89,6 +89,12 @@ let
       name = "mini.pairs";
       path = mini-nvim;
     }
+    # .waa files: filetype, syntax, waa-lsp (from the board flake's overlay;
+    # it starts waa-lsp from the Nix store, so no extraPackages entry needed)
+    {
+      name = "waa.nvim";
+      path = waa-nvim;
+    }
   ];
 
   lazyPlugins = pkgs.linkFarm "lazy-plugins" (
