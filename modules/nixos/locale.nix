@@ -20,6 +20,12 @@
     };
   };
 
-  # Swiss German keyboard on the text console
-  console.keyMap = "de_CH-latin1";
+  # Swiss German keyboard (Caps Lock <-> Escape) on the text console,
+  # derived from the same XKB settings niri uses
+  services.xserver.xkb = {
+    layout = "ch";
+    variant = "de_nodeadkeys";
+    options = "caps:swapescape";
+  };
+  console.useXkbConfig = true;
 }

@@ -74,12 +74,12 @@
   };
 
   # Unitree Go2 robot dev network
-  go2 = {
-    enable = true;
-    interface = "enp1s0f0";
-    address = "192.168.123.99"; # default
-    ollama = true;
-  };
+  # go2 = {
+  #   enable = true;
+  #   interface = "enp1s0f0";
+  #   address = "192.168.123.99"; # default
+  #   ollama = true;
+  # };
 
   system.stateVersion = "25.05";
 }

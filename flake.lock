@@ -9,7 +9,7 @@
       },
       "locked": {
         "lastModified": 1792870068,
-        "narHash": "sha256-LOpXaIrHX7tgle6DEYVoizAJG0OMjSgAD2MRWLjJGH0=",
+        "narHash": "sha256-ocSK2bzDQLEI1OcSpAwK5ZVklSXD2I4Q4treTBkCeXA=",
         "path": "/home/progressio/ost/git/gpio-wasm-project-vm/data/gpio-wasm-project/new_setup_guestInControl_v7",
         "type": "path"
       },
@@ -47,13 +47,13 @@
         "unitree-ros2-src": "unitree-ros2-src"
       },
       "locked": {
-        "lastModified": 1792308510,
-        "narHash": "sha256-eswpcT2dwhLMB+IuunenVkTW8amKdu1OqPdhIHXnt/Y=",
-        "path": "/home/progressio/ost/git/go2/go2-voice-agent",
+        "lastModified": 1793096176,
+        "narHash": "sha256-S3sxokc4TLaQ/Pe/wpnmsCkwSbT8w+x/XX/5ipbcWSI=",
+        "path": "/home/progressio/ost/git/go2/go2_infi",
         "type": "path"
       },
       "original": {
-        "path": "/home/progressio/ost/git/go2/go2-voice-agent",
+        "path": "/home/progressio/ost/git/go2/go2_infi",
         "type": "path"
       }
     },

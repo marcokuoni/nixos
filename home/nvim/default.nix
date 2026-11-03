@@ -44,6 +44,7 @@ let
     plenary-nvim
     render-markdown-nvim
     snacks-nvim
+    smear-cursor-nvim
     todo-comments-nvim
     tokyonight-nvim
     trouble-nvim

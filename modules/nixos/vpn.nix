@@ -29,12 +29,12 @@
           remote-cert-tls = "server";
           data-ciphers = "AES-256-GCM";
         };
-        ipv4 = {
-          method = "auto";
-          ignore-auto-dns = true;
-          dns = "127.0.0.1;";
-          dns-priority = -50;
-        };
+        # ipv4 = {
+        #   method = "auto";
+        #   ignore-auto-dns = true;
+        #   dns = "127.0.0.1;";
+        #   dns-priority = -50;
+        # };
       };
 
       # Public LB VPN (certificate-based OpenVPN)

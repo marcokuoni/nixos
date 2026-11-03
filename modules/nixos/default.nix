@@ -12,6 +12,7 @@
     ./printing.nix
     ./power.nix
     ./devices.nix
+    ./kanata.nix
     ./development.nix
     ./remarkable
     ./remarkable/rmdoc-to-pdf.nix
