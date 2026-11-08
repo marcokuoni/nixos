@@ -22,7 +22,7 @@
     };
 
     # go2hs.url = "path:/home/progressio/ost/git/go2/devvm/data/go2hs"; # or a git URL
-    go2hs.url = "path:/home/progressio/ost/git/go2/go2_infi"; # or a git URL
+    go2hs.url = "path:/home/progressio/ost/git/go2/devvm/data/go2_infi"; # or a git URL
 
     # the ESP32-C6 board project: waac, waa-lsp and the Neovim plugin for .waa
     board = {

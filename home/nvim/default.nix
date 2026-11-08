@@ -8,6 +8,7 @@
 # Everything about *how* nvim behaves lives in ./lua — edit those files
 # like any normal LazyVim config.
 {
+  config,
   lib,
   pkgs,
   ...
@@ -313,15 +314,14 @@ in
       source = ./lua;
       recursive = true;
     };
+  };
 
-    # Noctalia fills lua/matugen-template.lua with the current wallpaper colors
-    # and tells nvim to reload them
-    "noctalia/user-templates.toml".text = ''
-      [templates.nvim-base16]
-      input_path = "~/.config/nvim/lua/matugen-template.lua"
-      output_path = "~/.config/nvim/lua/matugen.lua"
-      post_hook = 'pkill -SIGUSR1 nvim'
-    '';
+  # Noctalia fills lua/matugen-template.lua with the current wallpaper colors
+  # and tells nvim to reload them
+  programs.noctalia.settings.theme.templates.user.nvim-base16 = {
+    input_path = "${config.xdg.configHome}/nvim/lua/matugen-template.lua";
+    output_path = "${config.xdg.configHome}/nvim/lua/matugen.lua";
+    post_hook = "pkill -USR1 -x nvim";
   };
 
   home.sessionVariables = {

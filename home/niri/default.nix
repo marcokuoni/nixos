@@ -114,6 +114,11 @@
               repeat = false;
               action.spawn = "ghostty";
             };
+            # For the terminal to reload ctrl+shift+,
+            "Mod+Shift+T" = {
+              repeat = false;
+              action = spawn "noctalia" "msg" "theme-mode-toggle";
+            };
             "Mod+N" = {
               repeat = false;
               action.spawn-sh = "ghostty --command=nvim";
