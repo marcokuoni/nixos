@@ -15,7 +15,7 @@
       theme = {
         mode = "dark";
         source = "builtin";
-        builtin = "Ayu";
+        builtin = "Catppuccin"; # (Mod+Shift+T toggles, Ctrl+Shift+, reloads)
       };
 
       wallpaper.automation = {
