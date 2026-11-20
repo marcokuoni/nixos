@@ -11,9 +11,6 @@
     };
 
     initrd = {
-      # systemd in the initrd is needed for FIDO2 (YubiKey) disk unlocking
-      systemd.enable = true;
-
       luks.devices.cryptroot = {
         device = "/dev/disk/by-partlabel/CRYPTROOT";
         # unlock with a YubiKey; without one, a passphrase is asked after the

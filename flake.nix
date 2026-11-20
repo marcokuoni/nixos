@@ -26,7 +26,7 @@
 
     # the ESP32-C6 board project: waac, waa-lsp and the Neovim plugin for .waa
     board = {
-      url = "path:/home/progressio/ost/git/gpio-wasm-project-vm/data/gpio-wasm-project/new_setup_guestInControl_v7"; # or git+file:///… (only tracked files)
+      url = "path:/home/progressio/ost/git/waa-compiler/data"; # or git+file:///… (only tracked files)
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

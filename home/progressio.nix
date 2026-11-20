@@ -25,6 +25,18 @@ in
     nextcloud-client.enable = true;
   };
 
+  # systemd starts Nextcloud as soon as niri's session is up, but the tray
+  # (Noctalia, spawned by niri) appears a moment later. Nextcloud only looks
+  # for a tray once, at startup, so its icon would never show. Wait for the
+  # tray first (at most 60 s, then start anyway).
+  systemd.user.services.nextcloud-client.Service.ExecStartPre =
+    "${pkgs.writeShellScript "wait-for-tray" ''
+      for _ in $(seq 60); do
+        ${pkgs.systemd}/bin/busctl --user status org.kde.StatusNotifierWatcher >/dev/null 2>&1 && exit 0
+        sleep 1
+      done
+    ''}";
+
   programs = {
     git = {
       enable = true;

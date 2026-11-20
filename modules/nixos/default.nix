@@ -16,5 +16,6 @@
     ./development.nix
     ./remarkable
     ./remarkable/rmdoc-to-pdf.nix
+    ./insecure.nix
   ];
 }
