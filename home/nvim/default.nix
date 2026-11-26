@@ -66,6 +66,8 @@ let
     vim-dadbod # sql
     vim-dadbod-completion
     vim-dadbod-ui
+    vimtex # tex
+    ltex_extra-nvim # LTeX+ dictionaries (plugins/latex.lua)
     # plugins whose nixpkgs name differs from the name LazyVim uses
     {
       name = "typst-preview.nvim";
@@ -149,6 +151,7 @@ let
     yaml
     # also used
     bash
+    bibtex
     diff
     latex
     lua
@@ -282,10 +285,29 @@ in
       tinymist
       typstyle
 
-      # LaTeX
-      tectonic
+      # LaTeX (vimtex compiles with latexmk, views in zathura)
+      (texliveMedium.withPackages (
+        ps: with ps; [
+          latexmk
+          biber
+          biblatex
+          chktex # linter, run by texlab
+          cleveref
+          csquotes
+          glossaries
+          todonotes
+          minted
+        ]
+      ))
+      texlab
+      tex-fmt
+      tectonic # for projects with a Tectonic.toml
       ghostscript
       python313Packages.pylatexenc
+      python3Packages.pygments # minted
+
+      # Grammar / spelling (LanguageTool, runs locally): LaTeX, BibTeX, Typst
+      ltex-ls-plus
 
       # Shell
       shfmt

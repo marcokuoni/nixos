@@ -26,7 +26,7 @@
 
     # the ESP32-C6 board project: waac, waa-lsp and the Neovim plugin for .waa
     board = {
-      url = "path:/home/progressio/ost/git/waa-compiler/data"; # or git+file:///… (only tracked files)
+      url = "path:/home/progressio/ost/git/vendor-and-language-independent-hardware-abstraction-layer/waa-compiler/data"; # or git+file:///… (only tracked files)
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

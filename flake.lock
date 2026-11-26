@@ -9,13 +9,13 @@
         ]
       },
       "locked": {
-        "lastModified": 1795105186,
-        "narHash": "sha256-wEqObzLHohF9aintqs6bpSTqBo+3UjwEtIFyHDwGH+A=",
-        "path": "/home/progressio/ost/git/waa-compiler/data",
+        "lastModified": 1795632766,
+        "narHash": "sha256-8JgJNCVxFDdknzNjEIxktY4EssGQQHFNVBkJT1T98WA=",
+        "path": "/home/progressio/ost/git/vendor-and-language-independent-hardware-abstraction-layer/waa-compiler/data",
         "type": "path"
       },
       "original": {
-        "path": "/home/progressio/ost/git/waa-compiler/data",
+        "path": "/home/progressio/ost/git/vendor-and-language-independent-hardware-abstraction-layer/waa-compiler/data",
         "type": "path"
       }
     },
@@ -67,7 +67,7 @@
       },
       "locked": {
         "lastModified": 1794159279,
-        "narHash": "sha256-8+HUz8OyVuPkX58QFS4Q6O/6cHGjMJR+8ISNUWEyPdU=",
+        "narHash": "sha256-dCqPEN6kjeAMQIsTUIiBr6HI9C9hPk5Dkhq8W+EZUpQ=",
         "path": "/home/progressio/ost/git/go2/devvm/data/go2_infi",
         "type": "path"
       },

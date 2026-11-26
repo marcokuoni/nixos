@@ -29,7 +29,10 @@ function M.setup()
 		base0C = "{{colors.tertiary_fixed_dim.default.hex}}",
 		base0D = "{{colors.primary_fixed_dim.default.hex}}",
 		base0E = "{{colors.secondary_fixed_dim.default.hex}}",
-		base0F = "{{colors.error_container.default.hex}}",
+		-- base0F colors punctuation (. , ; brackets via Delimiter /
+		-- @punctuation.*). error_container is a *background* tint (30 % accent
+		-- over surface), ~1.8:1 contrast as text — use a readable muted tone.
+		base0F = "{{colors.on_surface_variant.default.hex}}",
 	})
 end
 

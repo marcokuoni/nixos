@@ -17,6 +17,7 @@ home/nvim/
     │   ├── dap.lua      # Debugging PHP / Rust / C# / JS
     │   ├── editor.lua   # snacks (Terminal = zsh), Completion (blink.cmp)
     │   ├── format.lua   # conform + nvim-lint
+    │   ├── latex.lua    # vimtex, texlab, LTeX+ (Grammatik/Rechtschreibung)
     │   ├── lsp.lua      # html, css, xml, omnisharp, tinymist
     │   ├── nix.lua      # Mason aus, Treesitter aus dem Nix-Ordner, debugpy
     │   └── typst.lua
@@ -34,6 +35,39 @@ home/nvim/
   gelten Parser als installiert, sonst schaltet LazyVim kein Highlighting ein.
 - Store-Pfade, die Lua braucht (Debug-Adapter, Plugin-Ordner), stehen in
   `require("nix")`, gesetzt in `initLua` in `default.nix`.
+
+## LaTeX
+
+| Teil | Rolle |
+| ---- | ----- |
+| **vimtex** | Kompilieren (latexmk, kontinuierlich), Zathura-Viewer mit SyncTeX, Motions/Textobjekte (`ie`/`ae` Umgebung, `i$`/`a$` Mathe, `cse` Umgebung umbenennen, `dse` löschen, `tsf` `\frac` ↔ `/`) |
+| **texlab** | LSP: Completion von `\ref`/`\cite`/Befehlen, Goto-Definition, Rename von Labels, chktex beim Öffnen/Speichern |
+| **LTeX+** | LanguageTool lokal: Grammatik, Stil, Rechtschreibung für `.tex`, `.bib`, `.typ`, Git-Commits. Versteht LaTeX-Befehle und Mathe |
+| **tex-fmt** | Formatter (statt latexindent: schneller, kein `indent.log`) |
+| **TeX Live** | `texliveMedium` + latexmk, biber/biblatex, cleveref, glossaries, minted … (Liste in `default.nix`) |
+
+Keymaps (`<localleader>` = `\`):
+
+| Keybind | Aktion |
+| ------- | ------ |
+| `\ll` | Kompilieren an/aus (kontinuierlich bei jedem `:w`) |
+| `\lv` | PDF in Zathura an Cursorposition zeigen (Ctrl+Klick in Zathura springt zurück) |
+| `\le` | Fehler/Warnungen (Quickfix) |
+| `\lt` | Inhaltsverzeichnis |
+| `\lc` | Hilfsdateien aufräumen |
+| `<leader>ca` | LTeX-Vorschlag übernehmen / Wort ins Wörterbuch / Regel abschalten |
+| `<leader>K` | Doku zum Paket unter dem Cursor |
+
+**Sprache:** Standard ist `en-US` (picky rules an, Muttersprache Deutsch →
+erkennt *false friends*). Pro Datei umstellen mit einer Zeile ganz oben:
+`% LTeX: language=de-CH` (Typst: `// LTeX: language=de-CH`). Global in
+`lua/plugins/latex.lua` (`ltex_plus.settings.ltex.language`).
+
+**Wörterbuch:** „Add to dictionary“ etc. landet in `~/.local/share/nvim/ltex/`
+(eine Datei pro Sprache, für alle Projekte). Nicht im Repo, weil nvim reinschreibt.
+
+**Markdown** wird bewusst nicht geprüft (gemischt Deutsch/Englisch im Vault).
+Bei Bedarf `"markdown"` in `ltex_plus.filetypes` ergänzen.
 
 ---
 

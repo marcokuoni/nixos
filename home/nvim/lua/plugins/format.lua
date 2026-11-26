@@ -11,6 +11,9 @@ return {
         json = { "prettierd", "prettier", "jq", stop_after_first = true },
         jsonc = { "biome", "fixjson", "prettierd", "prettier", stop_after_first = true },
         cs = { "csharpier" },
+        -- latexindent is slow and leaves indent.log files around
+        tex = { "tex-fmt" },
+        plaintex = { "tex-fmt" },
         -- typst is formatted by tinymist (plugins/lsp.lua)
       },
     },
